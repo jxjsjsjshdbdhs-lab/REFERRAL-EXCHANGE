@@ -330,9 +330,8 @@
             const userId = getTelegramUserId();
             const appUrl = window.location.href.split('#')[0].split('?')[0];
 
-            // This link is prepared for later server/bot integration.
-            // The actual bot username should be supplied by the Mini App configuration.
-            const configuredBot = window.APP_BOT_USERNAME || "YourBot";
+            // رابط الإحالة يفتح نفس البوت Getttttsbot مع كود المستخدم الخاص به.
+            const configuredBot = window.APP_BOT_USERNAME || "Getttttsbot";
             const link = `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
 
             box.innerText = link;
