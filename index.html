@@ -95,13 +95,7 @@
         <div class="stat-box"><div class="stat-val" id="completed-cnt">0</div><div class="stat-lbl">روابط زرتها</div></div>
     </div>
 
-    <div class="banner">
-        <div>
-            <h4 style="color:var(--amber); font-size:11pt;">شراء نقاط سريعة ⚡</h4>
-            <p style="font-size:8pt; color:var(--muted);">100 نقطة مقابل 0.05 Gram</p>
-        </div>
-        <button class="btn btn-amber" style="width:auto;" onclick="openModal('buy-modal')">شراء الآن</button>
-    </div>
+    <!-- المتجر مؤجل حالياً -->
 
     <!-- Active Task Card -->
     <div class="card" id="task-card">
@@ -111,6 +105,27 @@
         </div>
         <div class="link-box" id="task-url">https://t.me/example_bot</div>
         <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
+    </div>
+
+    <!-- Referral Card -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-weight:800; font-size:10pt;">نظام الإحالة 👥</span>
+            <span style="font-size:8pt; background:rgba(52,211,153,0.15); color:var(--emerald); padding:3px 7px; border-radius:7px;">+40 نقطة</span>
+        </div>
+        <p style="font-size:8.5pt; color:var(--muted); margin-bottom:8px;">
+            ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.
+        </p>
+        <div class="link-box" id="referral-url">جارٍ تجهيز رابط الإحالة...</div>
+        <div style="display:flex; gap:8px;">
+            <button class="btn btn-emerald" onclick="copyReferral()">📋 نسخ الرابط</button>
+            <button class="btn btn-purple" onclick="shareReferral()">📤 مشاركة</button>
+        </div>
+        <div style="margin-top:10px; font-size:8.5pt; color:var(--muted);">
+            عدد الإحالات: <b id="ref-count" style="color:#fff;">0</b>
+            &nbsp;|&nbsp;
+            نقاط الإحالة: <b id="ref-points" style="color:var(--amber);">0</b>
+        </div>
     </div>
 
     <!-- My Link Card -->
@@ -158,8 +173,8 @@
     <!-- Bottom Navigation -->
     <div class="nav">
         <div class="nav-item" onclick="alert('أنت في الصفحة الرئيسية')">🏠<br>الرئيسية</div>
-        <div class="nav-item" onclick="openModal('buy-modal')">💎<br>المتجر</div>
-        <div class="nav-item" onclick="alert('رابط إحالتك:\nhttps://t.me/YourBot?start=123')">👥<br>الإحالة</div>
+        <div class="nav-item" onclick="showReferral()">👥<br>الإحالة</div>
+        <div class="nav-item" onclick="alert('المتجر غير متاح حالياً')">💎<br>المتجر</div>
     </div>
 
     <script>
@@ -172,6 +187,8 @@
         let gram = parseFloat(localStorage.getItem('gram')) || 0.50;
         let myLink = JSON.parse(localStorage.getItem('myLink')) || null;
         let visitedTasks = JSON.parse(localStorage.getItem('visitedTasks')) || [];
+        let referralCount = parseInt(localStorage.getItem('referralCount')) || 0;
+        let referralPoints = parseInt(localStorage.getItem('referralPoints')) || 0;
 
         // All active referral tasks
         let tasks = JSON.parse(localStorage.getItem('globalTasks')) || [
@@ -193,21 +210,107 @@
             let curTask = getNextAvailableTask();
             let cardBox = document.getElementById('task-card');
 
-            if(curTask) {
+            if (curTask) {
                 cardBox.style.display = 'block';
-                document.getElementById('task-user').innerText = "ناشر الرابط: " + curTask.user;
-                document.getElementById('task-left').innerText = "متبقي: " + curTask.left;
-                document.getElementById('task-url').innerText = curTask.url;
+                cardBox.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:800; font-size:10pt;" id="task-user">ناشر الرابط: ${escapeHtml(curTask.user)}</span>
+                        <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">متبقي: ${curTask.left}</span>
+                    </div>
+                    <div class="link-box" id="task-url">${escapeHtml(curTask.url)}</div>
+                    <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
+                `;
             } else {
                 cardBox.innerHTML = `<div style="text-align:center; padding:15px; color:var(--muted); font-size:10pt;">🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.</div>`;
             }
 
             let infoBox = document.getElementById('my-task-info');
-            if(myLink) {
-                infoBox.innerHTML = `<b style="color:var(--cyan);">${myLink.url}</b><br>المتبقي: ${myLink.cnt} زيارة`;
+            if (myLink) {
+                infoBox.innerHTML = `<b style="color:var(--cyan);">${escapeHtml(myLink.url)}</b><br>المتبقي: ${myLink.cnt} زيارة`;
             } else {
                 infoBox.innerText = "لا يوجد رابط مضاف حالياً.";
             }
+
+            document.getElementById('ref-count').innerText = referralCount;
+            document.getElementById('ref-points').innerText = referralPoints;
+
+            buildReferralLink();
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, ch => ({
+                '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+            }[ch]));
+        }
+
+        function getTelegramUserId() {
+            try {
+                return window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function buildReferralLink() {
+            const box = document.getElementById('referral-url');
+            if (!box) return;
+
+            const botUsername =
+                window.Telegram?.WebApp?.initDataUnsafe?.user?.username
+                ? null
+                : null;
+
+            // Telegram provides the launch parameters through start_param.
+            // If no bot username is available from the client, keep a safe placeholder.
+            const userId = getTelegramUserId();
+            const appUrl = window.location.href.split('#')[0].split('?')[0];
+
+            // This link is prepared for later server/bot integration.
+            // The actual bot username should be supplied by the Mini App configuration.
+            const configuredBot = window.APP_BOT_USERNAME || "YourBot";
+            const link = `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
+
+            box.innerText = link;
+            box.dataset.referral = link;
+        }
+
+        function copyReferral() {
+            const box = document.getElementById('referral-url');
+            const link = box?.dataset?.referral || box?.innerText || '';
+            if (!link) return;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(link).then(() => alert("تم نسخ رابط الإحالة ✅"));
+            } else {
+                const temp = document.createElement('textarea');
+                temp.value = link;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                temp.remove();
+                alert("تم نسخ رابط الإحالة ✅");
+            }
+        }
+
+        function shareReferral() {
+            const box = document.getElementById('referral-url');
+            const link = box?.dataset?.referral || box?.innerText || '';
+            if (!link) return;
+
+            const text = "انضم عن طريقي واحصل على فرصة لجمع النقاط 👥";
+            if (window.Telegram?.WebApp?.openTelegramLink) {
+                window.Telegram.WebApp.openTelegramLink(
+                    `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`
+                );
+            } else if (navigator.share) {
+                navigator.share({ text, url: link }).catch(() => {});
+            } else {
+                copyReferral();
+            }
+        }
+
+        function showReferral() {
+            document.getElementById('referral-url')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -257,7 +360,7 @@
             let u = document.getElementById('add-url').value.trim();
             let c = parseInt(document.getElementById('add-cnt').value);
 
-            if(!u || !c || c < 1) {
+            if(!u || c < 1 || c > 100000) {
                 alert("يرجى كتابة الرابط وتحديد عدد الزيارات!");
                 return;
             }
@@ -283,6 +386,8 @@
             alert("تم إنشاء المهمة ونشر رابطك بنجاح!");
         }
 
+        // ملاحظة: احتساب الإحالة +40 بشكل نهائي يحتاج Bot/Server للتحقق من مستخدم Telegram.
+        // هنا يتم تجهيز الرابط والواجهة فقط، حتى لا يمكن للمستخدم منح نفسه نقاطاً بالتلاعب بالمتصفح.
         render();
     </script>
 </body>
