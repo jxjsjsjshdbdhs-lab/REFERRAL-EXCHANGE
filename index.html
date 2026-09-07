@@ -3,585 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Referral Exchange Mini App</title>
+    <title>Exchange App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-grad-start: #0f172a;
-            --bg-grad-end: #1e1b4b;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --accent-purple: #818cf8;
-            --accent-cyan: #22d3ee;
-            --accent-emerald: #34d399;
-            --accent-amber: #fbbf24;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-start: #0f172a;
+            --bg-end: #1e1b4b;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --purple: #818cf8;
+            --cyan: #22d3ee;
+            --emerald: #34d399;
+            --amber: #fbbf24;
+            --text: #f8fafc;
+            --muted: #94a3b8;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
 
         body {
-            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
             background-attachment: fixed;
-            color: var(--text-main);
+            color: var(--text);
             padding: 16px;
-            padding-bottom: 95px;
+            padding-bottom: 90px;
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
         }
 
-        /* Header Title */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .title { font-size: 20pt; font-weight: 900; color: var(--cyan); }
+        .pill { background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: 20px; font-size: 10pt; font-weight: 700; }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+        .stat-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 10px; text-align: center; }
+        .stat-val { font-size: 14pt; font-weight: 900; color: white; }
+        .stat-lbl { font-size: 8pt; color: var(--muted); margin-top: 4px; }
+
+        .banner {
+            background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.3));
+            border: 1px solid var(--amber); border-radius: 16px; padding: 14px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
         }
 
-        .header-title {
-            font-size: 22pt;
-            font-weight: 900;
-            background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+        .btn-gold {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;
+            border: none; border-radius: 10px; padding: 8px 16px; font-weight: 800; cursor: pointer;
         }
 
-        .user-pill {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--card-border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 10pt;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .btn-purple {
+            background: linear-gradient(135deg, var(--purple), #6366f1); color: white;
+            border: none; border-radius: 12px; padding: 12px; width: 100%; font-size: 11pt; font-weight: 800; cursor: pointer;
         }
 
-        /* Stats Grid - Modern Glassmorphism */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 20px; }
+        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .link-box { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); padding: 10px; border-radius: 10px; font-size: 9pt; color: var(--cyan); margin-bottom: 12px; text-align: left; direction: ltr; word-break: break-all; }
+
+        /* Popups / Modals */
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.9);
+            display: none; align-items: center; justify-content: center;
+            z-index: 999; padding: 16px;
         }
 
-        .stat-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 12px 8px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
+        .modal-content { background: #1e293b; border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; width: 100%; max-width: 380px; }
+        .inp { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 10px; color: white; margin: 8px 0 16px 0; outline: none; }
+
+        .nav {
+            position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 32px); max-width: 440px;
+            background: rgba(30, 41, 59, 0.95); border: 1px solid var(--card-border);
+            border-radius: 20px; display: flex; justify-content: space-around; padding: 10px 0;
         }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 3px;
-        }
-
-        .stat-card.purple::before { background: var(--accent-purple); }
-        .stat-card.amber::before { background: var(--accent-amber); }
-        .stat-card.cyan::before { background: var(--accent-cyan); }
-
-        .stat-icon {
-            font-size: 16pt;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 15pt;
-            font-weight: 900;
-            color: #ffffff;
-            line-height: 1.1;
-        }
-
-        .stat-label {
-            font-size: 7.5pt;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* Buy Points Banner */
-        .buy-banner {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.25));
-            border: 1px solid rgba(251, 191, 36, 0.4);
-            border-radius: 18px;
-            padding: 14px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.1);
-        }
-
-        .buy-info h4 {
-            font-size: 12pt;
-            font-weight: 800;
-            color: var(--accent-amber);
-            margin-bottom: 2px;
-        }
-
-        .buy-info p {
-            font-size: 8.5pt;
-            color: var(--text-muted);
-        }
-
-        .btn-buy {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0f172a;
-            border: none;
-            border-radius: 12px;
-            padding: 8px 16px;
-            font-size: 10pt;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .btn-buy:active {
-            transform: scale(0.96);
-        }
-
-        /* Task Card */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .section-title {
-            font-size: 11pt;
-            font-weight: 800;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-        }
-
-        .task-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .task-header {
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid var(--card-border);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 13pt;
-            box-shadow: 0 2px 8px rgba(129, 140, 248, 0.4);
-        }
-
-        .username {
-            font-size: 11pt;
-            font-weight: 800;
-        }
-
-        .clicks-badge {
-            background: rgba(34, 211, 238, 0.15);
-            border: 1px solid rgba(34, 211, 238, 0.3);
-            border-radius: 12px;
-            padding: 4px 10px;
-            color: var(--accent-cyan);
-            font-size: 9pt;
-            font-weight: 800;
-        }
-
-        .task-body {
-            padding: 16px;
-        }
-
-        .link-pill {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-size: 9.5pt;
-            color: var(--accent-cyan);
-            margin-bottom: 14px;
-            word-break: break-all;
-            direction: ltr;
-            text-align: left;
-        }
-
-        .btn-main {
-            width: 100%;
-            background: linear-gradient(135deg, var(--accent-purple), #6366f1);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            padding: 14px;
-            font-size: 12pt;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: transform 0.15s;
-        }
-
-        .btn-main:active {
-            transform: scale(0.98);
-        }
-
-        /* My Tasks Section */
-        .btn-add-sm {
-            background: rgba(52, 211, 153, 0.15);
-            border: 1px solid rgba(52, 211, 153, 0.4);
-            color: var(--accent-emerald);
-            border-radius: 10px;
-            padding: 5px 12px;
-            font-size: 9.5pt;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .my-task-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 14px;
-        }
-
-        .badge-green {
-            background: rgba(52, 211, 153, 0.2);
-            color: var(--accent-emerald);
-            border: 1px solid rgba(52, 211, 153, 0.3);
-            border-radius: 6px;
-            padding: 2px 8px;
-            font-size: 8pt;
-            font-weight: 800;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 16px;
-        }
-
-        .modal-card {
-            background: #1e293b;
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 400px;
-            padding: 22px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-title {
-            font-size: 15pt;
-            font-weight: 800;
-            margin-bottom: 14px;
-            color: #ffffff;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 9pt;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            color: white;
-            font-size: 10pt;
-            outline: none;
-        }
-
-        /* Bottom Navigation Bar */
-        .bottom-nav {
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 32px);
-            max-width: 448px;
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 22px;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 4px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-            padding: 6px 14px;
-            border-radius: 14px;
-            color: var(--text-muted);
-            font-size: 8pt;
-            font-weight: 700;
-        }
-
-        .nav-item.active {
-            background: rgba(129, 140, 248, 0.15);
-            color: var(--accent-purple);
-        }
-
-        .nav-icon { font-size: 13pt; }
+        .nav-btn { color: var(--muted); font-size: 8pt; font-weight: 700; text-align: center; cursor: pointer; }
+        .nav-btn.active { color: var(--purple); }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <div class="app-header">
-        <div class="header-title">تبادل الإحالات</div>
-        <div class="user-pill">
-            <span>💎 Gram:</span>
-            <span id="gram-balance" style="color: var(--accent-amber);">0.50</span>
-        </div>
+    <div class="header">
+        <div class="title">تبادل الإحالات</div>
+        <div class="pill">💎 Gram: <span id="gram-bal" style="color:var(--amber);">0.50</span></div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-card purple">
-            <div class="stat-icon">🌐</div>
-            <div class="stat-value" id="global-clicks">41.7K</div>
-            <div class="stat-label">إجمالي النقاط</div>
-        </div>
-        <div class="stat-card amber">
-            <div class="stat-icon">🎯</div>
-            <div class="stat-value" id="click-balance">10</div>
-            <div class="stat-label">رصيد نقاطك</div>
-        </div>
-        <div class="stat-card cyan">
-            <div class="stat-icon">📥</div>
-            <div class="stat-value" id="clicks-received">0</div>
-            <div class="stat-label">الزيارات المستلمة</div>
-        </div>
+    <div class="stats">
+        <div class="stat-box"><div class="stat-val">41.7K</div><div class="stat-lbl">إجمالي النقاط</div></div>
+        <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">10</div><div class="stat-lbl">رصيدك الحالي</div></div>
+        <div class="stat-box"><div class="stat-val" id="clicks-count">0</div><div class="stat-lbl">الزيارات المستلمة</div></div>
     </div>
 
-    <!-- Buy Points Banner -->
-    <div class="buy-banner">
-        <div class="buy-info">
-            <h4>شراء نقاط سريعة ⚡</h4>
-            <p>100 نقطة مقابل <b>0.05 Gram</b></p>
+    <div class="banner">
+        <div>
+            <h4 style="color:var(--amber);">شراء نقاط سريعة ⚡</h4>
+            <p style="font-size:8pt; color:var(--muted);">100 نقطة مقابل 0.05 Gram</p>
         </div>
-        <button class="btn-buy" onclick="openBuyModal()">شراء الآن</button>
+        <button class="btn-gold" id="open-buy-btn">شراء الآن</button>
     </div>
 
-    <!-- Current Task Section -->
-    <div class="section-header">
-        <div class="section-title">المهمة الحالية (كسب النقاط)</div>
-    </div>
-
-    <div class="task-card">
-        <div class="task-header">
-            <div class="user-info">
-                <div class="avatar" id="task-avatar">M</div>
-                <div>
-                    <div style="font-size: 7.5pt; color: var(--text-muted);">ناشر الرابط</div>
-                    <div class="username" id="task-username">Muktar</div>
-                </div>
-            </div>
-            <div class="clicks-badge">
-                متبقي: <span id="task-clicks-left">6</span>
-            </div>
+    <div class="card">
+        <div class="card-head">
+            <span style="font-weight:800;" id="task-user">ناشر الرابط: Muktar</span>
+            <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:4px 8px; border-radius:8px;" id="task-left">متبقي: 6</span>
         </div>
-        <div class="task-body">
-            <div class="link-pill" id="task-link">https://t.me/example_bot</div>
-            <button class="btn-main" onclick="visitCurrentTask()">
-                <span>↗</span> زيارة الرابط وكسب +1 نقطة
-            </button>
+        <div class="link-box" id="task-url">https://t.me/example_bot</div>
+        <button class="btn-purple" id="visit-btn">↗ زيارة الرابط (+1 نقطة)</button>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-weight:800; font-size:10pt;">رابطك المنشور</span>
+            <button style="background:rgba(52,211,153,0.2); color:var(--emerald); border:1px solid var(--emerald); padding:4px 10px; border-radius:8px; font-weight:800; cursor:pointer;" id="open-add-btn">+ نشر رابط جديد</button>
         </div>
+        <div id="my-task-info" style="font-size:9pt; color:var(--muted);">لا يوجد رابط مضاف حالياً.</div>
     </div>
 
-    <!-- My Tasks Section -->
-    <div class="section-header">
-        <div class="section-title">روابطك المنشورة</div>
-        <button class="btn-add-sm" onclick="openAddModal()">+ نشر رابط جديد</button>
-    </div>
-
-    <div class="my-task-card" id="my-tasks-container">
-        <div class="badge-green">رابطك الحالي</div>
-        <div id="my-task-details" style="font-size: 9pt; color: var(--text-muted);">
-            لا يوجد رابط مضاف حالياً. اضغط على "+ نشر رابط جديد" لتوزيع رابطك!
-        </div>
-    </div>
-
-    <!-- Modal 1: Add Link -->
-    <div class="modal-overlay" id="addModal">
-        <div class="modal-card">
-            <div class="modal-title">نشر رابط إحالة جديد 🔗</div>
-            <div class="form-group">
-                <label>رابط الإحالة (رابط بوتك أو قناتك):</label>
-                <input type="url" id="input-url" class="form-input" placeholder="https://t.me/your_bot?start=123">
-            </div>
-            <div class="form-group">
-                <label>عدد الزيارات المطلوبة (كل زيارة = 1 نقطة):</label>
-                <input type="number" id="input-clicks" class="form-input" placeholder="مثال: 10" min="1">
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 18px;">
-                <button class="btn-main" style="background: linear-gradient(135deg, var(--accent-emerald), #059669);" onclick="submitNewTask()">نشر الرابط</button>
-                <button class="btn-main" style="background: rgba(255,255,255,0.1); color: white;" onclick="closeAddModal()">إلغاء</button>
+    <!-- Modal: Buy Points -->
+    <div class="modal" id="buy-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:12px;">شراء النقاط بـ Gram 💎</h3>
+            <label style="font-size:9pt; color:var(--muted);">اختر الباقة:</label>
+            <select class="inp" id="buy-pkg">
+                <option value="100">100 نقطة = 0.05 Gram</option>
+                <option value="300">300 نقطة = 0.15 Gram</option>
+                <option value="500">500 نقطة = 0.25 Gram</option>
+                <option value="1000">1000 نقطة = 0.50 Gram</option>
+            </select>
+            <div style="display:flex; gap:8px;">
+                <button class="btn-gold" style="flex:1;" id="confirm-buy-btn">تأكيد الشراء</button>
+                <button class="btn-purple" style="flex:1; background:rgba(255,255,255,0.1);" id="close-buy-btn">إلغاء</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal 2: Buy Points -->
-    <div class="modal-overlay" id="buyModal">
-        <div class="modal-card">
-            <div class="modal-title">شراء نقاط عملة Gram 💎</div>
-            <div class="form-group">
-                <label>اختر باقة النقاط:</label>
-                <select id="buy-package" class="form-input" style="background:#0f172a;" onchange="updateBuyPrice()">
-                    <option value="100">100 نقطة (0.05 Gram)</option>
-                    <option value="300">300 نقطة (0.15 Gram)</option>
-                    <option value="500">500 نقطة (0.25 Gram)</option>
-                    <option value="1000">1000 نقطة (0.50 Gram)</option>
-                </select>
-            </div>
-            <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 16px; font-size: 9pt; color: var(--text-muted);">
-                السعر الإجمالي: <b id="total-price" style="color: var(--accent-amber);">0.05 Gram</b>
-            </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-main" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;" onclick="processBuy()">تأكيد الشراء</button>
-                <button class="btn-main" style="background: rgba(255,255,255,0.1); color: white;" onclick="closeBuyModal()">إلغاء</button>
+    <!-- Modal: Add Link -->
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:12px;">نشر رابط جديد 🔗</h3>
+            <label style="font-size:9pt; color:var(--muted);">رابط الإحالة:</label>
+            <input type="url" class="inp" id="add-url-inp" placeholder="https://t.me/your_bot">
+            <label style="font-size:9pt; color:var(--muted);">عدد الزيارات المطلوب:</label>
+            <input type="number" class="inp" id="add-cnt-inp" placeholder="مثال: 10">
+            <div style="display:flex; gap:8px;">
+                <button class="btn-purple" style="flex:1; background:var(--emerald);" id="confirm-add-btn">نشر</button>
+                <button class="btn-purple" style="flex:1; background:rgba(255,255,255,0.1);" id="close-add-btn">إلغاء</button>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav">
-        <div class="nav-item active"><span class="nav-icon">🏠</span><span>الرئيسية</span></div>
-        <div class="nav-item"><span class="nav-icon">📋</span><span>المهام</span></div>
-        <div class="nav-item"><span class="nav-icon">💎</span><span>المتجر</span></div>
-        <div class="nav-item"><span class="nav-icon">🏆</span><span>الأوائل</span></div>
-        <div class="nav-item"><span class="nav-icon">👥</span><span>فريقي</span></div>
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-btn active" id="nav-home">🏠<br>الرئيسية</div>
+        <div class="nav-btn" id="nav-store">💎<br>المتجر</div>
+        <div class="nav-btn" id="nav-ref">👥<br>الإحالة</div>
     </div>
 
     <script>
-        // Telegram Web App API Initialization
-        const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if(tg) tg.expand();
+        // Init Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.expand();
+        }
 
-        // Local State
-        let clickBalance = parseInt(localStorage.getItem('clickBalance')) || 10;
-        let clicksReceived = parseInt(localStorage.getItem('clicksReceived')) || 0;
-        let gramBalance = parseFloat(localStorage.getItem('gramBalance')) || 0.50;
-        let myTask = JSON.parse(localStorage.getItem('myTask')) || null;
+        // State Variables
+        let pts = parseInt(localStorage.getItem('pts')) || 10;
+        let gram = parseFloat(localStorage.getItem('gram')) || 0.50;
+        let myLink = JSON.parse(localStorage.getItem('myLink')) || null;
 
-        let sampleTasks = [
-            { username: "Muktar", avatar: "M", clicksLeft: 6, link: "https://t.me/CryptoAirdropBot" },
-            { username: "Ahmed", avatar: "A", clicksLeft: 12, link: "https://t.me/MajorTonBot" },
-            { username: "Sarah", avatar: "S", clicksLeft: 3, link: "https://t.me/BlumCryptoBot" }
+        let tasks = [
+            { user: "Muktar", left: 6, url: "https://t.me/CryptoAirdropBot" },
+            { user: "Ahmed", left: 12, url: "https://t.me/MajorTonBot" }
         ];
-        let currentTaskIndex = 0;
+        let curTask = 0;
 
-        function updateUI() {
-            document.getElementById('click-balance').innerText = clickBalance;
-            document.getElementById('clicks-received').innerText = clicksReceived;
-            document.getElementById('gram-balance').innerText = gramBalance.toFixed(2);
-
-            if(sampleTasks.length > 0) {
-                let task = sampleTasks[currentTaskIndex];
-                document.getElementById('task-avatar').innerText = task.avatar;
-                document.getElementById('task-username').innerText = task.username;
-                document.getElementById('task-clicks-left').innerText = task.clicksLeft;
-                document.getElementById('task-link').innerText = task.link;
+        function refreshUI() {
+            document.getElementById('pts-bal').innerText = pts;
+            document.getElementById('gram-bal').innerText = gram.toFixed(2);
+            
+            if(tasks.length > 0) {
+                document.getElementById('task-user').innerText = "ناشر الرابط: " + tasks[curTask].user;
+                document.getElementById('task-left').innerText = "متبقي: " + tasks[curTask].left;
+                document.getElementById('task-url').innerText = tasks[curTask].url;
             }
 
-            const container = document.getElementById('my-task-details');
-            if(myTask) {
-                container.innerHTML = `
-                    <div style="font-size: 10pt; font-weight: 800; color: var(--accent-cyan); margin-bottom: 4px; direction: ltr; text-align: right;">${myTask.link}</div>
-                    <div style="font-size: 8.5pt; color: var(--text-muted);">الزيارات المتبقية: <b style="color:white;">${myTask.clicksLeft}</b> زيارة</div>
-                `;
+            let infoBox = document.getElementById('my-task-info');
+            if(myLink) {
+                infoBox.innerHTML = `<b style="color:var(--cyan);">${myLink.url}</b><br>المتبقي: ${myLink.cnt} زيارة`;
             } else {
-                container.innerHTML = 'لا يوجد رابط مضاف حالياً. اضغط على "+ نشر رابط جديد" لتوزيع رابطك!';
+                infoBox.innerText = "لا يوجد رابط مضاف حالياً.";
             }
         }
 
-        function visitCurrentTask() {
-            if(sampleTasks.length === 0) return;
-            let task = sampleTasks[currentTaskIndex];
+        // Button Events Mapping
+        document.getElementById('open-buy-btn').onclick = () => document.getElementById('buy-modal').style.display = 'flex';
+        document.getElementById('close-buy-btn').onclick = () => document.getElementById('buy-modal').style.display = 'none';
 
-            if(tg) {
-                tg.openTelegramLink(task.link);
-            } else {
-                window.open(task.link, '_blank');
-            }
+        document.getElementById('open-add-btn').onclick = () => document.getElementById('add-modal').style.display = 'flex';
+        document.getElementById('close-add-btn').onclick = () => document.getElementById('add-modal').style.display = 'none';
 
-            clickBalance += 1;
-            localStorage.setItem('clickBalance', clickBalance);
+        document.getElementById('nav-store').onclick = () => document.getElementById('buy-modal').style.display = 'flex';
+        document.getElementById('nav-ref').onclick = () => alert("رابط الإحالة الخاص بك:\nhttps://t.me/YourBot?start=12345");
 
-            task.clicksLeft -= 1;
-            if(task.clicksLeft <= 0) {
-                sampleTasks.splice(currentTaskIndex, 1);
-               
+        // Visit Task Function
+        document.getElementById('visit-btn').onclick = () => {
+            if(tasks.length === 0) return;
+            let t = tasks[curTask];
+            window.open(t.url, '_blank');
+            pts += 1;
+            t.left -= 1;
+            localStorage.setItem('pts', pts);
+            if(t.left <= 0) tasks.splice(curTask, 1);
+            refreshUI();
+        };
+
+        // Confirm Buy
+        document.getElementById('confirm-buy-btn').onclick = () => {
+            let p = parseInt(document.getElementById('buy-pkg').value);
+            let cost = (p / 100) * 0.05;
+            if(gram < cost) { alert("رصيدك من عملة Gram غير كافٍ!"); return; }
+            gram -= cost;
+            pts += p;
+            localStorage.setItem('gram', gram);
+            localStorage.setItem('pts', pts);
+            document.getElementById('buy-modal').style.display = 'none';
+            refreshUI();
+            alert("تم شراء " + p + " نقطة بنجاح!");
+        };
+
+        // Confirm Add Link
+        document.getElementById('confirm-add-btn').onclick = () => {
+            let u = document.getElementById('add-url-inp').value.trim();
+            let c = parseInt(document.getElementById('add-cnt-inp').value);
+            if(!u || !c || c < 1) { alert("يرجى إدخال الرابط والعدد بشكل صحيح"); return; }
+            if(c > pts) { alert("نقاطك لا تكفي! رصيدك: " + pts); return; }
+            pts -= c;
+            myLink = { url: u, cnt: c };
+            localStorage.setItem('pts', pts);
+            localStorage.setItem('myLink', JSON.stringify(myLink));
+            document.getElementById('add-modal').style.display = 'none';
+            refreshUI();
+            alert("تم نشر رابطك بنجاح!");
+        };
+
+        refreshUI();
+    </script>
+</body>
+</html>
