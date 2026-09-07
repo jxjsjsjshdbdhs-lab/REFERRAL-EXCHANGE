@@ -89,11 +89,18 @@
         <div class="pill">💎 Gram: <span id="gram-bal" style="color:var(--amber);">0.50</span></div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-box"><div class="stat-val" id="total-tasks-cnt">2</div><div class="stat-lbl">الروابط المتاحة</div></div>
-        <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">10</div><div class="stat-lbl">رصيدك الحالي</div></div>
-        <div class="stat-box"><div class="stat-val" id="completed-cnt">0</div><div class="stat-lbl">روابط زرتها</div></div>
-    </div>
+    <div id="home-page">
+        <div class="stats-grid">
+            <div class="stat-box"><div class="stat-val" id="total-tasks-cnt">2</div><div class="stat-lbl">الروابط المتاحة</div></div>
+            <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">10</div><div class="stat-lbl">رصيدك الحالي</div></div>
+            <div class="stat-box"><div class="stat-val" id="completed-cnt">0</div><div class="stat-lbl">روابط زرتها</div></div>
+        </div>
+
+        <div class="card" style="text-align:center;">
+            <div style="font-size:24px;">👥</div>
+            <div style="font-size:16pt;font-weight:900;margin:4px 0;" id="daily-visitors">0</div>
+            <div style="font-size:8.5pt;color:var(--muted);">زائر البوت اليوم</div>
+        </div>
 
     <!-- المتجر مؤجل حالياً -->
 
@@ -105,27 +112,6 @@
         </div>
         <div class="link-box" id="task-url">https://t.me/example_bot</div>
         <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
-    </div>
-
-    <!-- Referral Card -->
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-weight:800; font-size:10pt;">نظام الإحالة 👥</span>
-            <span style="font-size:8pt; background:rgba(52,211,153,0.15); color:var(--emerald); padding:3px 7px; border-radius:7px;">+40 نقطة</span>
-        </div>
-        <p style="font-size:8.5pt; color:var(--muted); margin-bottom:8px;">
-            ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.
-        </p>
-        <div class="link-box" id="referral-url">جارٍ تجهيز رابط الإحالة...</div>
-        <div style="display:flex; gap:8px;">
-            <button class="btn btn-emerald" onclick="copyReferral()">📋 نسخ الرابط</button>
-            <button class="btn btn-purple" onclick="shareReferral()">📤 مشاركة</button>
-        </div>
-        <div style="margin-top:10px; font-size:8.5pt; color:var(--muted);">
-            عدد الإحالات: <b id="ref-count" style="color:#fff;">0</b>
-            &nbsp;|&nbsp;
-            نقاط الإحالة: <b id="ref-points" style="color:var(--amber);">0</b>
-        </div>
     </div>
 
     <!-- My Link Card -->
@@ -162,7 +148,7 @@
             <label style="font-size:8.5pt; color:var(--muted);">رابط الإحالة:</label>
             <input type="url" class="inp" id="add-url" placeholder="https://t.me/your_bot">
             <label style="font-size:8.5pt; color:var(--muted);">عدد الزيارات المطلوبة:</label>
-            <input type="number" class="inp" id="add-cnt" placeholder="مثال: 10">
+            <input type="number" class="inp" id="add-cnt" placeholder="من 1 إلى 20" min="1" max="20">
             <div style="display:flex; gap:8px;">
                 <button class="btn btn-purple" style="background:var(--emerald); color:#0f172a;" onclick="addLink()">نشر الآن</button>
                 <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('add-modal')">إلغاء</button>
@@ -170,10 +156,44 @@
         </div>
     </div>
 
+    </div> <!-- /home-page -->
+
+    <div id="referrals-page" style="display:none;">
+        <div class="card">
+            <div style="font-size:18pt;font-weight:900;color:var(--cyan);margin-bottom:6px;">👥 الإحالات</div>
+            <p style="font-size:9pt;color:var(--muted);line-height:1.7;">
+                شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.
+            </p>
+        </div>
+
+    <!-- Referral Card -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-weight:800; font-size:10pt;">نظام الإحالة 👥</span>
+            <span style="font-size:8pt; background:rgba(52,211,153,0.15); color:var(--emerald); padding:3px 7px; border-radius:7px;">+40 نقطة</span>
+        </div>
+        <p style="font-size:8.5pt; color:var(--muted); margin-bottom:8px;">
+            ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.
+        </p>
+        <div class="link-box" id="referral-url">جارٍ تجهيز رابط الإحالة...</div>
+        <div style="display:flex; gap:8px;">
+            <button class="btn btn-emerald" onclick="copyReferral()">📋 نسخ الرابط</button>
+            <button class="btn btn-purple" onclick="shareReferral()">📤 مشاركة</button>
+        </div>
+        <div style="margin-top:10px; font-size:8.5pt; color:var(--muted);">
+            عدد الإحالات: <b id="ref-count" style="color:#fff;">0</b>
+            &nbsp;|&nbsp;
+            نقاط الإحالة: <b id="ref-points" style="color:var(--amber);">0</b>
+        </div>
+    </div>
+
+
+    </div>
+
     <!-- Bottom Navigation -->
     <div class="nav">
-        <div class="nav-item" onclick="alert('أنت في الصفحة الرئيسية')">🏠<br>الرئيسية</div>
-        <div class="nav-item" onclick="showReferral()">👥<br>الإحالة</div>
+        <div id="nav-home" class="nav-item active" onclick="showPage('home')">🏠<br>الرئيسية</div>
+        <div id="nav-referrals" class="nav-item" onclick="showPage('referrals')">👥<br>الإحالات</div>
         <div class="nav-item" onclick="alert('المتجر غير متاح حالياً')">💎<br>المتجر</div>
     </div>
 
@@ -199,6 +219,49 @@
 
         function getNextAvailableTask() {
             return tasks.find(t => !visitedTasks.includes(t.id) && t.left > 0);
+        }
+
+        // زوار اليوم: محلياً حالياً. الإحصاء العالمي يحتاج Backend/Database.
+        const todayKey = new Date().toISOString().slice(0, 10);
+        let visitorDate = localStorage.getItem('visitorDate');
+        let dailyVisitors = parseInt(localStorage.getItem('dailyVisitors')) || 0;
+        if (visitorDate !== todayKey) {
+            visitorDate = todayKey;
+            dailyVisitors = 0;
+            localStorage.setItem('visitorDate', visitorDate);
+            localStorage.setItem('dailyVisitors', '0');
+        }
+
+        const visitorSessionKey = 'visitorSession_' + todayKey;
+        if (!sessionStorage.getItem(visitorSessionKey)) {
+            dailyVisitors += 1;
+            localStorage.setItem('dailyVisitors', String(dailyVisitors));
+            sessionStorage.setItem(visitorSessionKey, '1');
+        }
+
+        function showPage(page) {
+            const home = document.getElementById('home-page');
+            const referrals = document.getElementById('referrals-page');
+            const homeNav = document.getElementById('nav-home');
+            const refNav = document.getElementById('nav-referrals');
+
+            if (page === 'referrals') {
+                home.style.display = 'none';
+                referrals.style.display = 'block';
+                homeNav.classList.remove('active');
+                refNav.classList.add('active');
+                window.scrollTo({top:0, behavior:'smooth'});
+            } else {
+                home.style.display = 'block';
+                referrals.style.display = 'none';
+                homeNav.classList.add('active');
+                refNav.classList.remove('active');
+                window.scrollTo({top:0, behavior:'smooth'});
+            }
+        }
+
+        function showReferral() {
+            showPage('referrals');
         }
 
         function render() {
@@ -233,6 +296,8 @@
 
             document.getElementById('ref-count').innerText = referralCount;
             document.getElementById('ref-points').innerText = referralPoints;
+            const dailyBox = document.getElementById('daily-visitors');
+            if (dailyBox) dailyBox.innerText = dailyVisitors;
 
             buildReferralLink();
         }
@@ -360,8 +425,8 @@
             let u = document.getElementById('add-url').value.trim();
             let c = parseInt(document.getElementById('add-cnt').value);
 
-            if(!u || c < 1 || c > 100000) {
-                alert("يرجى كتابة الرابط وتحديد عدد الزيارات!");
+            if(!u || c < 1 || c > 20) {
+                alert("يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!");
                 return;
             }
 
