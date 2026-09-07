@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تبادل الإحالات</title>
+
+  <!-- مكتبة تليغرام الرسمية -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: #f3efe6;
+      color: #000;
+      padding: 16px;
+      padding-bottom: 80px;
+    }
+
+    /* أسلوب Neo-brutalism */
+    .card {
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 16px;
+      box-shadow: 4px 4px 0px #000;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      background: #4d82f3;
+      color: #fff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 3px 3px 0px #000;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-box {
+      border: 3px solid #000;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 3px 3px 0px #000;
+    }
+
+    .purple { background: #b19ffb; }
+    .yellow { background: #ffd43b; }
+    .blue { background: #4d82f3; color: #fff; }
+
+    /* شريط التنقل السفلي */
+    .navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 3px solid #000;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    .nav-item {
+      border: none;
+      background: none;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    .nav-item.active {
+      background: #4d82f3;
+      color: #fff;
+      border: 2px solid #000;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- قسم الرئيسية (Home) -->
+  <div id="home" class="tab-content active">
+    <div class="stats-grid">
+      <div class="stat-box purple">
+        <div>المجموع</div>
+        <div id="globalClicks">100</div>
+      </div>
+      <div class="stat-box yellow">
+        <div>نقاطك</div>
+        <div id="userBalance">10</div>
+      </div>
+      <div class="stat-box blue">
+        <div>المحقق</div>
+        <div id="receivedClicks">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>المهمة الحالية</h3>
+      <p style="margin: 8px 0; color: #555;">زيارة رابط وقنوات للحصول على نقاط</p>
+      <a href="https://t.me" target="_blank" class="btn" onclick="addClick()">زيارة الرابط (+1 نقطة)</a>
+    </div>
+  </div>
+
+  <!-- قسم المهام (Tasks) -->
+  <div id="tasks" class="tab-content">
+    <div class="card">
+      <h3>قائمة المهام المتاحة</h3>
+      <p style="margin: 10px 0;">اختر من القائمة وقم بإكمال المهام لكسب النقاط:</p>
+      <div class="card" style="background: #f9f9f9; box-shadow: none;">
+        <strong>انضمام لقناة تليغرام</strong>
+        <p>النقاط: +2 CLICK</p>
+        <button class="btn" style="margin-top: 8px;" onclick="addPoints(2)">إكمال المهمة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- قسم الإحالات (Referrals) -->
+  <div id="referrals" class="tab-content">
+    <div class="card purple">
+      <h2>دعوة الأصدقاء</h2>
+      <p style="margin-top: 8px;">احصل على 20% من كل النقاط التي يكسبها أصدقاؤك!</p>
+    </div>
+    <div class="card">
+      <h3>رابط الإحالة الخاص بك:</h3>
+      <input type="text" id="refLink" value="https://t.me/your_bot?start=12345" readonly style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #000; border-radius: 8px;">
+      <button class="btn" onclick="copyRef()">نسخ الرابط</button>
+    </div>
+  </div>
+
+  <!-- شريط التنقل السفلي -->
+  <div class="navbar">
+    <button class="nav-item active" onclick="switchTab('home', this)">الرئيسية</button>
+    <button class="nav-item" onclick="switchTab('tasks', this)">المهام</button>
+    <button class="nav-item" onclick="switchTab('referrals', this)">الإحالات</button>
+  </div>
+
+  <script>
+    // تهيئة مكتبة تليغرام
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // توسيع الشاشة بالكامل داخل تليغرام
+
+    let balance = 10;
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function addClick() {
+      balance += 1;
+      document.getElementById('userBalance').innerText = balance;
+      tg.showAlert("تمت إضافة 1 نقطة لك حسابك!");
+    }
+
+    function addPoints(pts) {
+      balance += pts;
+      document.getElementById('userBalance').innerText = balance;
+      tg.showAlert(`تمت إضافة ${pts} نقاط!`);
+    }
+
+    function copyRef() {
+      const copyText = document.getElementById("refLink");
+      navigator.clipboard.writeText(copyText.value);
+      tg.showAlert("تم نسخ رابط الإحالة!");
+    }
+  </script>
+</body>
+</html>
