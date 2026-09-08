@@ -80,6 +80,8 @@
             border: 1px solid var(--border); border-radius: 16px; display: flex; justify-content: space-around; padding: 8px 0;
         }
         .nav-item { color: var(--muted); font-size: 8pt; font-weight: 700; text-align: center; cursor: pointer; }
+        body.en { direction:ltr; }
+        body.en .link-box { direction:ltr; text-align:left; }
     </style>
 </head>
 <body>
@@ -87,6 +89,18 @@
     <div class="header">
         <div class="title">تبادل الإحالات</div>
         <div class="pill">💎 Gram: <span id="gram-bal" style="color:var(--amber);">0.50</span></div>
+    </div>
+
+    <div class="card" style="padding:10px;margin-bottom:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;">
+        <span style="font-size:9pt;color:var(--muted);">🌐 Language / اللغة</span>
+        <button id="lang-toggle" class="btn btn-emerald" style="width:auto;padding:6px 12px;" onclick="toggleLanguage()">English</button>
+    </div>
+
+    <div class="card" style="text-align:center;">
+        <div style="font-size:24px;">🎁</div>
+        <div style="font-size:13pt;font-weight:900;" id="reward-title">مكافأة كل 12 ساعة</div>
+        <div style="font-size:9pt;color:var(--muted);margin:5px 0;" id="reward-status">احصل على 8 نقاط مجاناً</div>
+        <button class="btn btn-amber" id="reward-btn" onclick="claimReward()">استلام 8 نقاط</button>
     </div>
 
     <div id="home-page">
@@ -238,6 +252,61 @@
             localStorage.setItem('dailyVisitors', String(dailyVisitors));
             sessionStorage.setItem(visitorSessionKey, '1');
         }
+
+        let currentLang = localStorage.getItem('appLang') || 'ar';
+        let rewardAt = parseInt(localStorage.getItem('rewardAt') || '0');
+        const REWARD_MS = 12 * 60 * 60 * 1000;
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            localStorage.setItem('appLang', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const en = currentLang === 'en';
+            document.body.classList.toggle('en', en);
+            document.documentElement.lang = en ? 'en' : 'ar';
+            document.documentElement.dir = en ? 'ltr' : 'rtl';
+            document.getElementById('lang-toggle').innerText = en ? 'العربية' : 'English';
+            document.getElementById('reward-title').innerText = en ? 'Reward every 12 hours' : 'مكافأة كل 12 ساعة';
+            updateRewardUI();
+        }
+
+        function updateRewardUI() {
+            const now = Date.now();
+            const ready = !rewardAt || now >= rewardAt;
+            const btn = document.getElementById('reward-btn');
+            const status = document.getElementById('reward-status');
+            if (ready) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.innerText = currentLang === 'en' ? 'Claim 8 points' : 'استلام 8 نقاط';
+                status.innerText = currentLang === 'en' ? 'Your free reward is ready' : 'مكافأتك المجانية جاهزة';
+            } else {
+                const remaining = rewardAt - now;
+                const h = Math.floor(remaining / 3600000);
+                const m = Math.floor((remaining % 3600000) / 60000);
+                const sec = Math.floor((remaining % 60000) / 1000);
+                btn.disabled = true;
+                btn.style.opacity = '.55';
+                btn.innerText = currentLang === 'en' ? `Available in ${h}h ${m}m ${sec}s` : `متاحة بعد ${h}س ${m}د ${sec}ث`;
+                status.innerText = currentLang === 'en' ? 'Come back after 12 hours' : 'ارجع بعد 12 ساعة';
+            }
+        }
+
+        function claimReward() {
+            if (rewardAt && Date.now() < rewardAt) return;
+            pts += 8;
+            rewardAt = Date.now() + REWARD_MS;
+            localStorage.setItem('pts', String(pts));
+            localStorage.setItem('rewardAt', String(rewardAt));
+            render();
+            updateRewardUI();
+            alert(currentLang === 'en' ? 'You received 8 points 🎉' : 'تمت إضافة 8 نقاط إلى رصيدك 🎉');
+        }
+
+        setInterval(updateRewardUI, 1000);
 
         function showPage(page) {
             const home = document.getElementById('home-page');
@@ -451,7 +520,8 @@
         }
 
         // ملاحظة: احتساب الإحالة +40 بشكل نهائي يحتاج Bot/Server للتحقق من مستخدم Telegram.
-        // هنا يتم تجهيز الرابط والواجهة فقط، حتى لا يمكن للمستخدم منح نفسه نقاطاً بالتلاعب بالمتصفح.
+        // المكافأة 8 نقاط/12 ساعة هنا محفوظة محلياً؛ للحماية من التحايل يجب نقلها إلى Backend.
+        applyLanguage();
         render();
     </script>
 </body>
