@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-title">منصة تبادل الإحالات</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -42,12 +45,6 @@
         .stat-val { font-size: 13pt; font-weight: 900; color: #fff; }
         .stat-lbl { font-size: 7.5pt; color: var(--muted); margin-top: 2px; }
 
-        .banner {
-            background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.25));
-            border: 1px solid var(--amber); border-radius: 14px; padding: 12px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
-        }
-
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
 
         .btn {
@@ -84,15 +81,14 @@
         body.en .stat-box, body.en .card { text-align:left; }
         body.en .header { direction:ltr; }
         .nav-item { color: var(--muted); font-size: 8pt; font-weight: 700; text-align: center; cursor: pointer; }
-        body.en { direction:ltr; }
-        body.en .link-box { direction:ltr; text-align:left; }
+        .nav-item.active { color: var(--cyan); }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="title" data-i18n="appName">تبادل الإحالات</div>
-        <div class="pill">💎 Gram: <span id="gram-bal" style="color:var(--amber);">0.50</span></div>
+        <div class="pill">💎 Gram: <span id="gram-bal" style="color:var(--amber);">0.00</span></div>
     </div>
 
     <div class="card" style="padding:10px;margin-bottom:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;">
@@ -100,201 +96,131 @@
         <button id="lang-toggle" class="btn btn-emerald" style="width:auto;padding:6px 12px;" onclick="toggleLanguage()">English</button>
     </div>
 
+    <!-- مكافأة الإعلان -->
     <div class="card" style="text-align:center;">
-        <div style="font-size:24px;">🎁</div>
-        <div style="font-size:13pt;font-weight:900;" id="reward-title">مكافأة كل 12 ساعة</div>
-        <div style="font-size:9pt;color:var(--muted);margin:5px 0;" id="reward-status">احصل على 8 نقاط مجاناً</div>
-        <button class="btn btn-amber" id="reward-btn" onclick="claimReward()">استلام 8 نقاط</button>
+        <div style="font-size:24px;">📺</div>
+        <div style="font-size:13pt;font-weight:900;" id="reward-title">مكافأة مشاهدة إعلان</div>
+        <div style="font-size:9pt;color:var(--muted);margin:5px 0;" id="reward-status">احصل على 5 نقاط عند مشاهدة الإعلان</div>
+        <button class="btn btn-amber" id="reward-btn" onclick="watchAd()">مشاهدة إعلان (+5 نقاط)</button>
     </div>
 
     <div id="home-page">
         <div class="stats-grid">
-            <div class="stat-box"><div class="stat-val" id="total-tasks-cnt">2</div><div class="stat-lbl" data-i18n="availableLinks">الروابط المتاحة</div></div>
-            <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">10</div><div class="stat-lbl" data-i18n="currentBalance">رصيدك الحالي</div></div>
+            <div class="stat-box"><div class="stat-val" id="total-tasks-cnt">0</div><div class="stat-lbl" data-i18n="availableLinks">الروابط المتاحة</div></div>
+            <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">0</div><div class="stat-lbl" data-i18n="currentBalance">رصيدك الحالي</div></div>
             <div class="stat-box"><div class="stat-val" id="completed-cnt">0</div><div class="stat-lbl" data-i18n="visitedLinks">روابط زرتها</div></div>
         </div>
 
-        <div class="card" style="text-align:center;">
-            <div style="font-size:24px;">👥</div>
-            <div style="font-size:16pt;font-weight:900;margin:4px 0;" id="daily-visitors">0</div>
-            <div style="font-size:8.5pt;color:var(--muted);" data-i18n="dailyVisitors">زائر البوت اليوم</div>
+        <!-- Active Task Card -->
+        <div class="card" id="task-card">
+            <div style="text-align:center; padding:15px; color:var(--muted); font-size:10pt;">جاري تحميل المهام...</div>
         </div>
 
-    <!-- المتجر مؤجل حالياً -->
-
-    <!-- Active Task Card -->
-    <div class="card" id="task-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:800; font-size:10pt;" id="task-user">ناشر الرابط: Muktar</span>
-            <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">متبقي: 6</span>
+        <!-- My Link Card -->
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:800; font-size:10pt;" data-i18n="yourPublishedLink">رابطك المنشور</span>
+                <button class="btn btn-emerald" style="width:auto; padding:4px 10px;" onclick="openModal('add-modal')" data-i18n="createTask">+ إنشاء مهمة</button>
+            </div>
+            <div id="my-task-info" style="font-size:8.5pt; color:var(--muted);">جاري التحميل...</div>
         </div>
-        <div class="link-box" id="task-url">https://t.me/example_bot</div>
-        <button class="btn btn-purple" onclick="visitLink()">${t('visitLink')}</button>
-    </div>
 
-    <!-- My Link Card -->
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-weight:800; font-size:10pt;" data-i18n="yourPublishedLink">رابطك المنشور</span>
-            <button class="btn btn-emerald" style="width:auto; padding:4px 10px;" onclick="openModal('add-modal')" data-i18n="createTask">+ إنشاء مهمة</button>
-        </div>
-        <div id="my-task-info" style="font-size:8.5pt; color:var(--muted);">لا يوجد رابط مضاف حالياً.</div>
-    </div>
-
-    <!-- Modal: Buy Points -->
-    <div class="modal" id="buy-modal">
-        <div class="modal-box">
-            <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="buyPointsTitle">شراء النقاط بعملة Gram 💎</h3>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="choosePackage">اختر الباقة:</label>
-            <select class="inp" id="buy-pkg">
-                <option value="100">100 نقطة = 0.05 Gram</option>
-                <option value="300">300 نقطة = 0.15 Gram</option>
-                <option value="500">500 نقطة = 0.25 Gram</option>
-                <option value="1000">1000 نقطة = 0.50 Gram</option>
-            </select>
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-amber" onclick="buyPoints()" data-i18n="confirmPurchase">تأكيد الشراء</button>
-                <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('buy-modal')" data-i18n="cancel">إلغاء</button>
+        <!-- Modal: Add Link -->
+        <div class="modal" id="add-modal">
+            <div class="modal-box">
+                <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="newTaskTitle">إنشاء مهمة جديدة 🔗</h3>
+                <label style="font-size:8.5pt; color:var(--muted);">عنوان المهمة:</label>
+                <input type="text" class="inp" id="add-title" placeholder="عنوان مختصر">
+                <label style="font-size:8.5pt; color:var(--muted);">وصف المهمة (اختياري):</label>
+                <input type="text" class="inp" id="add-desc" placeholder="وصف المهمة">
+                <label style="font-size:8.5pt; color:var(--muted);" data-i18n="referralLinkLabel">رابط الإحالة:</label>
+                <input type="url" class="inp" id="add-url" placeholder="https://t.me/your_bot">
+                <label style="font-size:8.5pt; color:var(--muted);" data-i18n="requiredVisits">عدد الزيارات المطلوبة (required_visits):</label>
+                <input type="number" class="inp" id="add-cnt" placeholder="أدخل عدد الزيارات" min="1" value="1">
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-purple" style="background:var(--emerald); color:#0f172a;" onclick="addLink()" data-i18n="publishNow">نشر الآن</button>
+                    <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('add-modal')">إلغاء</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Modal: Add Link -->
-    <div class="modal" id="add-modal">
-        <div class="modal-box">
-            <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="newTaskTitle">إنشاء مهمة جديدة 🔗</h3>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="referralLinkLabel">رابط الإحالة:</label>
-            <input type="url" class="inp" id="add-url" data-i18n-placeholder="urlPlaceholder" placeholder="https://t.me/your_bot">
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="requiredVisits">عدد الزيارات المطلوبة:</label>
-            <input type="number" class="inp" id="add-cnt" data-i18n-placeholder="visitsPlaceholder" placeholder="من 1 إلى 20" min="1" max="20">
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-purple" style="background:var(--emerald); color:#0f172a;" onclick="addLink()" data-i18n="publishNow">نشر الآن</button>
-                <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('add-modal')">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
     </div> <!-- /home-page -->
 
     <div id="referrals-page" style="display:none;">
         <div class="card">
             <div style="font-size:18pt;font-weight:900;color:var(--cyan);margin-bottom:6px;" data-i18n="referralsTitle">👥 الإحالات</div>
             <p style="font-size:9pt;color:var(--muted);line-height:1.7;">
-                <span data-i18n="referralsIntro">شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.</span>
+                <span>شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">20 نقطة</b>.</span>
             </p>
         </div>
 
-    <!-- Referral Card -->
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-weight:800; font-size:10pt;" data-i18n="referralSystem">نظام الإحالة 👥</span>
-            <span style="font-size:8pt; background:rgba(52,211,153,0.15); color:var(--emerald); padding:3px 7px; border-radius:7px;">+40 نقطة</span>
+        <!-- Referral Card -->
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:800; font-size:10pt;" data-i18n="referralSystem">نظام الإحالة 👥</span>
+                <span style="font-size:8pt; background:rgba(52,211,153,0.15); color:var(--emerald); padding:3px 7px; border-radius:7px;">+20 نقطة</span>
+            </div>
+            <div class="link-box" id="referral-url">جارٍ تجهيز رابط الإحالة...</div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn btn-emerald" onclick="copyReferral()" data-i18n="copyLink">📋 نسخ الرابط</button>
+                <button class="btn btn-purple" onclick="shareReferral()" data-i18n="share">📤 مشاركة</button>
+            </div>
+            <div style="margin-top:10px; font-size:8.5pt; color:var(--muted);">
+                <span data-i18n="referralCountLabel">عدد الإحالات:</span> <b id="ref-count" style="color:#fff;">0</b>
+            </div>
         </div>
-        <p style="font-size:8.5pt; color:var(--muted); margin-bottom:8px;">
-            <span data-i18n="referralDescription">ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.</span>
-        </p>
-        <div class="link-box" id="referral-url">جارٍ تجهيز رابط الإحالة...</div>
-        <div style="display:flex; gap:8px;">
-            <button class="btn btn-emerald" onclick="copyReferral()" data-i18n="copyLink">📋 نسخ الرابط</button>
-            <button class="btn btn-purple" onclick="shareReferral()" data-i18n="share">📤 مشاركة</button>
-        </div>
-        <div style="margin-top:10px; font-size:8.5pt; color:var(--muted);">
-            <span data-i18n="referralCountLabel">عدد الإحالات:</span> <b id="ref-count" style="color:#fff;">0</b>
-            &nbsp;|&nbsp;
-            <span data-i18n="referralPointsLabel">نقاط الإحالة:</span> <b id="ref-points" style="color:var(--amber);">0</b>
-        </div>
-    </div>
-
-
     </div>
 
     <!-- Bottom Navigation -->
     <div class="nav">
         <div id="nav-home" class="nav-item active" onclick="showPage('home')">🏠<br><span data-i18n="home">الرئيسية</span></div>
         <div id="nav-referrals" class="nav-item" onclick="showPage('referrals')">👥<br><span data-i18n="referrals">الإحالات</span></div>
-        <div class="nav-item" onclick="alert(t('storeUnavailable'))">💎<br><span data-i18n="store">المتجر</span></div>
     </div>
 
     <script>
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.expand();
-        }
+        // ============================================================
+        // 1. إعدادات Supabase والـ Telegram WebApp
+        // ============================================================
+        const SUPABASE_URL = "YOUR_SUPABASE_URL"; // استبدل بـ URL الخاص بمشروعك
+        const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"; // استبدل بـ ANON KEY الخاص بك
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // App States
-        let pts = parseInt(localStorage.getItem('pts')) || 10;
-        let gram = parseFloat(localStorage.getItem('gram')) || 0.50;
-        let myLink = JSON.parse(localStorage.getItem('myLink')) || null;
-        let visitedTasks = JSON.parse(localStorage.getItem('visitedTasks')) || [];
-        let referralCount = parseInt(localStorage.getItem('referralCount')) || 0;
-        let referralPoints = parseInt(localStorage.getItem('referralPoints')) || 0;
+        const tg = window.Telegram?.WebApp;
+        if (tg) tg.expand();
 
-        // All active referral tasks
-        let tasks = JSON.parse(localStorage.getItem('globalTasks')) || [
-            { id: 101, user: "Muktar", left: 6, url: "https://t.me/CryptoAirdropBot" },
-            { id: 102, user: "Ahmed", left: 12, url: "https://t.me/MajorTonBot" },
-            { id: 103, user: "Ali", left: 5, url: "https://t.me/BlumCryptoBot" }
-        ];
+        let currentUser = null;
+        let availableTasks = [];
+        let completedTaskIds = [];
+        let myTasks = [];
 
-        function getNextAvailableTask() {
-            return tasks.find(t => !visitedTasks.includes(t.id) && t.left > 0);
-        }
-
-        // زوار اليوم: محلياً حالياً. الإحصاء العالمي يحتاج Backend/Database.
-        const todayKey = new Date().toISOString().slice(0, 10);
-        let visitorDate = localStorage.getItem('visitorDate');
-        let dailyVisitors = parseInt(localStorage.getItem('dailyVisitors')) || 0;
-        if (visitorDate !== todayKey) {
-            visitorDate = todayKey;
-            dailyVisitors = 0;
-            localStorage.setItem('visitorDate', visitorDate);
-            localStorage.setItem('dailyVisitors', '0');
-        }
-
-        const visitorSessionKey = 'visitorSession_' + todayKey;
-        if (!sessionStorage.getItem(visitorSessionKey)) {
-            dailyVisitors += 1;
-            localStorage.setItem('dailyVisitors', String(dailyVisitors));
-            sessionStorage.setItem(visitorSessionKey, '1');
-        }
-
+        // ============================================================
+        // 2. القواميس واللغات (i18n)
+        // ============================================================
         const I18N = {
             ar: {
-                appName:'تبادل الإحالات', languageLabel:'🌐 اللغة', availableLinks:'الروابط المتاحة', currentBalance:'رصيدك الحالي', visitedLinks:'روابط زرتها', dailyVisitors:'زائر البوت اليوم',
-                rewardTitle:'مكافأة كل 12 ساعة', rewardStatus:'احصل على 8 نقاط مجاناً', claimReward:'استلام 8 نقاط', rewardReady:'مكافأتك المجانية جاهزة', rewardComeBack:'ارجع بعد 12 ساعة',
-                yourPublishedLink:'رابطك المنشور', createTask:'+ إنشاء مهمة', noPublishedLink:'لا يوجد رابط مضاف حالياً.', buyPointsTitle:'شراء النقاط بعملة Gram 💎', choosePackage:'اختر الباقة:', confirmPurchase:'تأكيد الشراء', cancel:'إلغاء',
-                newTaskTitle:'إنشاء مهمة جديدة 🔗', referralLinkLabel:'رابط الإحالة:', requiredVisits:'عدد الزيارات المطلوبة:', publishNow:'نشر الآن', referralsTitle:'👥 الإحالات',
-                referralsIntro:'شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.', referralSystem:'نظام الإحالة 👥', referralDescription:'ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.',
-                copyLink:'📋 نسخ الرابط', share:'📤 مشاركة', referralCountLabel:'عدد الإحالات:', referralPointsLabel:'نقاط الإحالة:', home:'الرئيسية', referrals:'الإحالات', store:'المتجر', storeUnavailable:'المتجر غير متاح حالياً',
-                publisher:'ناشر الرابط:', remaining:'متبقي:', visitLink:'↗ زيارة الرابط (+1 نقطة)', allDone:'🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.', remainingVisits:'المتبقي:',
-                copySuccess:'تم نسخ رابط الإحالة ✅', shareText:'انضم عن طريقي واحصل على فرصة لجمع النقاط 👥', insufficientGram:'رصيدك من عملة Gram غير كافٍ!', purchaseSuccess:'تم شراء {p} نقطة بنجاح!',
-                invalidTask:'يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!', insufficientPoints:'نقاطك لا تكفي! رصيدك الحالي: {p}', taskSuccess:'تم إنشاء المهمة ونشر رابطك بنجاح!', rewardReceived:'تمت إضافة 8 نقاط إلى رصيدك 🎉',
-                rewardAvailable:'متاحة بعد {h}س {m}د {s}ث', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'من 1 إلى 20', preparingReferral:'جارٍ تجهيز رابط الإحالة...'
+                appName:'تبادل الإحالات', languageLabel:'🌐 اللغة', availableLinks:'الروابط المتاحة', currentBalance:'رصيدك الحالي', visitedLinks:'روابط زرتها',
+                yourPublishedLink:'رابطك المنشور', createTask:'+ إنشاء مهمة', newTaskTitle:'إنشاء مهمة جديدة 🔗', referralLinkLabel:'رابط الإحالة:', requiredVisits:'عدد الزيارات المطلوبة:', publishNow:'نشر الآن', referralsTitle:'👥 الإحالات',
+                referralSystem:'نظام الإحالة 👥', copyLink:'📋 نسخ الرابط', share:'📤 مشاركة', referralCountLabel:'عدد الإحالات:', home:'الرئيسية', referrals:'الإحالات',
+                publisher:'الناشر:', remaining:'متبقي:', visitLink:'↗ زيارة الرابط (+1 نقطة)', allDone:'🎉 أكملت جميع الروابط المتاحة حالياً!', remainingVisits:'المتبقي:',
+                copySuccess:'تم نسخ رابط الإحالة ✅', shareText:'انضم عن طريقي واحصل على فرصة لجمع النقاط 👥', invalidTask:'يرجى ملء جميع البيانات بشكل صحيح وأن يكون عدد الزيارات 1 على الأقل!',
+                insufficientPoints:'نقاطك لا تكفي! رصيدك غير كافٍ لإنشاء هذه المهمة.', taskSuccess:'تم إنشاء المهمة بنجاح!'
             },
             en: {
-                appName:'Referral Exchange', languageLabel:'🌐 Language', availableLinks:'Available Links', currentBalance:'Current Balance', visitedLinks:'Links Visited', dailyVisitors:'Bot Visitors Today',
-                rewardTitle:'Reward Every 12 Hours', rewardStatus:'Get 8 free points', claimReward:'Claim 8 Points', rewardReady:'Your free reward is ready', rewardComeBack:'Come back after 12 hours',
-                yourPublishedLink:'Your Published Link', createTask:'+ Create Task', noPublishedLink:'No link added yet.', buyPointsTitle:'Buy Points with Gram 💎', choosePackage:'Choose a package:', confirmPurchase:'Confirm Purchase', cancel:'Cancel',
-                newTaskTitle:'Create New Task 🔗', referralLinkLabel:'Referral Link:', requiredVisits:'Required Visits:', publishNow:'Publish Now', referralsTitle:'👥 Referrals',
-                referralsIntro:'Share your link with friends. When a referral is counted successfully, you receive <b style="color:var(--emerald);">40 points</b>.', referralSystem:'Referral System 👥', referralDescription:'Invite friends using your link and get <b style="color:var(--emerald);">40 points</b> for each successful referral.',
-                copyLink:'📋 Copy Link', share:'📤 Share', referralCountLabel:'Referrals:', referralPointsLabel:'Referral Points:', home:'Home', referrals:'Referrals', store:'Store', storeUnavailable:'Store is currently unavailable',
-                publisher:'Link Publisher:', remaining:'Remaining:', visitLink:'↗ Visit Link (+1 point)', allDone:'🎉 You completed all available links!<br>Come back later for new links.', remainingVisits:'Remaining:',
-                copySuccess:'Referral link copied ✅', shareText:'Join through my link and get a chance to earn points 👥', insufficientGram:'Your Gram balance is insufficient!', purchaseSuccess:'Successfully purchased {p} points!',
-                invalidTask:'Please enter a link and choose between 1 and 20 visits!', insufficientPoints:'Not enough points! Your current balance: {p}', taskSuccess:'Task created and your link was published successfully!', rewardReceived:'8 points added to your balance 🎉',
-                rewardAvailable:'Available in {h}h {m}m {s}s', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'1 to 20', preparingReferral:'Preparing your referral link...'
+                appName:'Referral Exchange', languageLabel:'🌐 Language', availableLinks:'Available Links', currentBalance:'Current Balance', visitedLinks:'Links Visited',
+                yourPublishedLink:'Your Published Link', createTask:'+ Create Task', newTaskTitle:'Create New Task 🔗', referralLinkLabel:'Referral Link:', requiredVisits:'Required Visits:', publishNow:'Publish Now', referralsTitle:'👥 Referrals',
+                referralSystem:'Referral System 👥', copyLink:'📋 Copy Link', share:'📤 Share', referralCountLabel:'Referrals:', home:'Home', referrals:'Referrals',
+                publisher:'Publisher:', remaining:'Remaining:', visitLink:'↗ Visit Link (+1 point)', allDone:'🎉 You completed all available links!', remainingVisits:'Remaining:',
+                copySuccess:'Referral link copied ✅', shareText:'Join through my link and earn points 👥', invalidTask:'Please fill out all fields correctly (visits >= 1)!',
+                insufficientPoints:'Insufficient points balance!', taskSuccess:'Task created successfully!'
             }
         };
-        function t(key, vars={}) { let v=(I18N[currentLang]&&I18N[currentLang][key])||I18N.ar[key]||key; Object.keys(vars).forEach(k=>v=v.replaceAll('{'+k+'}',vars[k])); return v; }
-        function applyTranslations() {
-            document.querySelectorAll('[data-i18n]').forEach(el=>el.innerHTML=t(el.getAttribute('data-i18n')));
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-placeholder')));
-            document.getElementById('app-title').textContent=t('appName');
-        }
 
         let currentLang = localStorage.getItem('appLang') || 'ar';
-        let rewardAt = parseInt(localStorage.getItem('rewardAt') || '0');
-        const REWARD_MS = 12 * 60 * 60 * 1000;
+        function t(key, vars={}) { let v=(I18N[currentLang]&&I18N[currentLang][key])||I18N.ar[key]||key; Object.keys(vars).forEach(k=>v=v.replaceAll('{'+k+'}',vars[k])); return v; }
+        
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el=>el.innerHTML=t(el.getAttribute('data-i18n')));
+            document.getElementById('app-title').textContent=t('appName');
+        }
 
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
@@ -310,259 +236,162 @@
             document.getElementById('lang-toggle').innerText = en ? 'العربية' : 'English';
             applyTranslations();
             render();
-            updateRewardUI();
         }
 
-        function updateRewardUI() {
-            const now = Date.now();
-            const ready = !rewardAt || now >= rewardAt;
-            const btn = document.getElementById('reward-btn');
-            const status = document.getElementById('reward-status');
-            if (ready) {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.innerText = t('claimReward');
-                status.innerText = t('rewardReady');
-            } else {
-                const remaining = rewardAt - now;
-                const h = Math.floor(remaining / 3600000);
-                const m = Math.floor((remaining % 3600000) / 60000);
-                const sec = Math.floor((remaining % 60000) / 1000);
-                btn.disabled = true;
-                btn.style.opacity = '.55';
-                btn.innerText = t('rewardAvailable',{h,m,s:sec});
-                status.innerText = t('rewardComeBack');
-            }
-        }
+        // ============================================================
+        // 3. الربط وقواعد البيانات (Backend / Supabase)
+        // ============================================================
+        async function initApp() {
+            // جلب البيانات من تيليجرام أو حساب افتراضي للتجربة
+            const tgUser = tg?.initDataUnsafe?.user || {
+                id: 999888777,
+                username: "DemoUser",
+                first_name: "مستخدم تجريبي"
+            };
 
-        function claimReward() {
-            if (rewardAt && Date.now() < rewardAt) return;
-            pts += 8;
-            rewardAt = Date.now() + REWARD_MS;
-            localStorage.setItem('pts', String(pts));
-            localStorage.setItem('rewardAt', String(rewardAt));
-            render();
-            updateRewardUI();
-            alert(t('rewardReceived'));
-        }
+            // دالة (5) create_user
+            const { data: userData, error: userError } = await supabase.rpc('create_user', {
+                p_telegram_id: tgUser.id,
+                p_username: tgUser.username || '',
+                p_first_name: tgUser.first_name || ''
+            });
 
-        setInterval(updateRewardUI, 1000);
-
-        function showPage(page) {
-            const home = document.getElementById('home-page');
-            const referrals = document.getElementById('referrals-page');
-            const homeNav = document.getElementById('nav-home');
-            const refNav = document.getElementById('nav-referrals');
-
-            if (page === 'referrals') {
-                home.style.display = 'none';
-                referrals.style.display = 'block';
-                homeNav.classList.remove('active');
-                refNav.classList.add('active');
-                window.scrollTo({top:0, behavior:'smooth'});
-            } else {
-                home.style.display = 'block';
-                referrals.style.display = 'none';
-                homeNav.classList.add('active');
-                refNav.classList.remove('active');
-                window.scrollTo({top:0, behavior:'smooth'});
-            }
-        }
-
-        function showReferral() {
-            showPage('referrals');
-        }
-
-        function render() {
-            document.getElementById('pts-bal').innerText = pts;
-            document.getElementById('gram-bal').innerText = gram.toFixed(2);
-            document.getElementById('completed-cnt').innerText = visitedTasks.length;
-            document.getElementById('total-tasks-cnt').innerText = tasks.filter(t => t.left > 0).length;
-
-            let curTask = getNextAvailableTask();
-            let cardBox = document.getElementById('task-card');
-
-            if (curTask) {
-                cardBox.style.display = 'block';
-                cardBox.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:10pt;" id="task-user">${t('publisher')} ${escapeHtml(curTask.user)}</span>
-                        <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">${t('remaining')} ${curTask.left}</span>
-                    </div>
-                    <div class="link-box" id="task-url">${escapeHtml(curTask.url)}</div>
-                    <button class="btn btn-purple" onclick="visitLink()">${t('visitLink')}</button>
-                `;
-            } else {
-                cardBox.innerHTML = `<div style="text-align:center; padding:15px; color:var(--muted); font-size:10pt;">${t('allDone')}</div>`;
-            }
-
-            let infoBox = document.getElementById('my-task-info');
-            if (myLink) {
-                infoBox.innerHTML = `<b style="color:var(--cyan);">${escapeHtml(myLink.url)}</b><br>${t('remainingVisits')} ${myLink.cnt}`;
-            } else {
-                infoBox.innerText = t('noPublishedLink');
-            }
-
-            document.getElementById('ref-count').innerText = referralCount;
-            document.getElementById('ref-points').innerText = referralPoints;
-            const dailyBox = document.getElementById('daily-visitors');
-            if (dailyBox) dailyBox.innerText = dailyVisitors;
-
-            buildReferralLink();
-        }
-
-        function escapeHtml(value) {
-            return String(value).replace(/[&<>"']/g, ch => ({
-                '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
-            }[ch]));
-        }
-
-        function getTelegramUserId() {
-            try {
-                return window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
-            } catch (_) {
-                return null;
-            }
-        }
-
-        function buildReferralLink() {
-            const box = document.getElementById('referral-url');
-            if (!box) return;
-
-            const botUsername =
-                window.Telegram?.WebApp?.initDataUnsafe?.user?.username
-                ? null
-                : null;
-
-            // Telegram provides the launch parameters through start_param.
-            // If no bot username is available from the client, keep a safe placeholder.
-            const userId = getTelegramUserId();
-            const appUrl = window.location.href.split('#')[0].split('?')[0];
-
-            // رابط الإحالة يفتح نفس البوت Getttttsbot مع كود المستخدم الخاص به.
-            const configuredBot = window.APP_BOT_USERNAME || "Getttttsbot";
-            const link = `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
-
-            box.innerText = link;
-            box.dataset.referral = link;
-        }
-
-        function copyReferral() {
-            const box = document.getElementById('referral-url');
-            const link = box?.dataset?.referral || box?.innerText || '';
-            if (!link) return;
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(link).then(() => alert(t('copySuccess')));
-            } else {
-                const temp = document.createElement('textarea');
-                temp.value = link;
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand('copy');
-                temp.remove();
-                alert(t('copySuccess'));
-            }
-        }
-
-        function shareReferral() {
-            const box = document.getElementById('referral-url');
-            const link = box?.dataset?.referral || box?.innerText || '';
-            if (!link) return;
-
-            const text = t('shareText');
-            if (window.Telegram?.WebApp?.openTelegramLink) {
-                window.Telegram.WebApp.openTelegramLink(
-                    `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`
-                );
-            } else if (navigator.share) {
-                navigator.share({ text, url: link }).catch(() => {});
-            } else {
-                copyReferral();
-            }
-        }
-
-        function showReferral() {
-            document.getElementById('referral-url')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function visitLink() {
-            let curTask = getNextAvailableTask();
-            if(!curTask) return;
-
-            // Open URL
-            window.open(curTask.url, '_blank');
-
-            // Reward & update state
-            pts += 1;
-            curTask.left -= 1;
-            visitedTasks.push(curTask.id);
-
-            // Save changes locally
-            localStorage.setItem('pts', pts);
-            localStorage.setItem('visitedTasks', JSON.stringify(visitedTasks));
-            localStorage.setItem('globalTasks', JSON.stringify(tasks));
-
-            render();
-        }
-
-        function buyPoints() {
-            let p = parseInt(document.getElementById('buy-pkg').value);
-            let cost = (p / 100) * 0.05;
-
-            if(gram < cost) {
-                alert(t('insufficientGram'));
+            if (userError) {
+                console.error("خطأ أثناء تسجل المستخدم:", userError);
                 return;
             }
 
-            gram -= cost;
-            pts += p;
+            currentUser = userData;
 
-            localStorage.setItem('gram', gram);
-            localStorage.setItem('pts', pts);
+            // دالة (6) create_referral - معالجة الإحالة إن وجدت
+            const startParam = tg?.initDataUnsafe?.start_param;
+            if (startParam && parseInt(startParam) !== currentUser.telegram_id) {
+                const referrerId = parseInt(startParam);
+                const { data: refSuccess } = await supabase.rpc('create_referral', {
+                    p_referrer_id: referrerId,
+                    p_referred_id: currentUser.telegram_id,
+                    p_reward_points: 20
+                });
 
-            closeModal('buy-modal');
-            render();
-            alert(t('purchaseSuccess',{p}));
+                if (refSuccess) {
+                    // منح المكافأة لصاحب الإحالة
+                    await supabase.rpc('add_points', {
+                        p_user_id: referrerId,
+                        p_points: 20
+                    });
+                }
+            }
+
+            await loadData();
+            applyLanguage();
         }
 
-        function addLink() {
-            let u = document.getElementById('add-url').value.trim();
-            let c = parseInt(document.getElementById('add-cnt').value);
+        async function loadData() {
+            if (!currentUser) return;
 
-            if(!u || c < 1 || c > 20) {
+            // جلب بيانات الحساب المحدثة
+            const { data: uData } = await supabase
+                .from('users')
+                .select('*')
+                .eq('telegram_id', currentUser.telegram_id)
+                .single();
+            if (uData) currentUser = uData;
+
+            // جلب سجل المهمات المكتملة
+            const { data: compTasks } = await supabase
+                .from('completed_tasks')
+                .select('task_id')
+                .eq('user_id', currentUser.telegram_id);
+            
+            completedTaskIds = compTasks ? compTasks.map(ct => ct.task_id) : [];
+
+            // جلب المهام المتاحة
+            const { data: tasks } = await supabase
+                .from('tasks')
+                .select('*')
+                .gte('required_visits', 1)
+                .neq('owner_id', currentUser.telegram_id)
+                .order('created_at', { ascending: false });
+
+            availableTasks = tasks || [];
+
+            // جلب مهامي المنشورة
+            const { data: myTasksData } = await supabase
+                .from('tasks')
+                .select('*')
+                .eq('owner_id', currentUser.telegram_id)
+                .order('created_at', { ascending: false });
+
+            myTasks = myTasksData || [];
+
+            // جلب عدد الإحالات
+            const { count: refCount } = await supabase
+                .from('referrals')
+                .select('*', { count: 'exact', head: true })
+                .eq('referrer_id', currentUser.telegram_id);
+
+            currentUser.refCount = refCount || 0;
+
+            render();
+        }
+
+        // إكمال المهمة وإضافة المكافأة
+        async function visitLink() {
+            const curTask = getNextAvailableTask();
+            if (!curTask) return;
+
+            window.open(curTask.url, '_blank');
+
+            // 1. تسجل إكمال المهمة بجدول completed_tasks
+            const { error: compErr } = await supabase
+                .from('completed_tasks')
+                .insert([{ user_id: currentUser.telegram_id, task_id: curTask.id }]);
+
+            if (!compErr) {
+                // 2. تحديث عدد الزيارات المطلوبة
+                await supabase
+                    .from('tasks')
+                    .update({ required_visits: curTask.required_visits - 1 })
+                    .eq('id', curTask.id);
+
+                // 3. إضافة النقاط للمستخدم عبر دالة add_points
+                const { data: updatedPts } = await supabase.rpc('add_points', {
+                    p_user_id: currentUser.telegram_id,
+                    p_points: curTask.reward_points || 1
+                });
+
+                if (updatedPts !== null) currentUser.points = updatedPts;
+
+                await loadData();
+            }
+        }
+
+        // إنشاء مهمة جديدة وخصم النقاط
+        async function addLink() {
+            const title = document.getElementById('add-title').value.trim();
+            const desc = document.getElementById('add-desc').value.trim();
+            const url = document.getElementById('add-url').value.trim();
+            const visits = parseInt(document.getElementById('add-cnt').value);
+
+            if (!url || isNaN(visits) || visits < 1) {
                 alert(t('invalidTask'));
                 return;
             }
 
-            if(c > pts) {
-                alert(t('insufficientPoints',{p:pts}));
+            // دالة خصم النقاط (4) subtract_points
+            const { data: newPoints, error: subError } = await supabase.rpc('subtract_points', {
+                p_user_id: currentUser.telegram_id,
+                p_points: visits
+            });
+
+            if (subError) {
+                alert(t('insufficientPoints'));
                 return;
             }
 
-            pts -= c;
-            let newTask = { id: Date.now(), user: currentLang === 'en' ? "You" : "أنت", left: c, url: u };
-            tasks.push(newTask);
-            myLink = { url: u, cnt: c };
-
-            localStorage.setItem('pts', pts);
-            localStorage.setItem('myLink', JSON.stringify(myLink));
-            localStorage.setItem('globalTasks', JSON.stringify(tasks));
-
-            closeModal('add-modal');
-            document.getElementById('add-url').value = '';
-            document.getElementById('add-cnt').value = '';
-            render();
-            alert(t('taskSuccess'));
-        }
-
-        // ملاحظة: احتساب الإحالة +40 بشكل نهائي يحتاج Bot/Server للتحقق من مستخدم Telegram.
-        // المكافأة 8 نقاط/12 ساعة هنا محفوظة محلياً؛ للحماية من التحايل يجب نقلها إلى Backend.
-        applyLanguage();
-        render();
-    </script>
-</body>
-</html>
+            // إضافة المهمة لجدول tasks مع owner_id و required_visits
+            const { error: insertErr } = await supabase
+                .from('tasks')
+                .insert([{
+                    owner_id: currentUser.telegram_id,
+ 
