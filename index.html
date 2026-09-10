@@ -110,7 +110,7 @@
     <div id="home-page">
         <div class="stats-grid">
             <div class="stat-box"><div class="stat-val" id="total-tasks-cnt">2</div><div class="stat-lbl" data-i18n="availableLinks">الروابط المتاحة</div></div>
-            <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">10</div><div class="stat-lbl" data-i18n="currentBalance">رصيدك الحالي</div></div>
+            <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">0</div><div class="stat-lbl" data-i18n="currentBalance">رصيدك الحالي</div></div>
             <div class="stat-box"><div class="stat-val" id="completed-cnt">0</div><div class="stat-lbl" data-i18n="visitedLinks">روابط زرتها</div></div>
         </div>
 
@@ -703,6 +703,19 @@ function getTelegramUser() {
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        async function awardPoints(points, userId = currentUser?.telegram_id) {
+            const { data, error } = await supabase.rpc('add_points', {
+                p_user_id: userId,
+                p_points: points
+            });
+            if (error) throw error;
+            const newBalance = Number(data);
+            if (!Number.isFinite(newBalance)) {
+                throw new Error('Invalid balance returned by add_points');
+            }
+            return newBalance;
+        }
+
         async function visitLink() {
     if (!ensureSupabase('تنفيذ المهمة')) return;
             const curTask = getNextAvailableTask();
@@ -713,7 +726,14 @@ function getTelegramUser() {
 
             window.open(curTask.url, '_blank');
 
+            let pointsAwarded = false;
             try {
+                // Award the point first. If recording the visit fails, roll the point back.
+                // This prevents the old bug where a successful completed_tasks insert
+                // could happen while add_points failed, leaving the task completed but unpaid.
+                pts = await awardPoints(1);
+                pointsAwarded = true;
+
                 const { error: completedError } = await supabase
                     .from('completed_tasks')
                     .insert({
@@ -721,16 +741,21 @@ function getTelegramUser() {
                         task_id: taskId
                     });
 
-                if (completedError) throw completedError;
+                if (completedError) {
+                    // Duplicate means the task was already completed; don't keep the extra point.
+                    if (String(completedError.code) === '23505') {
+                        await supabase.rpc('subtract_points', {
+                            p_user_id: currentUser.telegram_id,
+                            p_points: 1
+                        });
+                        pointsAwarded = false;
+                        if (!visitedTasks.includes(taskId)) visitedTasks.push(taskId);
+                        render();
+                        return;
+                    }
+                    throw completedError;
+                }
 
-                const { data: newPoints, error: pointsError } = await supabase.rpc('add_points', {
-                    p_user_id: currentUser.telegram_id,
-                    p_points: 1
-                });
-
-                if (pointsError) throw pointsError;
-
-                pts = Number(newPoints);
                 visitedTasks.push(taskId);
 
                 // Update the local display immediately; server remains the source of truth.
@@ -738,14 +763,23 @@ function getTelegramUser() {
                 if (curTask.left === 0) curTask.is_active = false;
                 render();
             } catch (err) {
-                // Duplicate completion is treated as already visited.
-                if (String(err?.code) === '23505') {
-                    if (!visitedTasks.includes(taskId)) visitedTasks.push(taskId);
-                    render();
-                    return;
+                // If the visit could not be recorded after awarding the point, refund it.
+                if (pointsAwarded) {
+                    try {
+                        pts = await supabase.rpc('add_points', {
+                            p_user_id: currentUser.telegram_id,
+                            p_points: -1
+                        }).then(r => {
+                            if (r.error) throw r.error;
+                            return Number(r.data);
+                        });
+                    } catch (refundErr) {
+                        console.error('visitLink refund failed:', refundErr);
+                    }
                 }
                 console.error('visitLink:', err);
-                alert(t('loadError'));
+                alert((err?.message || '').includes('23505') ? 'تم احتساب هذه المهمة مسبقاً.' : t('loadError'));
+                await loadData();
             }
         }
 
@@ -835,6 +869,29 @@ function getTelegramUser() {
             }
         }
 
+        // Give each newly-created Telegram account a one-time 20-point welcome bonus.
+        // The server-side create_user RPC should ideally perform this atomically as well.
+        async function grantWelcomeBonusIfNew(user) {
+            if (!user?.telegram_id) return;
+            const key = 'welcomeBonusGranted_' + String(user.telegram_id);
+            if (localStorage.getItem(key) === '1') return;
+
+            const createdAt = user.created_at ? new Date(user.created_at).getTime() : NaN;
+            const isNewUser = Number.isFinite(createdAt) && (Date.now() - createdAt) < 2 * 60 * 1000;
+            if (!isNewUser) return;
+
+            try {
+                const newBalance = await awardPoints(20, user.telegram_id);
+                pts = Number(newBalance);
+                localStorage.setItem(key, '1');
+                render();
+                alert('🎁 أهلاً بك! تمت إضافة 20 نقطة مجانية إلى حسابك.');
+            } catch (err) {
+                console.error('welcome bonus:', err);
+                // Do not mark as granted if the server rejected it; retry on next load.
+            }
+        }
+
         // Gram purchases remain a UI placeholder until a real payment/backend flow is implemented.
         async function loadData() {
     if (!ensureSupabase('تحميل بيانات الحساب')) {
@@ -867,6 +924,7 @@ function getTelegramUser() {
                 if (userError) throw userError;
 
                 currentUser = user;
+                await grantWelcomeBonusIfNew(user);
 
                 const { data: taskRows, error: taskError } = await supabase
                     .from('tasks')
