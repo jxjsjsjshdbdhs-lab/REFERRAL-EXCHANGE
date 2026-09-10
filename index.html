@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-title">منصة تبادل الإحالات</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-1: #0f172a;
@@ -128,8 +128,9 @@
             <span style="font-weight:800; font-size:10pt;" id="task-user">ناشر الرابط: Muktar</span>
             <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">متبقي: 6</span>
         </div>
+        <div id="task-description" style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-top:8px;"></div>
         <div class="link-box" id="task-url">https://t.me/example_bot</div>
-        <button class="btn btn-purple" onclick="visitLink()">${t('visitLink')}</button>
+        <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
     </div>
 
     <!-- My Link Card -->
@@ -165,6 +166,8 @@
             <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="newTaskTitle">إنشاء مهمة جديدة 🔗</h3>
             <label style="font-size:8.5pt; color:var(--muted);" data-i18n="referralLinkLabel">رابط الإحالة:</label>
             <input type="url" class="inp" id="add-url" data-i18n-placeholder="urlPlaceholder" placeholder="https://t.me/your_bot">
+            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="taskDescriptionLabel">وصف المهمة:</label>
+            <textarea class="inp" id="add-description" data-i18n-placeholder="descriptionPlaceholder" placeholder="اكتب وصفاً مختصراً للمهمة" rows="3" style="resize:vertical;"></textarea>
             <label style="font-size:8.5pt; color:var(--muted);" data-i18n="requiredVisits">عدد الزيارات المطلوبة:</label>
             <input type="number" class="inp" id="add-cnt" data-i18n-placeholder="visitsPlaceholder" placeholder="من 1 إلى 20" min="1" max="20">
             <div style="display:flex; gap:8px;">
@@ -217,29 +220,207 @@
 
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
         }
 
-        // App States
-        let pts = parseInt(localStorage.getItem('pts')) || 10;
-        let gram = parseFloat(localStorage.getItem('gram')) || 0.50;
-        let myLink = JSON.parse(localStorage.getItem('myLink')) || null;
-        let visitedTasks = JSON.parse(localStorage.getItem('visitedTasks')) || [];
-        let referralCount = parseInt(localStorage.getItem('referralCount')) || 0;
-        let referralPoints = parseInt(localStorage.getItem('referralPoints')) || 0;
+        // Supabase configuration
+        // We use Supabase REST directly so the page does NOT depend on jsDelivr.
+        const SUPABASE_URL = "https://lquaccwytlxnosjbtdvk.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi";
 
-        // All active referral tasks
-        let tasks = JSON.parse(localStorage.getItem('globalTasks')) || [
-            { id: 101, user: "Muktar", left: 6, url: "https://t.me/CryptoAirdropBot" },
-            { id: 102, user: "Ahmed", left: 12, url: "https://t.me/MajorTonBot" },
-            { id: 103, user: "Ali", left: 5, url: "https://t.me/BlumCryptoBot" }
-        ];
+        class RestQuery {
+            constructor(client, table) {
+                this.client = client;
+                this.table = table;
+                this.params = new URLSearchParams();
+                this.headers = {};
+                this.method = 'GET';
+                this.body = null;
+                this.returnSingle = false;
+            }
 
-        function getNextAvailableTask() {
-            return tasks.find(t => !visitedTasks.includes(t.id) && t.left > 0);
+            select(columns='*') {
+                this.params.set('select', columns);
+                this.headers['Prefer'] = 'return=representation';
+                return this;
+            }
+
+            eq(column, value) {
+                this.params.set(column, `eq.${value}`);
+                return this;
+            }
+
+            order(column, options = {}) {
+                const direction = options.ascending === false ? 'desc' : 'asc';
+                this.params.set('order', `${column}.${direction}`);
+                return this;
+            }
+
+            insert(row) {
+                this.method = 'POST';
+                this.body = row;
+                this.headers['Prefer'] = 'return=representation';
+                return this;
+            }
+
+            single() {
+                this.returnSingle = true;
+                return this;
+            }
+
+            async execute() {
+                let url = `${this.client.url}/rest/v1/${encodeURIComponent(this.table)}`;
+                const options = {
+                    method: this.method,
+                    headers: {
+                        apikey: this.client.key,
+                        Authorization: `Bearer ${this.client.key}`,
+                        'Content-Type': 'application/json',
+                        ...this.headers
+                    }
+                };
+
+                if (this.method === 'GET') {
+                    const query = this.params.toString();
+                    if (query) url += `?${query}`;
+                } else {
+                    const query = this.params.toString();
+                    if (query) url += `?${query}`;
+                    options.body = JSON.stringify(this.body);
+                }
+
+                try {
+                    const response = await fetch(url, options);
+                    const raw = await response.text();
+                    let data = null;
+                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
+
+                    if (!response.ok) {
+                        const error = {
+                            message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
+                            code: data?.code,
+                            details: data?.details,
+                            hint: data?.hint,
+                            status: response.status
+                        };
+                        return { data: null, error };
+                    }
+
+                    if (this.returnSingle) {
+                        if (Array.isArray(data)) {
+                            if (data.length === 0) {
+                                return { data: null, error: { message: 'No rows returned', code: 'PGRST116' } };
+                            }
+                            return { data: data[0], error: null };
+                        }
+                    }
+
+                    return { data, error: null };
+                } catch (err) {
+                    return {
+                        data: null,
+                        error: {
+                            message: err?.message || 'Network error',
+                            code: 'NETWORK_ERROR'
+                        }
+                    };
+                }
+            }
+
+            then(resolve, reject) {
+                return this.execute().then(resolve, reject);
+            }
+
+            catch(reject) {
+                return this.execute().catch(reject);
+            }
         }
 
-        // زوار اليوم: محلياً حالياً. الإحصاء العالمي يحتاج Backend/Database.
+        const supabase = {
+            url: SUPABASE_URL,
+            key: SUPABASE_KEY,
+
+            from(table) {
+                return new RestQuery(this, table);
+            },
+
+            async rpc(functionName, args = {}) {
+                const url = `${this.url}/rest/v1/rpc/${encodeURIComponent(functionName)}`;
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            apikey: this.key,
+                            Authorization: `Bearer ${this.key}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(args)
+                    });
+
+                    const raw = await response.text();
+                    let data = null;
+                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
+
+                    if (!response.ok) {
+                        return {
+                            data: null,
+                            error: {
+                                message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
+                                code: data?.code,
+                                details: data?.details,
+                                hint: data?.hint,
+                                status: response.status
+                            }
+                        };
+                    }
+
+                    // PostgreSQL scalar RPC results are returned directly.
+                    if (Array.isArray(data) && data.length === 1 && Object.keys(data[0] || {}).length === 1) {
+                        const key = Object.keys(data[0])[0];
+                        if (typeof data[0][key] !== 'object') data = data[0][key];
+                    }
+
+                    return { data, error: null };
+                } catch (err) {
+                    return {
+                        data: null,
+                        error: {
+                            message: err?.message || 'Network error',
+                            code: 'NETWORK_ERROR'
+                        }
+                    };
+                }
+            }
+        };
+
+        let supabaseReady = true;
+
+        // App state
+        let pts = 0;
+        let gram = 0.50;
+        let myLink = null;
+        let visitedTasks = [];
+        let referralCount = 0;
+        let referralPoints = 0;
+        let tasks = [];
+        let currentUser = null;
+
+        // Temporary client-side reward timer. Final anti-abuse protection belongs in Backend/Edge Function.
+        let rewardAt = parseInt(localStorage.getItem('rewardAt') || '0');
+        const REWARD_MS = 12 * 60 * 60 * 1000;
+
+        function getNextAvailableTask() {
+            return tasks.find(t =>
+                Number(t.owner_id) !== Number(currentUser?.telegram_id) &&
+                !visitedTasks.includes(Number(t.id)) &&
+                Number(t.left || t.required_visits || 0) > 0 &&
+                t.is_active !== false
+            );
+        }
+
+        // Visitor count is intentionally kept local for now.
+        // A global daily count requires a backend/Edge Function to avoid spoofing.
         const todayKey = new Date().toISOString().slice(0, 10);
         let visitorDate = localStorage.getItem('visitorDate');
         let dailyVisitors = parseInt(localStorage.getItem('dailyVisitors')) || 0;
@@ -249,7 +430,6 @@
             localStorage.setItem('visitorDate', visitorDate);
             localStorage.setItem('dailyVisitors', '0');
         }
-
         const visitorSessionKey = 'visitorSession_' + todayKey;
         if (!sessionStorage.getItem(visitorSessionKey)) {
             dailyVisitors += 1;
@@ -262,27 +442,27 @@
                 appName:'تبادل الإحالات', languageLabel:'🌐 اللغة', availableLinks:'الروابط المتاحة', currentBalance:'رصيدك الحالي', visitedLinks:'روابط زرتها', dailyVisitors:'زائر البوت اليوم',
                 rewardTitle:'مكافأة كل 12 ساعة', rewardStatus:'احصل على 8 نقاط مجاناً', claimReward:'استلام 8 نقاط', rewardReady:'مكافأتك المجانية جاهزة', rewardComeBack:'ارجع بعد 12 ساعة',
                 yourPublishedLink:'رابطك المنشور', createTask:'+ إنشاء مهمة', noPublishedLink:'لا يوجد رابط مضاف حالياً.', buyPointsTitle:'شراء النقاط بعملة Gram 💎', choosePackage:'اختر الباقة:', confirmPurchase:'تأكيد الشراء', cancel:'إلغاء',
-                newTaskTitle:'إنشاء مهمة جديدة 🔗', referralLinkLabel:'رابط الإحالة:', requiredVisits:'عدد الزيارات المطلوبة:', publishNow:'نشر الآن', referralsTitle:'👥 الإحالات',
+                newTaskTitle:'إنشاء مهمة جديدة 🔗', taskDescriptionLabel:'وصف المهمة:', descriptionPlaceholder:'اكتب وصفاً مختصراً للمهمة', referralLinkLabel:'رابط الإحالة:', requiredVisits:'عدد الزيارات المطلوبة:', publishNow:'نشر الآن', referralsTitle:'👥 الإحالات',
                 referralsIntro:'شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.', referralSystem:'نظام الإحالة 👥', referralDescription:'ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.',
                 copyLink:'📋 نسخ الرابط', share:'📤 مشاركة', referralCountLabel:'عدد الإحالات:', referralPointsLabel:'نقاط الإحالة:', home:'الرئيسية', referrals:'الإحالات', store:'المتجر', storeUnavailable:'المتجر غير متاح حالياً',
                 publisher:'ناشر الرابط:', remaining:'متبقي:', visitLink:'↗ زيارة الرابط (+1 نقطة)', allDone:'🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.', remainingVisits:'المتبقي:',
                 copySuccess:'تم نسخ رابط الإحالة ✅', shareText:'انضم عن طريقي واحصل على فرصة لجمع النقاط 👥', insufficientGram:'رصيدك من عملة Gram غير كافٍ!', purchaseSuccess:'تم شراء {p} نقطة بنجاح!',
                 invalidTask:'يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!', insufficientPoints:'نقاطك لا تكفي! رصيدك الحالي: {p}', taskSuccess:'تم إنشاء المهمة ونشر رابطك بنجاح!', rewardReceived:'تمت إضافة 8 نقاط إلى رصيدك 🎉',
                 rewardAvailable:'متاحة بعد {h}س {m}د {s}ث', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'من 1 إلى 20', preparingReferral:'جارٍ تجهيز رابط الإحالة...'
+                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'من 1 إلى 20', preparingReferral:'جارٍ تجهيز رابط الإحالة...', loading:'جارٍ تحميل البيانات...', loadError:'تعذر تحميل البيانات من الخادم. حاول مرة أخرى.'
             },
             en: {
                 appName:'Referral Exchange', languageLabel:'🌐 Language', availableLinks:'Available Links', currentBalance:'Current Balance', visitedLinks:'Links Visited', dailyVisitors:'Bot Visitors Today',
                 rewardTitle:'Reward Every 12 Hours', rewardStatus:'Get 8 free points', claimReward:'Claim 8 Points', rewardReady:'Your free reward is ready', rewardComeBack:'Come back after 12 hours',
                 yourPublishedLink:'Your Published Link', createTask:'+ Create Task', noPublishedLink:'No link added yet.', buyPointsTitle:'Buy Points with Gram 💎', choosePackage:'Choose a package:', confirmPurchase:'Confirm Purchase', cancel:'Cancel',
-                newTaskTitle:'Create New Task 🔗', referralLinkLabel:'Referral Link:', requiredVisits:'Required Visits:', publishNow:'Publish Now', referralsTitle:'👥 Referrals',
+                newTaskTitle:'Create New Task 🔗', taskDescriptionLabel:'Task Description:', descriptionPlaceholder:'Write a short task description', referralLinkLabel:'Referral Link:', requiredVisits:'Required Visits:', publishNow:'Publish Now', referralsTitle:'👥 Referrals',
                 referralsIntro:'Share your link with friends. When a referral is counted successfully, you receive <b style="color:var(--emerald);">40 points</b>.', referralSystem:'Referral System 👥', referralDescription:'Invite friends using your link and get <b style="color:var(--emerald);">40 points</b> for each successful referral.',
                 copyLink:'📋 Copy Link', share:'📤 Share', referralCountLabel:'Referrals:', referralPointsLabel:'Referral Points:', home:'Home', referrals:'Referrals', store:'Store', storeUnavailable:'Store is currently unavailable',
                 publisher:'Link Publisher:', remaining:'Remaining:', visitLink:'↗ Visit Link (+1 point)', allDone:'🎉 You completed all available links!<br>Come back later for new links.', remainingVisits:'Remaining:',
                 copySuccess:'Referral link copied ✅', shareText:'Join through my link and get a chance to earn points 👥', insufficientGram:'Your Gram balance is insufficient!', purchaseSuccess:'Successfully purchased {p} points!',
                 invalidTask:'Please enter a link and choose between 1 and 20 visits!', insufficientPoints:'Not enough points! Your current balance: {p}', taskSuccess:'Task created and your link was published successfully!', rewardReceived:'8 points added to your balance 🎉',
                 rewardAvailable:'Available in {h}h {m}m {s}s', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'1 to 20', preparingReferral:'Preparing your referral link...'
+                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'1 to 20', preparingReferral:'Preparing your referral link...', loading:'Loading data...', loadError:'Could not load data from the server. Please try again.'
             }
         };
         function t(key, vars={}) { let v=(I18N[currentLang]&&I18N[currentLang][key])||I18N.ar[key]||key; Object.keys(vars).forEach(k=>v=v.replaceAll('{'+k+'}',vars[k])); return v; }
@@ -293,8 +473,6 @@
         }
 
         let currentLang = localStorage.getItem('appLang') || 'ar';
-        let rewardAt = parseInt(localStorage.getItem('rewardAt') || '0');
-        const REWARD_MS = 12 * 60 * 60 * 1000;
 
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
@@ -335,15 +513,36 @@
             }
         }
 
-        function claimReward() {
+        async function claimReward() {
+    if (!ensureSupabase('استلام المكافأة')) return;
             if (rewardAt && Date.now() < rewardAt) return;
-            pts += 8;
-            rewardAt = Date.now() + REWARD_MS;
-            localStorage.setItem('pts', String(pts));
-            localStorage.setItem('rewardAt', String(rewardAt));
-            render();
-            updateRewardUI();
-            alert(t('rewardReceived'));
+            if (!currentUser) {
+                alert(t('loadError'));
+                return;
+            }
+
+            const btn = document.getElementById('reward-btn');
+            btn.disabled = true;
+
+            try {
+                const { data, error } = await supabase.rpc('add_points', {
+                    p_user_id: currentUser.telegram_id,
+                    p_points: 8
+                });
+
+                if (error) throw error;
+
+                pts = Number(data);
+                rewardAt = Date.now() + REWARD_MS;
+                localStorage.setItem('rewardAt', String(rewardAt));
+                render();
+                updateRewardUI();
+                alert(t('rewardReceived'));
+            } catch (err) {
+                console.error('claimReward:', err);
+                btn.disabled = false;
+                alert(t('loadError'));
+            }
         }
 
         setInterval(updateRewardUI, 1000);
@@ -377,7 +576,7 @@
             document.getElementById('pts-bal').innerText = pts;
             document.getElementById('gram-bal').innerText = gram.toFixed(2);
             document.getElementById('completed-cnt').innerText = visitedTasks.length;
-            document.getElementById('total-tasks-cnt').innerText = tasks.filter(t => t.left > 0).length;
+            document.getElementById('total-tasks-cnt').innerText = tasks.filter(t => Number(t.owner_id) !== Number(currentUser?.telegram_id) && t.left > 0).length;
 
             let curTask = getNextAvailableTask();
             let cardBox = document.getElementById('task-card');
@@ -389,8 +588,9 @@
                         <span style="font-weight:800; font-size:10pt;" id="task-user">${t('publisher')} ${escapeHtml(curTask.user)}</span>
                         <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">${t('remaining')} ${curTask.left}</span>
                     </div>
+                    ${curTask.description ? `<div style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-top:8px;">${escapeHtml(curTask.description)}</div>` : ''}
                     <div class="link-box" id="task-url">${escapeHtml(curTask.url)}</div>
-                    <button class="btn btn-purple" onclick="visitLink()">${t('visitLink')}</button>
+                    <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
                 `;
             } else {
                 cardBox.innerHTML = `<div style="text-align:center; padding:15px; color:var(--muted); font-size:10pt;">${t('allDone')}</div>`;
@@ -425,21 +625,35 @@
             }
         }
 
+        function ensureSupabase(actionName = 'هذه العملية') {
+    if (!navigator.onLine) {
+        alert('لا يوجد اتصال بالإنترنت حالياً.\n\n' + actionName + ' تحتاج اتصالاً بالإنترنت.');
+        return false;
+    }
+    if (!supabaseReady || !supabase) {
+        alert('تعذر الاتصال بخدمة البيانات الآن.\n\n' + actionName + ' تحتاج اتصال Supabase. جرّب تحديث الصفحة والتأكد من الإنترنت.');
+        return false;
+    }
+    return true;
+}
+
+function isTelegramMode() {
+    return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
+}
+
+function getTelegramUser() {
+            try {
+                return window.Telegram?.WebApp?.initDataUnsafe?.user || null;
+            } catch (_) {
+                return null;
+            }
+        }
+
         function buildReferralLink() {
             const box = document.getElementById('referral-url');
             if (!box) return;
 
-            const botUsername =
-                window.Telegram?.WebApp?.initDataUnsafe?.user?.username
-                ? null
-                : null;
-
-            // Telegram provides the launch parameters through start_param.
-            // If no bot username is available from the client, keep a safe placeholder.
             const userId = getTelegramUserId();
-            const appUrl = window.location.href.split('#')[0].split('?')[0];
-
-            // رابط الإحالة يفتح نفس البوت Getttttsbot مع كود المستخدم الخاص به.
             const configuredBot = window.APP_BOT_USERNAME || "Getttttsbot";
             const link = `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
 
@@ -489,24 +703,50 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function visitLink() {
-            let curTask = getNextAvailableTask();
-            if(!curTask) return;
+        async function visitLink() {
+    if (!ensureSupabase('تنفيذ المهمة')) return;
+            const curTask = getNextAvailableTask();
+            if (!curTask || !currentUser) return;
 
-            // Open URL
+            const taskId = Number(curTask.id);
+            if (visitedTasks.includes(taskId)) return;
+
             window.open(curTask.url, '_blank');
 
-            // Reward & update state
-            pts += 1;
-            curTask.left -= 1;
-            visitedTasks.push(curTask.id);
+            try {
+                const { error: completedError } = await supabase
+                    .from('completed_tasks')
+                    .insert({
+                        user_id: currentUser.telegram_id,
+                        task_id: taskId
+                    });
 
-            // Save changes locally
-            localStorage.setItem('pts', pts);
-            localStorage.setItem('visitedTasks', JSON.stringify(visitedTasks));
-            localStorage.setItem('globalTasks', JSON.stringify(tasks));
+                if (completedError) throw completedError;
 
-            render();
+                const { data: newPoints, error: pointsError } = await supabase.rpc('add_points', {
+                    p_user_id: currentUser.telegram_id,
+                    p_points: 1
+                });
+
+                if (pointsError) throw pointsError;
+
+                pts = Number(newPoints);
+                visitedTasks.push(taskId);
+
+                // Update the local display immediately; server remains the source of truth.
+                curTask.left = Math.max(0, Number(curTask.left || curTask.required_visits || 0) - 1);
+                if (curTask.left === 0) curTask.is_active = false;
+                render();
+            } catch (err) {
+                // Duplicate completion is treated as already visited.
+                if (String(err?.code) === '23505') {
+                    if (!visitedTasks.includes(taskId)) visitedTasks.push(taskId);
+                    render();
+                    return;
+                }
+                console.error('visitLink:', err);
+                alert(t('loadError'));
+            }
         }
 
         function buyPoints() {
@@ -529,40 +769,201 @@
             alert(t('purchaseSuccess',{p}));
         }
 
-        function addLink() {
-            let u = document.getElementById('add-url').value.trim();
-            let c = parseInt(document.getElementById('add-cnt').value);
+        async function addLink() {
+    if (!ensureSupabase('إضافة المهمة')) return;
+            const u = document.getElementById('add-url').value.trim();
+            const description = document.getElementById('add-description').value.trim();
+            const c = parseInt(document.getElementById('add-cnt').value);
 
-            if(!u || c < 1 || c > 20) {
+            if (!u || !/^https?:\/\//i.test(u) || c < 1 || c > 20) {
                 alert(t('invalidTask'));
                 return;
             }
 
-            if(c > pts) {
-                alert(t('insufficientPoints',{p:pts}));
+            if (!currentUser) {
+                alert(t('loadError'));
                 return;
             }
 
-            pts -= c;
-            let newTask = { id: Date.now(), user: currentLang === 'en' ? "You" : "أنت", left: c, url: u };
-            tasks.push(newTask);
-            myLink = { url: u, cnt: c };
+            try {
+                const { data: newPoints, error: pointsError } = await supabase.rpc('subtract_points', {
+                    p_user_id: currentUser.telegram_id,
+                    p_points: c
+                });
+                if (pointsError) throw pointsError;
 
-            localStorage.setItem('pts', pts);
-            localStorage.setItem('myLink', JSON.stringify(myLink));
-            localStorage.setItem('globalTasks', JSON.stringify(tasks));
+                const { data: insertedTask, error: taskError } = await supabase
+                    .from('tasks')
+                    .insert({
+                        title: u,
+                        description: description || null,
+                        reward_points: 1,
+                        url: u,
+                        is_active: true,
+                        owner_id: currentUser.telegram_id,
+                        required_visits: c
+                    })
+                    .select()
+                    .single();
 
-            closeModal('add-modal');
-            document.getElementById('add-url').value = '';
-            document.getElementById('add-cnt').value = '';
-            render();
-            alert(t('taskSuccess'));
+                if (taskError) {
+                    // Refund points if task creation failed.
+                    await supabase.rpc('add_points', {
+                        p_user_id: currentUser.telegram_id,
+                        p_points: c
+                    });
+                    throw taskError;
+                }
+
+                pts = Number(newPoints);
+                myLink = insertedTask;
+
+                closeModal('add-modal');
+                document.getElementById('add-url').value = '';
+                document.getElementById('add-description').value = '';
+                document.getElementById('add-cnt').value = '';
+
+                await loadData();
+                alert(t('taskSuccess'));
+            } catch (err) {
+                console.error('addLink:', err);
+                if (String(err?.message || '').toLowerCase().includes('insufficient points')) {
+                    alert(t('insufficientPoints', {p: pts}));
+                } else {
+                    alert(t('loadError'));
+                }
+            }
         }
 
-        // ملاحظة: احتساب الإحالة +40 بشكل نهائي يحتاج Bot/Server للتحقق من مستخدم Telegram.
-        // المكافأة 8 نقاط/12 ساعة هنا محفوظة محلياً؛ للحماية من التحايل يجب نقلها إلى Backend.
-        applyLanguage();
+        // Gram purchases remain a UI placeholder until a real payment/backend flow is implemented.
+        async function loadData() {
+    if (!ensureSupabase('تحميل بيانات الحساب')) {
+        currentUser = null;
+        pts = Number(localStorage.getItem('pts') || 0);
         render();
+        return;
+    }
+            const telegramUser = getTelegramUser();
+
+            if (!telegramUser?.id) {
+                // Browser preview: no Telegram user exists, so do not create fake DB users.
+                currentUser = null;
+                pts = 0;
+                tasks = [];
+                visitedTasks = [];
+                referralCount = 0;
+                referralPoints = 0;
+                render();
+                return;
+            }
+
+            try {
+                const { data: user, error: userError } = await supabase.rpc('create_user', {
+                    p_telegram_id: telegramUser.id,
+                    p_username: telegramUser.username || null,
+                    p_first_name: telegramUser.first_name || null
+                });
+
+                if (userError) throw userError;
+
+                currentUser = user;
+
+                const { data: taskRows, error: taskError } = await supabase
+                    .from('tasks')
+                    .select('id,title,description,reward_points,url,is_active,created_at,owner_id,required_visits')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: true });
+
+                if (taskError) throw taskError;
+
+                const { data: completedRows, error: completedError } = await supabase
+                    .from('completed_tasks')
+                    .select('task_id')
+                    .eq('user_id', telegramUser.id);
+
+                if (completedError) throw completedError;
+
+                const { data: allCompletedRows, error: allCompletedError } = await supabase
+                    .from('completed_tasks')
+                    .select('task_id');
+
+                if (allCompletedError) throw allCompletedError;
+
+                const completedCounts = {};
+                (allCompletedRows || []).forEach(row => {
+                    const id = Number(row.task_id);
+                    completedCounts[id] = (completedCounts[id] || 0) + 1;
+                });
+
+                const { data: referralRows, error: referralError } = await supabase
+                    .from('referrals')
+                    .select('reward_points')
+                    .eq('referrer_id', telegramUser.id);
+
+                if (referralError) throw referralError;
+
+                pts = Number(user.points || 0);
+                visitedTasks = (completedRows || []).map(r => Number(r.task_id));
+                referralCount = (referralRows || []).length;
+                referralPoints = (referralRows || []).reduce((sum, r) => sum + Number(r.reward_points || 0), 0);
+
+                // Map DB tasks to the UI. "left" is derived from required_visits minus completed visits
+                // for the current task; exact global remaining counters should eventually be handled server-side.
+                tasks = (taskRows || []).map(row => ({
+                    id: Number(row.id),
+                    user: Number(row.owner_id) === Number(telegramUser.id)
+                        ? (currentLang === 'en' ? 'You' : 'أنت')
+                        : (row.title || 'User'),
+                    title: row.title,
+                    description: row.description || '',
+                    url: row.url,
+                    left: Math.max(0, Number(row.required_visits || 1) - Number(completedCounts[Number(row.id)] || 0)),
+                    required_visits: Number(row.required_visits || 1),
+                    reward_points: Number(row.reward_points || 1),
+                    is_active: row.is_active,
+                    owner_id: row.owner_id
+                }));
+
+                myLink = tasks.find(t => Number(t.owner_id) === Number(telegramUser.id)) || null;
+
+                render();
+            } catch (err) {
+                console.error('loadData:', err);
+                currentUser = null;
+                render();
+                alert(t('loadError'));
+            }
+        }
+
+        applyLanguage();
+        // Never block the UI waiting for a third-party script.
+        setTimeout(() => loadData(), 0);
     </script>
+
+<div id="connectionStatus" style="
+position:fixed;left:10px;bottom:10px;z-index:9999;
+padding:7px 10px;border-radius:10px;font-size:11px;
+background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
+">
+جاري فحص الاتصال...
+</div>
+<script>
+(function(){
+    function updateConnectionStatus(){
+        const el=document.getElementById('connectionStatus');
+        if(!el) return;
+        const telegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
+        const online = navigator.onLine;
+        let text = telegram ? 'Telegram ✓' : 'Chrome/Browser';
+        text += online ? ' • Internet ✓' : ' • Internet ✕';
+        text += (typeof supabaseReady !== 'undefined' && supabaseReady) ? ' • Supabase ✓' : ' • Supabase ✕';
+        el.textContent=text;
+    }
+    window.addEventListener('online',updateConnectionStatus);
+    window.addEventListener('offline',updateConnectionStatus);
+    setTimeout(updateConnectionStatus,500);
+})();
+</script>
+
 </body>
 </html>
