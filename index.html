@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-title">منصة تبادل الإحالات</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js" async></script>
+        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-1: #0f172a;
@@ -225,29 +224,188 @@
         }
 
         // Supabase configuration
+        // We use Supabase REST directly so the page does NOT depend on jsDelivr.
         const SUPABASE_URL = "https://lquaccwytlxnosjbtdvk.supabase.co";
         const SUPABASE_KEY = "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi";
-        let supabase = null;
-let supabaseReady = false;
 
-function initSupabase() {
-    try {
-        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-            console.warn('Supabase library did not load.');
-            return false;
+        class RestQuery {
+            constructor(client, table) {
+                this.client = client;
+                this.table = table;
+                this.params = new URLSearchParams();
+                this.headers = {};
+                this.method = 'GET';
+                this.body = null;
+                this.returnSingle = false;
+            }
+
+            select(columns='*') {
+                this.params.set('select', columns);
+                this.headers['Prefer'] = 'return=representation';
+                return this;
+            }
+
+            eq(column, value) {
+                this.params.set(column, `eq.${value}`);
+                return this;
+            }
+
+            order(column, options = {}) {
+                const direction = options.ascending === false ? 'desc' : 'asc';
+                this.params.set('order', `${column}.${direction}`);
+                return this;
+            }
+
+            insert(row) {
+                this.method = 'POST';
+                this.body = row;
+                this.headers['Prefer'] = 'return=representation';
+                return this;
+            }
+
+            single() {
+                this.returnSingle = true;
+                return this;
+            }
+
+            async execute() {
+                let url = `${this.client.url}/rest/v1/${encodeURIComponent(this.table)}`;
+                const options = {
+                    method: this.method,
+                    headers: {
+                        apikey: this.client.key,
+                        Authorization: `Bearer ${this.client.key}`,
+                        'Content-Type': 'application/json',
+                        ...this.headers
+                    }
+                };
+
+                if (this.method === 'GET') {
+                    const query = this.params.toString();
+                    if (query) url += `?${query}`;
+                } else {
+                    const query = this.params.toString();
+                    if (query) url += `?${query}`;
+                    options.body = JSON.stringify(this.body);
+                }
+
+                try {
+                    const response = await fetch(url, options);
+                    const raw = await response.text();
+                    let data = null;
+                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
+
+                    if (!response.ok) {
+                        const error = {
+                            message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
+                            code: data?.code,
+                            details: data?.details,
+                            hint: data?.hint,
+                            status: response.status
+                        };
+                        return { data: null, error };
+                    }
+
+                    if (this.returnSingle) {
+                        if (Array.isArray(data)) {
+                            if (data.length === 0) {
+                                return { data: null, error: { message: 'No rows returned', code: 'PGRST116' } };
+                            }
+                            return { data: data[0], error: null };
+                        }
+                    }
+
+                    return { data, error: null };
+                } catch (err) {
+                    return {
+                        data: null,
+                        error: {
+                            message: err?.message || 'Network error',
+                            code: 'NETWORK_ERROR'
+                        }
+                    };
+                }
+            }
+
+            then(resolve, reject) {
+                return this.execute().then(resolve, reject);
+            }
+
+            catch(reject) {
+                return this.execute().catch(reject);
+            }
         }
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        supabaseReady = true;
-        return true;
-    } catch (error) {
-        console.error('Supabase initialization failed:', error);
-        supabase = null;
-        supabaseReady = false;
-        return false;
-    }
-}
 
-initSupabase();
+        const supabase = {
+            url: SUPABASE_URL,
+            key: SUPABASE_KEY,
+
+            from(table) {
+                return new RestQuery(this, table);
+            },
+
+            async rpc(functionName, args = {}) {
+                const url = `${this.url}/rest/v1/rpc/${encodeURIComponent(functionName)}`;
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            apikey: this.key,
+                            Authorization: `Bearer ${this.key}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(args)
+                    });
+
+                    const raw = await response.text();
+                    let data = null;
+                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
+
+                    if (!response.ok) {
+                        return {
+                            data: null,
+                            error: {
+                                message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
+                                code: data?.code,
+                                details: data?.details,
+                                hint: data?.hint,
+                                status: response.status
+                            }
+                        };
+                    }
+
+                    // PostgreSQL scalar RPC results are returned directly.
+                    if (Array.isArray(data) && data.length === 1 && Object.keys(data[0] || {}).length === 1) {
+                        const key = Object.keys(data[0])[0];
+                        if (typeof data[0][key] !== 'object') data = data[0][key];
+                    }
+
+                    return { data, error: null };
+                } catch (err) {
+                    return {
+                        data: null,
+                        error: {
+                            message: err?.message || 'Network error',
+                            code: 'NETWORK_ERROR'
+                        }
+                    };
+                }
+            }
+        };
+
+        let supabaseReady = true;
+
+        function ensureSupabase(actionName = 'هذه العملية') {
+            if (!navigator.onLine) {
+                alert('لا يوجد اتصال بالإنترنت حالياً.\\n\\n' + actionName + ' تحتاج اتصالاً بالإنترنت.');
+                return false;
+            }
+            return true;
+        }
+
+        function isTelegramMode() {
+            return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
+        }
 
         // App state
         let pts = 0;
@@ -785,7 +943,8 @@ function getTelegramUser() {
         }
 
         applyLanguage();
-        loadData();
+        // Never block the UI waiting for a third-party script.
+        setTimeout(() => loadData(), 0);
     </script>
 
 <div id="connectionStatus" style="
