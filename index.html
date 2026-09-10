@@ -227,7 +227,27 @@
         // Supabase configuration
         const SUPABASE_URL = "https://lquaccwytlxnosjbtdvk.supabase.co";
         const SUPABASE_KEY = "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase = null;
+let supabaseReady = false;
+
+function initSupabase() {
+    try {
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+            console.warn('Supabase library did not load.');
+            return false;
+        }
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        supabaseReady = true;
+        return true;
+    } catch (error) {
+        console.error('Supabase initialization failed:', error);
+        supabase = null;
+        supabaseReady = false;
+        return false;
+    }
+}
+
+initSupabase();
 
         // App state
         let pts = 0;
@@ -347,6 +367,7 @@
         }
 
         async function claimReward() {
+    if (!ensureSupabase('استلام المكافأة')) return;
             if (rewardAt && Date.now() < rewardAt) return;
             if (!currentUser) {
                 alert(t('loadError'));
@@ -457,7 +478,19 @@
             }
         }
 
-        function getTelegramUser() {
+        function ensureSupabase(actionName = 'هذه العملية') {
+    if (!supabaseReady || !supabase) {
+        alert('تعذر الاتصال بخدمة البيانات الآن.\n\n' + actionName + ' تحتاج اتصال Supabase. جرّب تحديث الصفحة والتأكد من الإنترنت.');
+        return false;
+    }
+    return true;
+}
+
+function isTelegramMode() {
+    return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
+}
+
+function getTelegramUser() {
             try {
                 return window.Telegram?.WebApp?.initDataUnsafe?.user || null;
             } catch (_) {
@@ -520,6 +553,7 @@
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         async function visitLink() {
+    if (!ensureSupabase('تنفيذ المهمة')) return;
             const curTask = getNextAvailableTask();
             if (!curTask || !currentUser) return;
 
@@ -585,6 +619,7 @@
         }
 
         async function addLink() {
+    if (!ensureSupabase('إضافة المهمة')) return;
             const u = document.getElementById('add-url').value.trim();
             const description = document.getElementById('add-description').value.trim();
             const c = parseInt(document.getElementById('add-cnt').value);
@@ -651,6 +686,12 @@
 
         // Gram purchases remain a UI placeholder until a real payment/backend flow is implemented.
         async function loadData() {
+    if (!ensureSupabase('تحميل بيانات الحساب')) {
+        currentUser = null;
+        pts = Number(localStorage.getItem('pts') || 0);
+        render();
+        return;
+    }
             const telegramUser = getTelegramUser();
 
             if (!telegramUser?.id) {
@@ -746,5 +787,31 @@
         applyLanguage();
         loadData();
     </script>
+
+<div id="connectionStatus" style="
+position:fixed;left:10px;bottom:10px;z-index:9999;
+padding:7px 10px;border-radius:10px;font-size:11px;
+background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
+">
+جاري فحص الاتصال...
+</div>
+<script>
+(function(){
+    function updateConnectionStatus(){
+        const el=document.getElementById('connectionStatus');
+        if(!el) return;
+        const telegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
+        const online = navigator.onLine;
+        let text = telegram ? 'Telegram ✓' : 'Chrome/Browser';
+        text += online ? ' • Internet ✓' : ' • Internet ✕';
+        text += (typeof supabaseReady !== 'undefined' && supabaseReady) ? ' • Supabase ✓' : ' • Supabase ✕';
+        el.textContent=text;
+    }
+    window.addEventListener('online',updateConnectionStatus);
+    window.addEventListener('offline',updateConnectionStatus);
+    setTimeout(updateConnectionStatus,500);
+})();
+</script>
+
 </body>
 </html>
