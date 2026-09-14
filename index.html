@@ -1056,7 +1056,12 @@ background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
         `;
 
         button.onclick = function () {
-            alert('لوحة الإدارة قيد التجهيز 🔧');
+    const panel = document.getElementById('adminPanel');
+
+    if (panel) {
+        panel.style.display = 'block';
+    }
+};
         };
 
         document.body.appendChild(button);
@@ -1114,5 +1119,10 @@ background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
         </button>
     </div>
 </div>
+<script>
+document.getElementById('closeAdminPanel').onclick = function () {
+    document.getElementById('adminPanel').style.display = 'none';
+};
+</script>
 </body>
 </html>
