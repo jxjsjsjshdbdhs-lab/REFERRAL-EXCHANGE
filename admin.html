@@ -1,2 +1,314 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Dashboard</title><script src="https://telegram.org/js/telegram-web-app.js"></script><style>*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#eef2ff;font-family:Arial}.wrap{max-width:1100px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.card,.tablebox{background:#111b2e;border:1px solid #22304a;border-radius:16px;padding:16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}.num{font-size:28px;font-weight:800;margin-top:8px}.muted{color:#94a3b8}button{background:#f97316;color:white;border:0;border-radius:10px;padding:10px 15px;font-weight:bold}table{width:100%;border-collapse:collapse;min-width:750px}th,td{padding:10px;border-bottom:1px solid #22304a;text-align:right;font-size:13px}.tablebox{overflow:auto;margin:12px 0}#error{display:none;background:#4a2028;padding:14px;border-radius:10px}</style></head><body><div class="wrap"><div class="top"><div><h1>🔐 لوحة الإدارة</h1><span class="muted">خاصة بمالك البوت فقط</span></div><button onclick="loadStats()">تحديث</button></div><div id="loading">جارٍ التحقق...</div><div id="error"></div><main id="content" style="display:none"><div class="grid"><div class="card">👥 المستخدمون<div class="num" id="users">0</div></div><div class="card">🆕 مستخدمو اليوم<div class="num" id="today">0</div></div><div class="card">🔗 المهام النشطة<div class="num" id="tasks">0</div></div><div class="card">👀 الزيارات<div class="num" id="visits">0</div></div><div class="card">🤝 الإحالات<div class="num" id="refs">0</div></div></div><h2>المستخدمون</h2><div class="tablebox"><table><thead><tr><th>ID</th><th>Username</th><th>الاسم</th><th>النقاط</th><th>الإحالات</th><th>آخر ظهور</th><th>التسجيل</th></tr></thead><tbody id="usersTable"></tbody></table></div><h2>الروابط والمهام</h2><div class="tablebox"><table><thead><tr><th>ID</th><th>الرابط</th><th>الناشر</th><th>المطلوب</th><th>الزيارات</th><th>المتبقي</th><th>الحالة</th></tr></thead><tbody id="tasksTable"></tbody></table></div></main></div><script>
-const URL="https://lquaccwytlxnosjbtdvk.supabase.co/functions/v1/admin-stats";const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand()}function e(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}function d(v){if(!v)return"-";return new Date(v).toLocaleString("ar-IQ")}function fail(x){loading.style.display="none";error.textContent=x;error.style.display="block"}async function loadStats(){error.style.display="none";loading.style.display="block";content.style.display="none";if(!tg?.initData)return fail("افتح هذه الصفحة من داخل Telegram حتى يتم التحقق من حسابك.");try{let r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({initData:tg.initData})}),j=await r.json();if(!r.ok||j.error)throw Error(j.error||"تعذر تحميل البيانات");let s=j.summary||{};users.textContent=s.users||0;today.textContent=s.today_users||0;tasks.textContent=s.active_tasks||0;visits.textContent=s.total_visits||0;refs.textContent=s.total_referrals||0;usersTable.innerHTML=(j.users||[]).map(u=>`<tr><td>${e(u.telegram_id)}</td><td>${e(u.username?"@"+u.username:"-")}</td><td>${e(u.first_name)}</td><td>${e(u.points)}</td><td>${e(u.referrals_count)}</td><td>${e(d(u.last_seen_at))}</td><td>${e(d(u.created_at))}</td></tr>`).join("");tasksTable.innerHTML=(j.tasks||[]).map(t=>`<tr><td>${e(t.id)}</td><td dir="ltr">${e(t.url)}</td><td>${e(t.owner_username?"@"+t.owner_username:t.owner_id)}</td><td>${e(t.required_visits)}</td><td>${e(t.visits)}</td><td>${Math.max(0,(t.required_visits||0)-(t.visits||0))}</td><td>${t.is_active?"نشطة":"مكتملة"}</td></tr>`).join("");loading.style.display="none";content.style.display="block"}catch(x){fail(x.message)}}loadStats();</script></body></html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم والإدارة الخاصة</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.9);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --accent-cyan: #22d3ee;
+            --accent-emerald: #34d399;
+            --accent-amber: #fbbf24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger-red: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            background-attachment: fixed;
+            color: var(--text-main);
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .header h1 {
+            font-size: 14pt;
+            color: var(--accent-amber);
+        }
+
+        .refresh-btn {
+            background: var(--accent-cyan);
+            color: #0f172a;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 8.5pt;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 16pt;
+            font-weight: 800;
+            color: var(--accent-cyan);
+        }
+
+        .stat-lbl {
+            font-size: 8pt;
+            color: var(--text-muted);
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 10pt;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid var(--card-border);
+            padding: 8px 4px;
+            text-align: center;
+        }
+
+        .data-table th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent-cyan);
+        }
+
+        .table-container {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .btn-delete {
+            background: rgba(248, 113, 113, 0.2);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 7.5pt;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Admin Content Container -->
+    <div id="admin-content" style="display: none;">
+        <div class="header">
+            <h1>⚙️ لوحة إدارة البوت الخاصة</h1>
+            <button class="refresh-btn" onclick="AdminApp.loadAllData()">تحديث 🔄</button>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="cnt-users">0</div>
+                <div class="stat-lbl">إجمالي الزوار</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="cnt-tasks">0</div>
+                <div class="stat-lbl">المهمات المنشورة</div>
+            </div>
+        </div>
+
+        <!-- Users Log -->
+        <div class="section-card">
+            <div class="section-title" style="color: var(--accent-cyan);">👥 سجل زوار البوت والمستخدمين</div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Telegram ID</th>
+                            <th>الاسم / اليوزر</th>
+                            <th>النقاط</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <tr><td colspan="3">جاري جلب البيانات...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tasks Log -->
+        <div class="section-card">
+            <div class="section-title" style="color: var(--accent-emerald);">🔗 سجل المهمات والروابط المنشورة</div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>الناشر (ID)</th>
+                            <th>الرابط</th>
+                            <th>الطلبات</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasks-table-body">
+                        <tr><td colspan="4">جاري جلب البيانات...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Access Denied Screen -->
+    <div id="access-denied" style="display: none; text-align: center; padding: 60px 20px;">
+        <h2 style="color: var(--danger-red); margin-bottom: 10px;">⛔ غير مصرح بالدخول</h2>
+        <p style="color: var(--text-muted); font-size: 9.5pt;">هذه اللوحة محمية وخاصة بأدمن البوت فقط.</p>
+    </div>
+
+    <script>
+        const CONFIG = {
+            SUPABASE_URL: "https://lquaccwytlxnosjbtdvk.supabase.co",
+            SUPABASE_KEY: "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi",
+            ADMIN_TELEGRAM_ID: 5339335944
+        };
+
+        async function dbQuery(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    apikey: CONFIG.SUPABASE_KEY,
+                    Authorization: `Bearer ${CONFIG.SUPABASE_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            if (body) options.body = JSON.stringify(body);
+            
+            try {
+                const res = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${endpoint}`, options);
+                return await res.json();
+            } catch (err) {
+                console.error("API Fetch Error:", err);
+                return null;
+            }
+        }
+
+        const AdminApp = {
+            checkAuthorization() {
+                const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                const currentUserId = tgUser?.id;
+
+                if (Number(currentUserId) === Number(CONFIG.ADMIN_TELEGRAM_ID)) {
+                    document.getElementById('admin-content').style.display = 'block';
+                    document.getElementById('access-denied').style.display = 'none';
+                    return true;
+                } else {
+                    document.getElementById('admin-content').style.display = 'none';
+                    document.getElementById('access-denied').style.display = 'block';
+                    return false;
+                }
+            },
+
+            async loadAllData() {
+                if (!this.checkAuthorization()) return;
+                await this.fetchUsers();
+                await this.fetchTasks();
+            },
+
+            async fetchUsers() {
+                const users = await dbQuery('users?select=*');
+                const tbody = document.getElementById('users-table-body');
+                
+                if (Array.isArray(users) && users.length > 0) {
+                    document.getElementById('cnt-users').innerText = users.length;
+                    tbody.innerHTML = users.map(u => `
+                        <tr>
+                            <td><code>${u.telegram_id || 'غير معرّف'}</code></td>
+                            <td>${u.first_name || u.username || 'زائر'}</td>
+                            <td><strong style="color:var(--accent-amber);">${u.points || 0}</strong></td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="3">لا يوجد مستخدمين بعد.</td></tr>`;
+                }
+            },
+
+            async fetchTasks() {
+                const tasks = await dbQuery('tasks?select=*');
+                const tbody = document.getElementById('tasks-table-body');
+
+                if (Array.isArray(tasks) && tasks.length > 0) {
+                    document.getElementById('cnt-tasks').innerText = tasks.length;
+                    tbody.innerHTML = tasks.map(t => `
+                        <tr>
+                            <td><code>${t.owner_id}</code></td>
+                            <td style="word-break: break-all; max-width: 150px;">
+                                <a href="${t.url}" target="_blank" style="color:var(--accent-cyan); text-decoration:none;">${t.url}</a>
+                            </td>
+                            <td>${t.required_visits || 0}</td>
+                            <td>
+                                <button class="btn-delete" onclick="AdminApp.deleteTask(${t.id})">حذف</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4">لا توجد مهمات منشورة.</td></tr>`;
+                }
+            },
+
+            async deleteTask(taskId) {
+                if (!confirm("هل أنت تأكد من إزالة هذه المهمة من المنصة؟")) return;
+                await dbQuery(`tasks?id=eq.${taskId}`, 'DELETE');
+                this.fetchTasks();
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.expand();
+            }
+            AdminApp.loadAllData();
+        });
+    </script>
+</body>
+</html>
