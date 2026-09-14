@@ -1065,5 +1065,54 @@ background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
     setTimeout(addAdminButton, 1000);
 })();
 </script>
+<div id="adminPanel" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:999998;
+    background:#f5f5f5;
+    color:#222;
+    padding:20px;
+    overflow:auto;
+    direction:rtl;
+">
+    <div style="
+        max-width:500px;
+        margin:40px auto;
+        background:white;
+        border-radius:18px;
+        padding:20px;
+        box-shadow:0 4px 20px rgba(0,0,0,.15);
+    ">
+        <h2 style="margin-top:0;">⚙️ لوحة الإدارة</h2>
+
+        <div style="
+            background:#f0f0f0;
+            border-radius:14px;
+            padding:18px;
+            margin-top:20px;
+        ">
+            <div style="font-size:15px;">👥 عدد المستخدمين</div>
+            <div id="adminUsersCount" style="
+                font-size:32px;
+                font-weight:bold;
+                margin-top:8px;
+            ">--</div>
+        </div>
+
+        <button id="closeAdminPanel" style="
+            width:100%;
+            margin-top:20px;
+            padding:13px;
+            border:0;
+            border-radius:12px;
+            background:#222;
+            color:white;
+            font-size:16px;
+        ">
+            إغلاق
+        </button>
+    </div>
+</div>
 </body>
 </html>
