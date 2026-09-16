@@ -215,7 +215,8 @@
     <div class="nav">
         <div id="nav-home" class="nav-item active" onclick="showPage('home')">🏠<br><span data-i18n="home">الرئيسية</span></div>
         <div id="nav-referrals" class="nav-item" onclick="showPage('referrals')">👥<br><span data-i18n="referrals">الإحالات</span></div>
-        <div class="nav-item" onclick="alert(t('storeUnavailable'))">💎<br><span data-i18n="store">المتجر</span></div>
+        <div id="nav-admin-tasks" class="nav-item" onclick="showPage('adminTasks')">📋<br><span>المهام</span></div>
+        <div id="nav-withdraw" class="nav-item" onclick="showPage('withdraw')">💸<br><span>السحب</span></div>
     </div>
 
     <script>
@@ -550,22 +551,30 @@
         function showPage(page) {
             const home = document.getElementById('home-page');
             const referrals = document.getElementById('referrals-page');
+            const referrals = document.getElementById('referrals-page');
+            const adminTasks = document.getElementById('admin-tasks-page');
+            const withdraw = document.getElementById('withdraw-page');
             const homeNav = document.getElementById('nav-home');
             const refNav = document.getElementById('nav-referrals');
+            const taskNav = document.getElementById('nav-admin-tasks');
+            const withdrawNav = document.getElementById('nav-withdraw');
+
+            [home, referrals, adminTasks, withdraw].forEach(el => { if (el) el.style.display = 'none'; });
+            [homeNav, refNav, taskNav, withdrawNav].forEach(el => { if (el) el.classList.remove('active'); });
 
             if (page === 'referrals') {
-                home.style.display = 'none';
-                referrals.style.display = 'block';
-                homeNav.classList.remove('active');
-                refNav.classList.add('active');
-                window.scrollTo({top:0, behavior:'smooth'});
+                referrals.style.display = 'block'; refNav.classList.add('active');
+            } else if (page === 'adminTasks') {
+                adminTasks.style.display = 'block'; taskNav.classList.add('active');
+                loadAdminTasksForUser();
+            } else if (page === 'withdraw') {
+                withdraw.style.display = 'block'; withdrawNav.classList.add('active');
+                updateWithdrawAmount();
+                loadMyWithdrawals();
             } else {
-                home.style.display = 'block';
-                referrals.style.display = 'none';
-                homeNav.classList.add('active');
-                refNav.classList.remove('active');
-                window.scrollTo({top:0, behavior:'smooth'});
+                home.style.display = 'block'; homeNav.classList.add('active');
             }
+            window.scrollTo({top:0, behavior:'smooth'});
         }
 
         function showReferral() {
@@ -1163,6 +1172,142 @@ document.body.appendChild(button);
 document.getElementById('closeAdminPanel').onclick = function () {
     document.getElementById('adminPanel').style.display = 'none';
 };
+</script>
+
+<!-- Admin-created Tasks page -->
+<div id="admin-tasks-page" style="display:none;">
+  <div class="card">
+    <div style="font-size:18pt;font-weight:900;color:var(--cyan);margin-bottom:6px;">📋 المهام</div>
+    <p style="font-size:9pt;color:var(--muted);line-height:1.7;">أكمل المهمة عبر فتح الرابط، وبعدها اضغط احتساب المهمة لتحصل على <b style="color:var(--emerald);">10 نقاط</b>.</p>
+  </div>
+  <div id="adminTasksList"></div>
+</div>
+
+<!-- Withdraw page -->
+<div id="withdraw-page" style="display:none;">
+  <div class="card">
+    <div style="font-size:18pt;font-weight:900;color:var(--amber);margin-bottom:6px;">💸 السحب</div>
+    <div style="font-size:9pt;color:var(--muted);line-height:1.8;">
+      كل <b style="color:var(--amber);">100 نقطة = 0.04 USDT</b><br>
+      الحد الأدنى للسحب <b style="color:var(--emerald);">0.10 USDT = 250 نقطة</b>
+    </div>
+    <div style="margin-top:12px;font-size:10pt;">رصيدك: <b id="withdrawPoints">0</b> نقطة</div>
+    <label style="font-size:8.5pt;color:var(--muted);display:block;margin-top:12px;">عدد النقاط المراد سحبها:</label>
+    <input id="withdrawPointsInput" class="inp" type="number" min="250" step="250" placeholder="مثال: 250" oninput="updateWithdrawAmount()">
+    <div style="font-size:10pt;margin-bottom:10px;">المبلغ: <b id="withdrawUsdt">0.00</b> USDT</div>
+    <label style="font-size:8.5pt;color:var(--muted);display:block;">عنوان محفظة USDT:</label>
+    <input id="withdrawWallet" class="inp" type="text" placeholder="أدخل عنوان المحفظة">
+    <button class="btn btn-amber" onclick="requestWithdrawal()">طلب السحب</button>
+  </div>
+  <div class="card">
+    <div style="font-weight:900;margin-bottom:10px;">📄 طلباتي</div>
+    <div id="myWithdrawals">جاري التحميل...</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TASK_REWARD = 10;
+  const MIN_WITHDRAW_POINTS = 250;
+  const POINTS_PER_USDT = 2500;
+  const TASK_ADMIN_ID = 5339335944;
+
+  function esc(v){return String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function getUid(){ return Number(currentUser?.telegram_id || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 0); }
+
+  window.loadAdminTasksForUser = async function(){
+    const box=document.getElementById('adminTasksList'); if(!box) return;
+    box.innerHTML='<div class="card">جاري تحميل المهام...</div>';
+    try{
+      const {data,error}=await supabase.from('admin_tasks').select('id,title,description,url,reward_points,is_active,created_at').eq('is_active',true).order('created_at',{ascending:false});
+      if(error) throw error;
+      if(!data?.length){box.innerHTML='<div class="card">لا توجد مهام حاليًا.</div>';return;}
+      const done=JSON.parse(localStorage.getItem('adminTaskDone_'+getUid())||'[]');
+      box.innerHTML=data.map(t=>{
+        const isDone=done.includes(Number(t.id));
+        return `<div class="card">
+          <div style="font-weight:900;font-size:12pt;">${esc(t.title)}</div>
+          <div style="font-size:9pt;color:var(--muted);margin:7px 0;line-height:1.6;">${esc(t.description||'أكمل المهمة واحصل على 10 نقاط')}</div>
+          <div class="link-box">${esc(t.url)}</div>
+          ${isDone ? '<div style="color:var(--emerald);font-weight:900;text-align:center;">✅ تم احتساب المهمة</div>' : `<div style="display:flex;gap:8px;"><button class="btn btn-purple" onclick="window.open(${JSON.stringify(t.url)},'_blank')">فتح الرابط</button><button class="btn btn-emerald" onclick="completeAdminTask(${Number(t.id)})">احتساب +10</button></div>`}
+        </div>`;
+      }).join('');
+    }catch(e){console.error(e);box.innerHTML='<div class="card">تعذر تحميل المهام. تأكد من إنشاء جداول المهام الجديدة.</div>';}
+  };
+
+  window.completeAdminTask = async function(taskId){
+    const uid=getUid(); if(!uid) return alert('افتح البوت من Telegram.');
+    const key='adminTaskDone_'+uid, done=JSON.parse(localStorage.getItem(key)||'[]');
+    if(done.includes(Number(taskId))) return alert('تم احتساب هذه المهمة مسبقًا.');
+    try{
+      const {error:insErr}=await supabase.from('admin_task_completions').insert({telegram_id:uid,task_id:Number(taskId)});
+      if(insErr) throw insErr;
+      const newBalance=await awardPoints(TASK_REWARD,uid);
+      pts=Number(newBalance); render(); done.push(Number(taskId)); localStorage.setItem(key,JSON.stringify(done));
+      alert('تم احتساب المهمة وحصلت على 10 نقاط 🎉'); loadAdminTasksForUser();
+    }catch(e){
+      if(String(e?.code)==='23505') return alert('تم احتساب هذه المهمة مسبقًا.');
+      console.error(e); alert('تعذر احتساب المهمة.');
+    }
+  };
+
+  window.updateWithdrawAmount=function(){
+    const input=document.getElementById('withdrawPointsInput'), p=Number(input?.value||0);
+    const bal=document.getElementById('withdrawPoints'); if(bal) bal.textContent=Number(pts||0);
+    const out=document.getElementById('withdrawUsdt'); if(out) out.textContent=(p/POINTS_PER_USDT).toFixed(2);
+  };
+
+  window.requestWithdrawal=async function(){
+    const uid=getUid(); if(!uid) return alert('افتح البوت من Telegram.');
+    const p=Number(document.getElementById('withdrawPointsInput')?.value||0);
+    const wallet=document.getElementById('withdrawWallet')?.value.trim();
+    if(p<MIN_WITHDRAW_POINTS || p%250!==0) return alert('الحد الأدنى 250 نقطة، والسحب يكون بمضاعفات 250 نقطة.');
+    if(p>Number(pts||0)) return alert('رصيدك لا يكفي.');
+    if(!wallet || wallet.length<10) return alert('أدخل عنوان محفظة USDT صحيح.');
+    const amount=p/POINTS_PER_USDT;
+    try{
+      const newBalance=await awardPoints(-p,uid);
+      const {error}=await supabase.from('withdrawals').insert({telegram_id:uid,username:currentUser?.username||null,points:p,amount_usdt:amount,wallet_address:wallet,status:'pending'});
+      if(error){ await awardPoints(p,uid); throw error; }
+      pts=Number(newBalance); render(); updateWithdrawAmount();
+      document.getElementById('withdrawPointsInput').value=''; document.getElementById('withdrawWallet').value='';
+      alert('تم إرسال طلب السحب بنجاح، وسيبقى قيد الانتظار حتى تتم مراجعته. ✅'); loadMyWithdrawals();
+    }catch(e){console.error(e);alert('تعذر إرسال طلب السحب.');}
+  };
+
+  window.loadMyWithdrawals=async function(){
+    const box=document.getElementById('myWithdrawals'); if(!box) return;
+    const uid=getUid(); if(!uid){box.textContent='افتح البوت من Telegram.';return;}
+    try{
+      const {data,error}=await supabase.from('withdrawals').select('id,points,amount_usdt,wallet_address,status,created_at').eq('telegram_id',uid).order('created_at',{ascending:false});
+      if(error) throw error;
+      if(!data?.length){box.textContent='لا توجد طلبات سحب.';return;}
+      box.innerHTML=data.map(w=>`<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:9pt;">💵 ${Number(w.amount_usdt).toFixed(2)} USDT — ${esc(w.points)} نقطة<br>الحالة: <b>${w.status==='pending'?'⏳ قيد الانتظار':w.status==='paid'?'✅ تم الدفع':'❌ مرفوض'}</b></div>`).join('');
+    }catch(e){console.error(e);box.textContent='تعذر تحميل الطلبات.';}
+  };
+
+  // Admin-only task creation and withdrawal list are added to the existing admin panel.
+  setTimeout(function(){
+    const panel=document.querySelector('#adminPanel > div'); if(!panel) return;
+    if(document.getElementById('adminTaskCreateBox')) return;
+    const box=document.createElement('div'); box.id='adminTaskCreateBox'; box.style.cssText='background:#f0f0f0;border-radius:14px;padding:18px;margin-top:20px;';
+    box.innerHTML=`<div style="font-weight:900;margin-bottom:10px;">➕ إضافة مهمة (للمدير فقط)</div><input id="adminTaskTitle" class="inp" style="color:#222;background:#fff;" placeholder="عنوان المهمة"><input id="adminTaskUrl" class="inp" style="color:#222;background:#fff;direction:ltr;" placeholder="https://..."><textarea id="adminTaskDesc" class="inp" style="color:#222;background:#fff;" placeholder="وصف المهمة" rows="2"></textarea><button class="btn btn-emerald" onclick="createAdminTask()">نشر المهمة</button>`;
+    panel.insertBefore(box,panel.querySelector('#closeAdminPanel'));
+    const w=document.createElement('div'); w.id='adminWithdrawalsBox'; w.style.cssText='background:#f0f0f0;border-radius:14px;padding:18px;margin-top:20px;';
+    w.innerHTML='<div style="font-weight:900;margin-bottom:10px;">💸 طلبات السحب</div><div id="adminWithdrawalsList">اضغط الإدارة لتحميل الطلبات...</div>';
+    panel.insertBefore(w,panel.querySelector('#closeAdminPanel'));
+  },1200);
+
+  window.createAdminTask=async function(){
+    const uid=getUid(); if(uid!==TASK_ADMIN_ID) return alert('غير مسموح.');
+    const title=document.getElementById('adminTaskTitle').value.trim(), url=document.getElementById('adminTaskUrl').value.trim(), description=document.getElementById('adminTaskDesc').value.trim();
+    if(!title || !/^https?:\/\//i.test(url)) return alert('أدخل عنوان المهمة ورابطًا صحيحًا.');
+    try{
+      const {error}=await supabase.from('admin_tasks').insert({title,description:description||null,url,reward_points:10,is_active:true});
+      if(error) throw error; document.getElementById('adminTaskTitle').value='';document.getElementById('adminTaskUrl').value='';document.getElementById('adminTaskDesc').value=''; alert('تم نشر المهمة. ✅');
+    }catch(e){console.error(e);alert('تعذر نشر المهمة. تأكد من إنشاء جدول admin_tasks.');}
+  };
+})();
 </script>
 </body>
 </html>
