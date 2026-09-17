@@ -179,12 +179,8 @@
     <div class="modal" id="add-modal">
         <div class="modal-box">
             <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="newTaskTitle">إنشاء مهمة جديدة 🔗</h3>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="referralLinkLabel">رابط الإحالة:</label>
+            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="referralLinkLabel">رابط المهمة:</label>
             <input type="url" class="inp" id="add-url" data-i18n-placeholder="urlPlaceholder" placeholder="https://t.me/your_bot">
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="taskDescriptionLabel">وصف المهمة:</label>
-            <textarea class="inp" id="add-description" data-i18n-placeholder="descriptionPlaceholder" placeholder="اكتب وصفاً مختصراً للمهمة" rows="3" style="resize:vertical;"></textarea>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="requiredVisits">عدد الزيارات المطلوبة:</label>
-            <input type="number" class="inp" id="add-cnt" data-i18n-placeholder="visitsPlaceholder" placeholder="من 1 إلى 20" min="1" max="20">
             <div style="display:flex; gap:8px;">
                 <button class="btn btn-purple" style="background:var(--emerald); color:#0f172a;" onclick="addLink()" data-i18n="publishNow">نشر الآن</button>
                 <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('add-modal')">إلغاء</button>
@@ -197,7 +193,7 @@
     <div id="tasks-page" style="display:none;">
         <div class="page-title" data-i18n="tasksTitle">📋 المهام</div>
         <div class="card" style="text-align:center;">
-            <div style="font-size:9pt;color:var(--muted);" data-i18n="tasksIntro">هذه المهام مستقلة عن مهام النقرات. إكمال كل مهمة يمنحك 25 نقطة، وإضافة المهمة مجانية.</div>
+            <div style="font-size:9pt;color:var(--muted);" data-i18n="tasksIntro">هذه المهام مستقلة تماماً عن مهام النقرات.</div>
         </div>
         <div id="adminAddTaskBox" style="display:none;margin:10px 0;">
             <button class="btn btn-purple" style="width:100%;background:var(--emerald);color:#0f172a;font-weight:bold;" onclick="openAdminAddTask()">➕ إضافة مهمة</button>
@@ -666,7 +662,6 @@ function showPage(page) {
                         <span style="font-weight:800; font-size:10pt;" id="task-user">${t('publisher')} ${escapeHtml(curTask.user)}</span>
                         <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">${t('remaining')} ${curTask.left}</span>
                     </div>
-                    ${cleanTaskDescription(curTask) ? `<div style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-top:8px;">${escapeHtml(cleanTaskDescription(curTask))}</div>` : ''}
                     <div class="link-box" id="task-url">${escapeHtml(curTask.url)}</div>
                     <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
                 `;
@@ -960,7 +955,6 @@ function getTelegramUser() {
             }
             box.innerHTML=available.map(task=>`<div class="task-item">
                 <div class="task-meta"><b>${t('publisher')} ${escapeHtml(task.user)}</b><span class="badge badge-cyan">${t('remaining')} ${task.left}</span></div>
-                ${cleanTaskDescription(task)?`<div style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-bottom:7px;">${escapeHtml(cleanTaskDescription(task))}</div>`:''}
                 <div class="link-box">${escapeHtml(task.url)}</div>
                 <button class="btn btn-purple" onclick="visitSpecificTask(${Number(task.id)})">${t('visitLink')}</button>
             </div>`).join('');
@@ -1080,13 +1074,11 @@ function getTelegramUser() {
         }
 
         async function addLink() {
-    if (!isAdminUser()) { alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
-    if (!ensureSupabase('إضافة المهمة')) return;
-            const u = document.getElementById('add-url').value.trim();
-            const description = document.getElementById('add-description').value.trim();
-            const c = parseInt(document.getElementById('add-cnt').value);
+            if (!isAdminUser()) { alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
+            if (!ensureSupabase('إضافة المهمة')) return;
 
-            if (!u || !/^https?:\/\//i.test(u) || c < 1 || c > 20) {
+            const u = document.getElementById('add-url').value.trim();
+            if (!u || !/^https?:\/\//i.test(u)) {
                 alert(t('invalidTask'));
                 return;
             }
@@ -1097,40 +1089,37 @@ function getTelegramUser() {
             }
 
             try {
-                                const { data: insertedTask, error: taskError } = await supabase
+                // Ordinary tasks have only one setting: the task/link itself.
+                // They are free to publish, always reward 25 points, and have no global click limit.
+                const { data: insertedTask, error: taskError } = await supabase
                     .from('tasks')
                     .insert({
                         title: u,
-                        description: '__NORMAL_TASK__' + (description ? description : ''),
+                        description: '__NORMAL_TASK__',
                         reward_points: 25,
                         url: u,
                         is_active: true,
                         owner_id: currentUser.telegram_id,
-                        required_visits: c
+                        required_visits: 1
                     })
                     .select()
                     .single();
 
                 if (taskError) throw taskError;
 
-                // Adding an ordinary task is completely free; the user's points are unchanged.
+                // Publishing an ordinary task is completely free.
                 pts = Number(pts);
-                myLink = insertedTask;
+                myLink = null;
 
                 closeModal('add-modal');
                 document.getElementById('add-url').value = '';
-                document.getElementById('add-description').value = '';
-                document.getElementById('add-cnt').value = '';
 
                 await loadData();
+                showPage('tasks');
                 alert(t('taskSuccess'));
             } catch (err) {
                 console.error('addLink:', err);
-                if (String(err?.message || '').toLowerCase().includes('insufficient points')) {
-                    alert(t('insufficientPoints', {p: pts}));
-                } else {
-                    alert(t('loadError'));
-                }
+                alert(t('loadError'));
             }
         }
 
@@ -1241,14 +1230,16 @@ function getTelegramUser() {
                     title: row.title,
                     description: row.description || '',
                     url: row.url,
-                    left: Math.max(0, Number(row.required_visits || 1) - Number(completedCounts[Number(row.id)] || 0)),
-                    required_visits: Number(row.required_visits || 1),
-                    reward_points: Number(row.reward_points || 1),
+                    left: String(row.description || '').startsWith('__NORMAL_TASK__')
+                        ? 1
+                        : Math.max(0, Number(row.required_visits || 1) - Number(completedCounts[Number(row.id)] || 0)),
+                    required_visits: String(row.description || '').startsWith('__NORMAL_TASK__') ? 1 : Number(row.required_visits || 1),
+                    reward_points: String(row.description || '').startsWith('__NORMAL_TASK__') ? 25 : Number(row.reward_points || 1),
                     is_active: row.is_active,
                     owner_id: row.owner_id
                 }));
 
-                myLink = tasks.find(t => Number(t.owner_id) === Number(telegramUser.id)) || null;
+                myLink = tasks.find(t => !isNormalTask(t) && Number(t.owner_id) === Number(telegramUser.id)) || null;
 
                 render();
             } catch (err) {
