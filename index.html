@@ -111,6 +111,7 @@
 
         .btn:disabled {
             cursor: not-allowed;
+            opacity: .55;
         }
 
         .btn-amber {
@@ -243,7 +244,7 @@
             margin-bottom: 10px;
         }
 
-        .task-item .task-meta {
+        .task-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -432,8 +433,6 @@
         </button>
     </div>
 
-    <!-- HOME -->
-
     <div id="home-page">
 
         <div class="stats-grid">
@@ -446,10 +445,7 @@
             </div>
 
             <div class="stat-box">
-                <div
-                    class="stat-val"
-                    id="pts-bal"
-                    style="color:var(--amber);">
+                <div class="stat-val" id="pts-bal" style="color:var(--amber);">
                     0
                 </div>
 
@@ -486,8 +482,6 @@
             </div>
         </div>
 
-        <!-- Active Task -->
-
         <div class="card" id="task-card">
 
             <div style="text-align:center;padding:15px;color:var(--muted);">
@@ -495,8 +489,6 @@
             </div>
 
         </div>
-
-        <!-- My Link -->
 
         <div class="card">
 
@@ -512,7 +504,7 @@
                     id="create-task-btn"
                     class="btn btn-emerald"
                     style="width:auto;padding:4px 10px;display:none;"
-                    onclick="openModal('add-modal')"
+                    onclick="openAdminAddTask()"
                     data-i18n="createTask">
                     + إنشاء مهمة
                 </button>
@@ -529,8 +521,6 @@
 
     </div>
 
-    <!-- TASKS PAGE -->
-
     <div id="tasks-page" style="display:none;">
 
         <div class="page-title" data-i18n="tasksTitle">
@@ -538,26 +528,22 @@
         </div>
 
         <div class="card" style="text-align:center;">
+
             <div
                 style="font-size:9pt;color:var(--muted);"
                 data-i18n="tasksIntro">
-                نفّذ المهام المتاحة واحصل على نقطة مقابل كل زيارة.
+                نفّذ المهام المتاحة واحصل على 25 نقطة مقابل كل مهمة مكتملة.
             </div>
+
         </div>
 
-        <!-- Admin only -->
-
-        <div
-            id="adminAddTaskBox"
-            style="display:none;margin:10px 0;">
+        <div id="adminAddTaskBox" style="display:none;margin:10px 0;">
 
             <button
                 class="btn btn-purple"
                 style="width:100%;background:var(--emerald);color:#0f172a;font-weight:bold;"
                 onclick="openAdminAddTask()">
-
                 ➕ إضافة مهمة
-
             </button>
 
         </div>
@@ -565,8 +551,6 @@
         <div id="tasks-list"></div>
 
     </div>
-
-    <!-- WITHDRAW PAGE -->
 
     <div id="withdraw-page" style="display:none;">
 
@@ -582,15 +566,11 @@
                 رصيد النقاط
             </div>
 
-            <div
-                class="withdraw-balance"
-                id="withdraw-points">
+            <div class="withdraw-balance" id="withdraw-points">
                 0
             </div>
 
-            <div
-                class="withdraw-usdt"
-                id="withdraw-value">
+            <div class="withdraw-usdt" id="withdraw-value">
                 0.00 USDT
             </div>
 
@@ -619,8 +599,7 @@
             </div>
 
             <div id="withdraw-history">
-                <div
-                    style="font-size:8.5pt;color:var(--muted);text-align:center;">
+                <div style="font-size:8.5pt;color:var(--muted);text-align:center;">
                     لا توجد طلبات سحب.
                 </div>
             </div>
@@ -628,8 +607,6 @@
         </div>
 
     </div>
-
-    <!-- REFERRALS PAGE -->
 
     <div id="referrals-page" style="display:none;">
 
@@ -675,9 +652,7 @@
                 عن كل إحالة ناجحة.
             </p>
 
-            <div
-                class="link-box"
-                id="referral-url">
+            <div class="link-box" id="referral-url">
                 جارٍ تجهيز رابط الإحالة...
             </div>
 
@@ -699,18 +674,13 @@
 
             </div>
 
-            <div
-                style="margin-top:10px;font-size:8.5pt;color:var(--muted);">
+            <div style="margin-top:10px;font-size:8.5pt;color:var(--muted);">
 
                 <span data-i18n="referralCountLabel">
                     عدد الإحالات:
                 </span>
 
-                <b
-                    id="ref-count"
-                    style="color:#fff;">
-                    0
-                </b>
+                <b id="ref-count" style="color:#fff;">0</b>
 
                 &nbsp;|&nbsp;
 
@@ -718,11 +688,7 @@
                     نقاط الإحالة:
                 </span>
 
-                <b
-                    id="ref-points"
-                    style="color:var(--amber);">
-                    0
-                </b>
+                <b id="ref-points" style="color:var(--amber);">0</b>
 
             </div>
 
@@ -730,34 +696,41 @@
 
     </div>
 
-    <!-- ADD TASK MODAL -->
+    <!-- ADD TASK -->
 
     <div class="modal" id="add-modal">
 
         <div class="modal-box">
 
-            <h3
-                style="margin-bottom:10px;font-size:12pt;"
-                data-i18n="newTaskTitle">
-                إنشاء مهمة جديدة 🔗
+            <h3 style="margin-bottom:10px;font-size:12pt;">
+                ➕ إضافة مهمة جديدة
             </h3>
 
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="referralLinkLabel">
-                رابط الإحالة:
+            <div style="
+                background:rgba(52,211,153,.1);
+                border:1px solid rgba(52,211,153,.3);
+                padding:9px;
+                border-radius:9px;
+                margin-bottom:12px;
+                font-size:8.5pt;
+                color:var(--emerald);
+                line-height:1.5;">
+                هذه المهمة مستقلة عن رصيد النقاط.
+                <br>
+                إضافة المهمة مجانية، وكل مستخدم يكملها يحصل على <b>25 نقطة</b>.
+            </div>
+
+            <label style="font-size:8.5pt;color:var(--muted);">
+                رابط المهمة:
             </label>
 
             <input
                 type="url"
                 class="inp"
                 id="add-url"
-                placeholder="https://t.me/your_bot"
-                data-i18n-placeholder="urlPlaceholder">
+                placeholder="https://t.me/your_bot">
 
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="taskDescriptionLabel">
+            <label style="font-size:8.5pt;color:var(--muted);">
                 وصف المهمة:
             </label>
 
@@ -765,12 +738,9 @@
                 class="inp"
                 id="add-description"
                 placeholder="اكتب وصفاً مختصراً للمهمة"
-                data-i18n-placeholder="descriptionPlaceholder"
                 rows="3"></textarea>
 
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="requiredVisits">
+            <label style="font-size:8.5pt;color:var(--muted);">
                 عدد الزيارات المطلوبة:
             </label>
 
@@ -779,25 +749,30 @@
                 class="inp"
                 id="add-cnt"
                 placeholder="من 1 إلى 20"
-                data-i18n-placeholder="visitsPlaceholder"
                 min="1"
                 max="20">
+
+            <div style="
+                font-size:8pt;
+                color:var(--muted);
+                margin:-8px 0 12px;
+                line-height:1.5;">
+                عدد الزيارات لا يخصم أي نقاط من حساب الإدارة.
+            </div>
 
             <div style="display:flex;gap:8px;">
 
                 <button
                     class="btn btn-purple"
                     style="background:var(--emerald);color:#0f172a;"
-                    onclick="addLink()"
-                    data-i18n="publishNow">
-                    نشر الآن
+                    onclick="addLink()">
+                    نشر المهمة
                 </button>
 
                 <button
                     class="btn btn-purple"
                     style="background:rgba(255,255,255,0.1);"
-                    onclick="closeModal('add-modal')"
-                    data-i18n="cancel">
+                    onclick="closeModal('add-modal')">
                     إلغاء
                 </button>
 
@@ -807,21 +782,17 @@
 
     </div>
 
-    <!-- WITHDRAW MODAL -->
+    <!-- WITHDRAW -->
 
     <div class="modal" id="withdraw-modal">
 
         <div class="modal-box">
 
-            <h3
-                style="margin-bottom:10px;font-size:12pt;"
-                data-i18n="withdrawRequestTitle">
+            <h3 style="margin-bottom:10px;font-size:12pt;">
                 طلب سحب USDT 💰
             </h3>
 
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="withdrawPointsLabel">
+            <label style="font-size:8.5pt;color:var(--muted);">
                 عدد النقاط المراد سحبها:
             </label>
 
@@ -840,9 +811,7 @@
                 0.00 USDT
             </div>
 
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="walletLabel">
+            <label style="font-size:8.5pt;color:var(--muted);">
                 عنوان محفظة USDT:
             </label>
 
@@ -854,25 +823,22 @@
                 dir="ltr">
 
             <div
-                style="font-size:7.5pt;color:var(--muted);margin:-5px 0 12px;line-height:1.5;"
-                data-i18n="walletWarning">
-                تأكد من عنوان المحفظة قبل الإرسال. سيتم استخدام العنوان الذي تدخله للدفع.
+                style="font-size:7.5pt;color:var(--muted);margin:-5px 0 12px;line-height:1.5;">
+                تأكد من عنوان المحفظة قبل الإرسال.
             </div>
 
             <div style="display:flex;gap:8px;">
 
                 <button
                     class="btn btn-emerald"
-                    onclick="submitWithdrawal()"
-                    data-i18n="confirmWithdraw">
+                    onclick="submitWithdrawal()">
                     إرسال الطلب
                 </button>
 
                 <button
                     class="btn btn-purple"
                     style="background:rgba(255,255,255,.1);"
-                    onclick="closeModal('withdraw-modal')"
-                    data-i18n="cancel">
+                    onclick="closeModal('withdraw-modal')">
                     إلغاء
                 </button>
 
@@ -886,36 +852,20 @@
 
     <div class="nav">
 
-        <div
-            id="nav-home"
-            class="nav-item active"
-            onclick="showPage('home')">
-            🏠<br>
-            <span data-i18n="home">الرئيسية</span>
+        <div id="nav-home" class="nav-item active" onclick="showPage('home')">
+            🏠<br>الرئيسية
         </div>
 
-        <div
-            id="nav-tasks"
-            class="nav-item"
-            onclick="showPage('tasks')">
-            📋<br>
-            <span data-i18n="tasks">المهام</span>
+        <div id="nav-tasks" class="nav-item" onclick="showPage('tasks')">
+            📋<br>المهام
         </div>
 
-        <div
-            id="nav-referrals"
-            class="nav-item"
-            onclick="showPage('referrals')">
-            👥<br>
-            <span data-i18n="referrals">الإحالات</span>
+        <div id="nav-referrals" class="nav-item" onclick="showPage('referrals')">
+            👥<br>الإحالات
         </div>
 
-        <div
-            id="nav-withdraw"
-            class="nav-item"
-            onclick="showPage('withdraw')">
-            💰<br>
-            <span data-i18n="withdraw">السحب</span>
+        <div id="nav-withdraw" class="nav-item" onclick="showPage('withdraw')">
+            💰<br>السحب
         </div>
 
     </div>
@@ -955,12 +905,8 @@
                     💰 طلبات السحب
                 </div>
 
-                <div
-                    id="adminWithdrawals"
-                    style="margin-top:8px;">
-                    <div style="color:#777;font-size:13px;">
-                        جاري تحميل طلبات السحب...
-                    </div>
+                <div id="adminWithdrawals" style="margin-top:8px;">
+                    جاري تحميل طلبات السحب...
                 </div>
 
             </div>
@@ -976,6 +922,7 @@
     </div>
 
 <script>
+
 /* =========================================================
    TELEGRAM
 ========================================================= */
@@ -1000,12 +947,26 @@ const ADMIN_ID = 5339335944;
 
 
 /* =========================================================
+   CONSTANTS
+========================================================= */
+
+const TASK_REWARD = 25;
+const REFERRAL_REWARD = 40;
+const WELCOME_REWARD = 20;
+const PERIODIC_REWARD = 8;
+
+const MIN_WITHDRAW_POINTS = 250;
+const USDT_PER_100_POINTS = 0.04;
+
+
+/* =========================================================
    REST QUERY
 ========================================================= */
 
 class RestQuery {
 
     constructor(client, table) {
+
         this.client = client;
         this.table = table;
         this.params = new URLSearchParams();
@@ -1016,19 +977,34 @@ class RestQuery {
     }
 
     select(columns='*') {
-        this.params.set('select', columns);
-        this.headers['Prefer'] = 'return=representation';
+
+        this.params.set(
+            'select',
+            columns
+        );
+
+        this.headers['Prefer'] =
+            'return=representation';
+
         return this;
     }
 
     eq(column, value) {
-        this.params.set(column, `eq.${value}`);
+
+        this.params.set(
+            column,
+            `eq.${value}`
+        );
+
         return this;
     }
 
     order(column, options={}) {
+
         const direction =
-            options.ascending === false ? 'desc' : 'asc';
+            options.ascending === false
+                ? 'desc'
+                : 'asc';
 
         this.params.set(
             'order',
@@ -1039,17 +1015,46 @@ class RestQuery {
     }
 
     limit(number) {
+
         this.params.set(
             'limit',
-            String(Math.max(0, Number(number) || 0))
+            String(
+                Math.max(
+                    0,
+                    Number(number) || 0
+                )
+            )
         );
 
         return this;
     }
 
     insert(row) {
+
         this.method = 'POST';
         this.body = row;
+
+        this.headers['Prefer'] =
+            'return=representation';
+
+        return this;
+    }
+
+    update(row) {
+
+        this.method = 'PATCH';
+        this.body = row;
+
+        this.headers['Prefer'] =
+            'return=representation';
+
+        return this;
+    }
+
+    delete() {
+
+        this.method = 'DELETE';
+
         this.headers['Prefer'] =
             'return=representation';
 
@@ -1057,7 +1062,9 @@ class RestQuery {
     }
 
     single() {
+
         this.returnSingle = true;
+
         return this;
     }
 
@@ -1066,25 +1073,37 @@ class RestQuery {
         let url =
             `${this.client.url}/rest/v1/${encodeURIComponent(this.table)}`;
 
-        const query = this.params.toString();
+        const query =
+            this.params.toString();
 
         if (query) {
             url += `?${query}`;
         }
 
         const options = {
+
             method: this.method,
 
             headers: {
-                apikey: this.client.key,
+
+                apikey:
+                    this.client.key,
+
                 Authorization:
                     `Bearer ${this.client.key}`,
-                'Content-Type': 'application/json',
+
+                'Content-Type':
+                    'application/json',
+
                 ...this.headers
             }
         };
 
-        if (this.method !== 'GET') {
+        if (
+            this.method !== 'GET' &&
+            this.method !== 'DELETE'
+        ) {
+
             options.body =
                 JSON.stringify(this.body);
         }
@@ -1092,7 +1111,10 @@ class RestQuery {
         try {
 
             const response =
-                await fetch(url, options);
+                await fetch(
+                    url,
+                    options
+                );
 
             const raw =
                 await response.text();
@@ -1100,68 +1122,92 @@ class RestQuery {
             let data = null;
 
             try {
-                data = raw ? JSON.parse(raw) : null;
+
+                data =
+                    raw
+                        ? JSON.parse(raw)
+                        : null;
+
             } catch (_) {
+
                 data = raw;
             }
 
             if (!response.ok) {
 
                 return {
-                    data: null,
+
+                    data:null,
 
                     error: {
+
                         message:
                             data?.message ||
                             data?.error_description ||
                             data?.hint ||
                             `HTTP ${response.status}`,
 
-                        code: data?.code,
+                        code:data?.code,
 
-                        details: data?.details,
+                        details:data?.details,
 
-                        hint: data?.hint,
+                        hint:data?.hint,
 
-                        status: response.status
+                        status:
+                            response.status
                     }
                 };
             }
 
-            if (this.returnSingle) {
+            if (
+                this.returnSingle
+            ) {
 
-                if (Array.isArray(data)) {
+                if (
+                    Array.isArray(data)
+                ) {
 
                     if (!data.length) {
 
                         return {
-                            data: null,
+
+                            data:null,
+
                             error: {
+
                                 message:
                                     'No rows returned',
-                                code: 'PGRST116'
+
+                                code:
+                                    'PGRST116'
                             }
                         };
                     }
 
                     return {
-                        data: data[0],
-                        error: null
+
+                        data:data[0],
+
+                        error:null
                     };
                 }
             }
 
             return {
+
                 data,
-                error: null
+
+                error:null
             };
 
         } catch (err) {
 
             return {
-                data: null,
+
+                data:null,
 
                 error: {
+
                     message:
                         err?.message ||
                         'Network error',
@@ -1173,12 +1219,17 @@ class RestQuery {
         }
     }
 
-    then(resolve, reject) {
+    then(resolve,reject) {
+
         return this.execute()
-            .then(resolve, reject);
+            .then(
+                resolve,
+                reject
+            );
     }
 
     catch(reject) {
+
         return this.execute()
             .catch(reject);
     }
@@ -1191,15 +1242,24 @@ class RestQuery {
 
 const supabase = {
 
-    url: SUPABASE_URL,
+    url:
+        SUPABASE_URL,
 
-    key: SUPABASE_KEY,
+    key:
+        SUPABASE_KEY,
 
     from(table) {
-        return new RestQuery(this, table);
+
+        return new RestQuery(
+            this,
+            table
+        );
     },
 
-    async rpc(functionName, args={}) {
+    async rpc(
+        functionName,
+        args={}
+    ) {
 
         const url =
             `${this.url}/rest/v1/rpc/${encodeURIComponent(functionName)}`;
@@ -1207,23 +1267,28 @@ const supabase = {
         try {
 
             const response =
-                await fetch(url, {
+                await fetch(
+                    url,
+                    {
 
-                    method: 'POST',
+                        method:'POST',
 
-                    headers: {
-                        apikey: this.key,
+                        headers: {
 
-                        Authorization:
-                            `Bearer ${this.key}`,
+                            apikey:
+                                this.key,
 
-                        'Content-Type':
-                            'application/json'
-                    },
+                            Authorization:
+                                `Bearer ${this.key}`,
 
-                    body:
-                        JSON.stringify(args)
-                });
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body:
+                            JSON.stringify(args)
+                    }
+                );
 
             const raw =
                 await response.text();
@@ -1231,29 +1296,36 @@ const supabase = {
             let data = null;
 
             try {
+
                 data =
-                    raw ? JSON.parse(raw) : null;
+                    raw
+                        ? JSON.parse(raw)
+                        : null;
+
             } catch (_) {
+
                 data = raw;
             }
 
             if (!response.ok) {
 
                 return {
-                    data: null,
+
+                    data:null,
 
                     error: {
+
                         message:
                             data?.message ||
                             data?.error_description ||
                             data?.hint ||
                             `HTTP ${response.status}`,
 
-                        code: data?.code,
+                        code:data?.code,
 
-                        details: data?.details,
+                        details:data?.details,
 
-                        hint: data?.hint,
+                        hint:data?.hint,
 
                         status:
                             response.status
@@ -1268,26 +1340,34 @@ const supabase = {
             ) {
 
                 const key =
-                    Object.keys(data[0])[0];
+                    Object.keys(
+                        data[0]
+                    )[0];
 
                 if (
                     typeof data[0][key] !== 'object'
                 ) {
-                    data = data[0][key];
+
+                    data =
+                        data[0][key];
                 }
             }
 
             return {
+
                 data,
-                error: null
+
+                error:null
             };
 
         } catch (err) {
 
             return {
-                data: null,
+
+                data:null,
 
                 error: {
+
                     message:
                         err?.message ||
                         'Network error',
@@ -1308,21 +1388,13 @@ let supabaseReady = true;
 ========================================================= */
 
 let pts = 0;
-
 let gram = 0.50;
-
 let myLink = null;
-
 let visitedTasks = [];
-
 let referralCount = 0;
-
 let referralPoints = 0;
-
 let tasks = [];
-
 let currentUser = null;
-
 let selectedTaskId = null;
 
 
@@ -1331,146 +1403,145 @@ let selectedTaskId = null;
 ========================================================= */
 
 let currentLang =
-    localStorage.getItem('appLang') || 'ar';
+    localStorage.getItem(
+        'appLang'
+    ) || 'ar';
 
 const I18N = {
 
     ar: {
 
-        appName:'تبادل الإحالات',
+        appName:
+            'تبادل الإحالات',
 
-        languageLabel:'🌐 اللغة',
+        languageLabel:
+            '🌐 اللغة',
 
-        availableLinks:'الروابط المتاحة',
+        availableLinks:
+            'الروابط المتاحة',
 
-        currentBalance:'رصيدك الحالي',
+        currentBalance:
+            'رصيدك الحالي',
 
-        visitedLinks:'روابط زرتها',
+        visitedLinks:
+            'مهام مكتملة',
 
-        dailyVisitors:'زائر البوت اليوم',
+        dailyVisitors:
+            'زائر البوت اليوم',
 
-        rewardTitle:'مكافأة كل 12 ساعة',
+        rewardTitle:
+            'مكافأة كل 12 ساعة',
 
-        rewardStatus:'احصل على 8 نقاط مجاناً',
+        rewardStatus:
+            'احصل على 8 نقاط مجاناً',
 
-        claimReward:'استلام 8 نقاط',
+        claimReward:
+            'استلام 8 نقاط',
 
-        rewardReady:'مكافأتك المجانية جاهزة',
+        rewardReady:
+            'مكافأتك المجانية جاهزة',
 
-        rewardComeBack:'ارجع بعد 12 ساعة',
+        rewardComeBack:
+            'ارجع بعد 12 ساعة',
 
-        yourPublishedLink:'رابطك المنشور',
+        yourPublishedLink:
+            'المهام المنشورة',
 
-        createTask:'+ إنشاء مهمة',
+        createTask:
+            '+ إضافة مهمة',
 
-        noPublishedLink:'لا يوجد رابط مضاف حالياً.',
+        noPublishedLink:
+            'لا توجد مهمة منشورة حالياً.',
 
-        newTaskTitle:'إنشاء مهمة جديدة 🔗',
-
-        taskDescriptionLabel:'وصف المهمة:',
-
-        descriptionPlaceholder:'اكتب وصفاً مختصراً للمهمة',
-
-        referralLinkLabel:'رابط الإحالة:',
-
-        requiredVisits:'عدد الزيارات المطلوبة:',
-
-        publishNow:'نشر الآن',
-
-        cancel:'إلغاء',
-
-        referralsTitle:'👥 الإحالات',
+        referralsTitle:
+            '👥 الإحالات',
 
         referralsIntro:
             'شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.',
 
-        referralSystem:'نظام الإحالة 👥',
+        referralSystem:
+            'نظام الإحالة 👥',
 
         referralDescription:
             'ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.',
 
-        copyLink:'📋 نسخ الرابط',
+        copyLink:
+            '📋 نسخ الرابط',
 
-        share:'📤 مشاركة',
+        share:
+            '📤 مشاركة',
 
-        referralCountLabel:'عدد الإحالات:',
+        referralCountLabel:
+            'عدد الإحالات:',
 
-        referralPointsLabel:'نقاط الإحالة:',
+        referralPointsLabel:
+            'نقاط الإحالة:',
 
-        home:'الرئيسية',
+        home:
+            'الرئيسية',
 
-        tasks:'المهام',
+        tasks:
+            'المهام',
 
-        referrals:'الإحالات',
+        referrals:
+            'الإحالات',
 
-        withdraw:'السحب',
+        withdraw:
+            'السحب',
 
-        tasksTitle:'📋 المهام',
+        tasksTitle:
+            '📋 المهام',
 
         tasksIntro:
-            'نفّذ المهام المتاحة واحصل على نقطة مقابل كل زيارة.',
+            'نفّذ المهام المتاحة واحصل على 25 نقطة مقابل كل مهمة مكتملة.',
 
-        withdrawTitle:'💰 السحب',
+        withdrawTitle:
+            '💰 السحب',
 
-        withdrawBalanceLabel:'رصيد النقاط',
+        withdrawBalanceLabel:
+            'رصيد النقاط',
 
         withdrawRate:
             'كل 100 نقطة = 0.04 USDT — الحد الأدنى للسحب 0.10 USDT (250 نقطة).',
 
-        requestWithdraw:'طلب سحب',
+        requestWithdraw:
+            'طلب سحب',
 
-        withdrawHistory:'سجل طلبات السحب',
+        withdrawHistory:
+            'سجل طلبات السحب',
 
-        withdrawRequestTitle:'طلب سحب USDT 💰',
+        publisher:
+            'ناشر المهمة:',
 
-        withdrawPointsLabel:'عدد النقاط المراد سحبها:',
+        remaining:
+            'المتبقي:',
 
-        walletLabel:'عنوان محفظة USDT:',
-
-        walletWarning:
-            'تأكد من عنوان المحفظة قبل الإرسال. سيتم استخدام العنوان الذي تدخله للدفع.',
-
-        confirmWithdraw:'إرسال الطلب',
-
-        publisher:'ناشر الرابط:',
-
-        remaining:'متبقي:',
-
-        visitLink:'↗ زيارة الرابط (+1 نقطة)',
+        visitLink:
+            '↗ تنفيذ المهمة (+25 نقطة)',
 
         allDone:
-            '🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.',
+            '🎉 أكملت جميع المهام المتاحة حالياً!<br>عد لاحقاً للحصول على مهام جديدة.',
 
-        remainingVisits:'المتبقي:',
+        remainingVisits:
+            'الزيارات المتبقية:',
 
-        copySuccess:'تم نسخ رابط الإحالة ✅',
+        copySuccess:
+            'تم نسخ رابط الإحالة ✅',
 
         shareText:
             'انضم عن طريقي واحصل على فرصة لجمع النقاط 👥',
 
         invalidTask:
-            'يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!',
-
-        insufficientPoints:
-            'نقاطك لا تكفي! رصيدك الحالي: {p}',
+            'يرجى كتابة رابط صحيح وتحديد عدد الزيارات من 1 إلى 20.',
 
         taskSuccess:
-            'تم إنشاء المهمة ونشر رابطك بنجاح!',
+            'تمت إضافة المهمة بنجاح مجاناً ✅',
 
         rewardReceived:
             'تمت إضافة 8 نقاط إلى رصيدك 🎉',
 
         rewardAvailable:
             'متاحة بعد {h}س {m}د {s}ث',
-
-        urlPlaceholder:
-            'https://t.me/your_bot',
-
-        visitsPlaceholder:
-            'من 1 إلى 20',
-
-        preparingReferral:
-            'جارٍ تجهيز رابط الإحالة...',
 
         loading:
             'جارٍ تحميل البيانات...',
@@ -1481,140 +1552,137 @@ const I18N = {
 
     en: {
 
-        appName:'Referral Exchange',
+        appName:
+            'Referral Exchange',
 
-        languageLabel:'🌐 Language',
+        languageLabel:
+            '🌐 Language',
 
-        availableLinks:'Available Links',
+        availableLinks:
+            'Available Tasks',
 
-        currentBalance:'Current Balance',
+        currentBalance:
+            'Current Balance',
 
-        visitedLinks:'Links Visited',
+        visitedLinks:
+            'Completed Tasks',
 
-        dailyVisitors:'Bot Visitors Today',
+        dailyVisitors:
+            'Bot Visitors Today',
 
-        rewardTitle:'Reward Every 12 Hours',
+        rewardTitle:
+            'Reward Every 12 Hours',
 
-        rewardStatus:'Get 8 free points',
+        rewardStatus:
+            'Get 8 free points',
 
-        claimReward:'Claim 8 Points',
+        claimReward:
+            'Claim 8 Points',
 
-        rewardReady:'Your free reward is ready',
+        rewardReady:
+            'Your free reward is ready',
 
-        rewardComeBack:'Come back after 12 hours',
+        rewardComeBack:
+            'Come back after 12 hours',
 
-        yourPublishedLink:'Your Published Link',
+        yourPublishedLink:
+            'Published Tasks',
 
-        createTask:'+ Create Task',
+        createTask:
+            '+ Add Task',
 
-        noPublishedLink:'No link added yet.',
+        noPublishedLink:
+            'No task published yet.',
 
-        newTaskTitle:'Create New Task 🔗',
-
-        taskDescriptionLabel:'Task Description:',
-
-        descriptionPlaceholder:'Write a short task description',
-
-        referralLinkLabel:'Referral Link:',
-
-        requiredVisits:'Required Visits:',
-
-        publishNow:'Publish Now',
-
-        cancel:'Cancel',
-
-        referralsTitle:'👥 Referrals',
+        referralsTitle:
+            '👥 Referrals',
 
         referralsIntro:
-            'Share your link with friends. When a referral is counted successfully, you receive <b style="color:var(--emerald);">40 points</b>.',
+            'Share your link with friends. You receive <b style="color:var(--emerald);">40 points</b> for each successful referral.',
 
-        referralSystem:'Referral System 👥',
+        referralSystem:
+            'Referral System 👥',
 
         referralDescription:
             'Invite friends using your link and get <b style="color:var(--emerald);">40 points</b> for each successful referral.',
 
-        copyLink:'📋 Copy Link',
+        copyLink:
+            '📋 Copy Link',
 
-        share:'📤 Share',
+        share:
+            '📤 Share',
 
-        referralCountLabel:'Referrals:',
+        referralCountLabel:
+            'Referrals:',
 
-        referralPointsLabel:'Referral Points:',
+        referralPointsLabel:
+            'Referral Points:',
 
-        home:'Home',
+        home:
+            'Home',
 
-        tasks:'Tasks',
+        tasks:
+            'Tasks',
 
-        referrals:'Referrals',
+        referrals:
+            'Referrals',
 
-        withdraw:'Withdraw',
+        withdraw:
+            'Withdraw',
 
-        tasksTitle:'📋 Tasks',
+        tasksTitle:
+            '📋 Tasks',
 
         tasksIntro:
-            'Complete available tasks and earn 1 point for each visit.',
+            'Complete available tasks and earn 25 points for each completed task.',
 
-        withdrawTitle:'💰 Withdraw',
+        withdrawTitle:
+            '💰 Withdraw',
 
-        withdrawBalanceLabel:'Points Balance',
+        withdrawBalanceLabel:
+            'Points Balance',
 
         withdrawRate:
             '100 points = 0.04 USDT — minimum withdrawal 0.10 USDT (250 points).',
 
-        requestWithdraw:'Request Withdrawal',
+        requestWithdraw:
+            'Request Withdrawal',
 
-        withdrawHistory:'Withdrawal History',
+        withdrawHistory:
+            'Withdrawal History',
 
-        withdrawRequestTitle:'USDT Withdrawal 💰',
+        publisher:
+            'Task Publisher:',
 
-        withdrawPointsLabel:'Points to withdraw:',
+        remaining:
+            'Remaining:',
 
-        walletLabel:'USDT Wallet Address:',
-
-        walletWarning:
-            'Check the wallet address carefully. The entered address will be used for payment.',
-
-        confirmWithdraw:'Submit Request',
-
-        publisher:'Link Publisher:',
-
-        remaining:'Remaining:',
-
-        visitLink:'↗ Visit Link (+1 Point)',
+        visitLink:
+            '↗ Complete Task (+25 Points)',
 
         allDone:
-            '🎉 You completed all available links!<br>Come back later for new links.',
+            '🎉 You completed all available tasks!<br>Come back later for new tasks.',
 
-        remainingVisits:'Remaining:',
+        remainingVisits:
+            'Remaining visits:',
 
-        copySuccess:'Referral link copied ✅',
+        copySuccess:
+            'Referral link copied ✅',
 
         shareText:
             'Join through my link and get a chance to earn points 👥',
 
         invalidTask:
-            'Please enter a link and choose between 1 and 20 visits!',
-
-        insufficientPoints:
-            'Not enough points! Your current balance: {p}',
+            'Please enter a valid link and choose between 1 and 20 visits.',
 
         taskSuccess:
-            'Task created and your link was published successfully!',
+            'Task added successfully for free ✅',
 
         rewardReceived:
             '8 points added to your balance 🎉',
 
         rewardAvailable:
             'Available in {h}h {m}m {s}s',
-
-        urlPlaceholder:
-            'https://t.me/your_bot',
-
-        visitsPlaceholder:
-            '1 to 20',
-
-        preparingReferral:
-            'Preparing your referral link...',
 
         loading:
             'Loading data...',
@@ -1627,19 +1695,22 @@ const I18N = {
 function t(key, vars={}) {
 
     let value =
-        (I18N[currentLang] &&
-         I18N[currentLang][key]) ||
+        (
+            I18N[currentLang] &&
+            I18N[currentLang][key]
+        ) ||
         I18N.ar[key] ||
         key;
 
-    Object.keys(vars).forEach(k => {
+    Object.keys(vars)
+        .forEach(k => {
 
-        value =
-            value.replaceAll(
-                '{' + k + '}',
-                vars[k]
-            );
-    });
+            value =
+                value.replaceAll(
+                    '{' + k + '}',
+                    vars[k]
+                );
+        });
 
     return value;
 }
@@ -1651,7 +1722,11 @@ function applyTranslations() {
         .forEach(el => {
 
             el.innerHTML =
-                t(el.getAttribute('data-i18n'));
+                t(
+                    el.getAttribute(
+                        'data-i18n'
+                    )
+                );
         });
 
     document
@@ -1659,17 +1734,25 @@ function applyTranslations() {
         .forEach(el => {
 
             el.placeholder =
-                t(el.getAttribute('data-i18n-placeholder'));
+                t(
+                    el.getAttribute(
+                        'data-i18n-placeholder'
+                    )
+                );
         });
 
-    document.getElementById('app-title')
-        .textContent = t('appName');
+    document.getElementById(
+        'app-title'
+    ).textContent =
+        t('appName');
 }
 
 function toggleLanguage() {
 
     currentLang =
-        currentLang === 'ar' ? 'en' : 'ar';
+        currentLang === 'ar'
+            ? 'en'
+            : 'ar';
 
     localStorage.setItem(
         'appLang',
@@ -1696,11 +1779,16 @@ function applyLanguage() {
         en ? 'ltr' : 'rtl';
 
     const btn =
-        document.getElementById('lang-toggle');
+        document.getElementById(
+            'lang-toggle'
+        );
 
     if (btn) {
+
         btn.innerText =
-            en ? 'العربية' : 'English';
+            en
+                ? 'العربية'
+                : 'English';
     }
 
     applyTranslations();
@@ -1744,10 +1832,12 @@ function getTelegramUserId() {
 ========================================================= */
 
 function isAdminUser(
-    userId = getTelegramUserId()
+    userId =
+        getTelegramUserId()
 ) {
 
-    return Number(userId) === ADMIN_ID;
+    return Number(userId) ===
+        ADMIN_ID;
 }
 
 function updateAdminVisibility() {
@@ -1763,7 +1853,9 @@ function updateAdminVisibility() {
     if (createBtn) {
 
         createBtn.style.display =
-            admin ? 'inline-flex' : 'none';
+            admin
+                ? 'inline-flex'
+                : 'none';
     }
 
     const box =
@@ -1774,7 +1866,9 @@ function updateAdminVisibility() {
     if (box) {
 
         box.style.display =
-            admin ? 'block' : 'none';
+            admin
+                ? 'block'
+                : 'none';
     }
 }
 
@@ -1789,7 +1883,9 @@ function openAdminAddTask() {
         return;
     }
 
-    openModal('add-modal');
+    openModal(
+        'add-modal'
+    );
 }
 
 
@@ -1848,9 +1944,11 @@ function buildReferralLink() {
     const link =
         `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
 
-    box.innerText = link;
+    box.innerText =
+        link;
 
-    box.dataset.referral = link;
+    box.dataset.referral =
+        link;
 }
 
 function copyReferral() {
@@ -1875,25 +1973,36 @@ function copyReferral() {
         navigator.clipboard
             .writeText(link)
             .then(() =>
-                alert(t('copySuccess'))
+                alert(
+                    t('copySuccess')
+                )
             );
 
     } else {
 
         const temp =
-            document.createElement('textarea');
+            document.createElement(
+                'textarea'
+            );
 
-        temp.value = link;
+        temp.value =
+            link;
 
-        document.body.appendChild(temp);
+        document.body.appendChild(
+            temp
+        );
 
         temp.select();
 
-        document.execCommand('copy');
+        document.execCommand(
+            'copy'
+        );
 
         temp.remove();
 
-        alert(t('copySuccess'));
+        alert(
+            t('copySuccess')
+        );
     }
 }
 
@@ -1924,11 +2033,13 @@ function shareReferral() {
                 `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`
             );
 
-    } else if (navigator.share) {
+    } else if (
+        navigator.share
+    ) {
 
         navigator.share({
             text,
-            url: link
+            url:link
         }).catch(() => {});
 
     } else {
@@ -1945,20 +2056,28 @@ function shareReferral() {
 function openModal(id) {
 
     const modal =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
     if (modal) {
-        modal.style.display = 'flex';
+
+        modal.style.display =
+            'flex';
     }
 }
 
 function closeModal(id) {
 
     const modal =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
     if (modal) {
-        modal.style.display = 'none';
+
+        modal.style.display =
+            'none';
     }
 }
 
@@ -1971,29 +2090,37 @@ function showPage(page) {
 
     const pages = {
 
-        home:'home-page',
+        home:
+            'home-page',
 
-        tasks:'tasks-page',
+        tasks:
+            'tasks-page',
 
-        referrals:'referrals-page',
+        referrals:
+            'referrals-page',
 
-        withdraw:'withdraw-page'
+        withdraw:
+            'withdraw-page'
     };
 
     Object.entries(pages)
-        .forEach(([key,id]) => {
+        .forEach(
+            ([key,id]) => {
 
-            const el =
-                document.getElementById(id);
+                const el =
+                    document.getElementById(
+                        id
+                    );
 
-            if (el) {
+                if (el) {
 
-                el.style.display =
-                    key === page
-                        ? 'block'
-                        : 'none';
+                    el.style.display =
+                        key === page
+                            ? 'block'
+                            : 'none';
+                }
             }
-        });
+        );
 
     [
         'home',
@@ -2016,12 +2143,16 @@ function showPage(page) {
         }
     });
 
-    if (page === 'tasks') {
+    if (
+        page === 'tasks'
+    ) {
 
         renderTasksPage();
     }
 
-    if (page === 'withdraw') {
+    if (
+        page === 'withdraw'
+    ) {
 
         renderWithdrawPage();
 
@@ -2029,8 +2160,8 @@ function showPage(page) {
     }
 
     window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+        top:0,
+        behavior:'smooth'
     });
 }
 
@@ -2047,14 +2178,18 @@ function renderWithdrawPage() {
         );
 
     if (points) {
-        points.innerText = pts;
+
+        points.innerText =
+            pts;
     }
 
     if (value) {
 
         value.innerText =
             (
-                Number(pts) * 0.04 / 100
+                Number(pts) *
+                USDT_PER_100_POINTS /
+                100
             ).toFixed(2) +
             ' USDT';
     }
@@ -2062,7 +2197,7 @@ function renderWithdrawPage() {
 
 
 /* =========================================================
-   REWARD EVERY 12 HOURS
+   12 HOUR REWARD
 ========================================================= */
 
 let rewardAt =
@@ -2073,7 +2208,10 @@ let rewardAt =
     );
 
 const REWARD_MS =
-    12 * 60 * 60 * 1000;
+    12 *
+    60 *
+    60 *
+    1000;
 
 function updateRewardUI() {
 
@@ -2094,13 +2232,17 @@ function updateRewardUI() {
             'reward-status'
         );
 
-    if (!btn || !status) return;
+    if (!btn || !status) {
+        return;
+    }
 
     if (ready) {
 
-        btn.disabled = false;
+        btn.disabled =
+            false;
 
-        btn.style.opacity = '1';
+        btn.style.opacity =
+            '1';
 
         btn.innerText =
             t('claimReward');
@@ -2111,35 +2253,45 @@ function updateRewardUI() {
     } else {
 
         const remaining =
-            rewardAt - now;
+            rewardAt -
+            now;
 
         const h =
             Math.floor(
-                remaining / 3600000
+                remaining /
+                3600000
             );
 
         const m =
             Math.floor(
-                (remaining % 3600000) /
+                (
+                    remaining %
+                    3600000
+                ) /
                 60000
             );
 
         const s =
             Math.floor(
-                (remaining % 60000) /
+                (
+                    remaining %
+                    60000
+                ) /
                 1000
             );
 
-        btn.disabled = true;
-
-        btn.style.opacity = '.55';
+        btn.disabled =
+            true;
 
         btn.innerText =
-            t('rewardAvailable', {
-                h,
-                m,
-                s
-            });
+            t(
+                'rewardAvailable',
+                {
+                    h,
+                    m,
+                    s
+                }
+            );
 
         status.innerText =
             t('rewardComeBack');
@@ -2156,12 +2308,15 @@ async function claimReward() {
 
     if (
         rewardAt &&
-        Date.now() < rewardAt
+        Date.now() <
+            rewardAt
     ) return;
 
     if (!currentUser) {
 
-        alert(t('loadError'));
+        alert(
+            t('loadError')
+        );
 
         return;
     }
@@ -2171,7 +2326,8 @@ async function claimReward() {
             'reward-btn'
         );
 
-    btn.disabled = true;
+    btn.disabled =
+        true;
 
     try {
 
@@ -2185,13 +2341,17 @@ async function claimReward() {
                     p_user_id:
                         currentUser.telegram_id,
 
-                    p_points: 8
+                    p_points:
+                        PERIODIC_REWARD
                 }
             );
 
-        if (error) throw error;
+        if (error) {
+            throw error;
+        }
 
-        pts = Number(data);
+        pts =
+            Number(data);
 
         rewardAt =
             Date.now() +
@@ -2217,9 +2377,12 @@ async function claimReward() {
             err
         );
 
-        btn.disabled = false;
+        btn.disabled =
+            false;
 
-        alert(t('loadError'));
+        alert(
+            t('loadError')
+        );
     }
 }
 
@@ -2235,19 +2398,23 @@ setInterval(
 
 function getNextAvailableTask() {
 
-    if (selectedTaskId !== null) {
+    if (
+        selectedTaskId !== null
+    ) {
 
         const selected =
             tasks.find(
-                t =>
-                    Number(t.id) ===
+                task =>
+                    Number(task.id) ===
                     Number(selectedTaskId)
             );
 
         if (
             selected &&
             Number(selected.owner_id) !==
-                Number(currentUser?.telegram_id) &&
+                Number(
+                    currentUser?.telegram_id
+                ) &&
             !visitedTasks.includes(
                 Number(selected.id)
             ) &&
@@ -2259,18 +2426,21 @@ function getNextAvailableTask() {
         }
     }
 
-    return tasks.find(task =>
+    return tasks.find(
+        task =>
 
-        Number(task.owner_id) !==
-            Number(currentUser?.telegram_id) &&
+            Number(task.owner_id) !==
+                Number(
+                    currentUser?.telegram_id
+                ) &&
 
-        !visitedTasks.includes(
-            Number(task.id)
-        ) &&
+            !visitedTasks.includes(
+                Number(task.id)
+            ) &&
 
-        Number(task.left || 0) > 0 &&
+            Number(task.left || 0) > 0 &&
 
-        task.is_active !== false
+            task.is_active !== false
     );
 }
 
@@ -2287,7 +2457,9 @@ function render() {
         );
 
     if (ptsBal) {
-        ptsBal.innerText = pts;
+
+        ptsBal.innerText =
+            pts;
     }
 
     const gramBal =
@@ -2296,6 +2468,7 @@ function render() {
         );
 
     if (gramBal) {
+
         gramBal.innerText =
             Number(gram).toFixed(2);
     }
@@ -2306,24 +2479,27 @@ function render() {
         );
 
     if (completed) {
+
         completed.innerText =
             visitedTasks.length;
     }
 
     const availableCount =
-        tasks.filter(task =>
+        tasks.filter(
+            task =>
 
-            Number(task.owner_id) !==
-                Number(currentUser?.telegram_id) &&
+                Number(task.owner_id) !==
+                    Number(
+                        currentUser?.telegram_id
+                    ) &&
 
-            Number(task.left || 0) > 0 &&
+                Number(task.left || 0) > 0 &&
 
-            task.is_active !== false &&
+                task.is_active !== false &&
 
-            !visitedTasks.includes(
-                Number(task.id)
-            )
-
+                !visitedTasks.includes(
+                    Number(task.id)
+                )
         ).length;
 
     const total =
@@ -2332,6 +2508,7 @@ function render() {
         );
 
     if (total) {
+
         total.innerText =
             availableCount;
     }
@@ -2342,16 +2519,14 @@ function render() {
         );
 
     if (daily) {
+
         daily.innerText =
             dailyVisitors;
     }
 
     renderActiveTask();
-
     renderTasksPage();
-
     renderMyLink();
-
     renderWithdrawPage();
 
     const refCount =
@@ -2360,6 +2535,7 @@ function render() {
         );
 
     if (refCount) {
+
         refCount.innerText =
             referralCount;
     }
@@ -2370,6 +2546,7 @@ function render() {
         );
 
     if (refPoints) {
+
         refPoints.innerText =
             referralPoints;
     }
@@ -2451,9 +2628,15 @@ function renderActiveTask() {
         }
 
         <div class="link-box">
-
             ${escapeHtml(task.url)}
+        </div>
 
+        <div style="
+            font-size:8pt;
+            color:var(--emerald);
+            margin-bottom:8px;
+            text-align:center;">
+            🎁 مكافأة إكمال المهمة: +25 نقطة
         </div>
 
         <button
@@ -2475,6 +2658,16 @@ function renderMyLink() {
 
     if (!box) return;
 
+    if (
+        !isAdminUser()
+    ) {
+
+        box.innerText =
+            'المهام تتم إدارتها من قبل الإدارة فقط.';
+
+        return;
+    }
+
     if (!myLink) {
 
         box.innerText =
@@ -2486,17 +2679,23 @@ function renderMyLink() {
     box.innerHTML = `
 
         <b style="color:var(--cyan);">
-
-            ${escapeHtml(
-                myLink.url
-            )}
-
+            ${escapeHtml(myLink.url)}
         </b>
 
         <br>
 
         ${t('remainingVisits')}
-        ${Number(myLink.left || myLink.required_visits || 0)}
+        ${Number(
+            myLink.left ||
+            myLink.required_visits ||
+            0
+        )}
+
+        <br>
+
+        <span style="color:var(--emerald);">
+            مكافأة كل إكمال: 25 نقطة
+        </span>
 
     `;
 }
@@ -2518,18 +2717,21 @@ function renderTasksPage() {
     if (!box) return;
 
     const available =
-        tasks.filter(task =>
+        tasks.filter(
+            task =>
 
-            Number(task.owner_id) !==
-                Number(currentUser?.telegram_id) &&
+                Number(task.owner_id) !==
+                    Number(
+                        currentUser?.telegram_id
+                    ) &&
 
-            Number(task.left || 0) > 0 &&
+                Number(task.left || 0) > 0 &&
 
-            task.is_active !== false &&
+                task.is_active !== false &&
 
-            !visitedTasks.includes(
-                Number(task.id)
-            )
+                !visitedTasks.includes(
+                    Number(task.id)
+                )
         );
 
     if (!available.length) {
@@ -2547,7 +2749,8 @@ function renderTasksPage() {
     }
 
     box.innerHTML =
-        available.map(task => `
+        available.map(
+            task => `
 
             <div class="task-item">
 
@@ -2586,9 +2789,15 @@ function renderTasksPage() {
                 }
 
                 <div class="link-box">
-
                     ${escapeHtml(task.url)}
+                </div>
 
+                <div style="
+                    font-size:8pt;
+                    color:var(--emerald);
+                    text-align:center;
+                    margin-bottom:8px;">
+                    🎁 +25 نقطة عند إكمال المهمة
                 </div>
 
                 <button
@@ -2601,10 +2810,13 @@ function renderTasksPage() {
 
             </div>
 
-        `).join('');
+        `
+        ).join('');
 }
 
-async function visitSpecificTask(taskId) {
+async function visitSpecificTask(
+    taskId
+) {
 
     const task =
         tasks.find(
@@ -2617,7 +2829,9 @@ async function visitSpecificTask(taskId) {
 
     if (
         Number(task.owner_id) ===
-        Number(currentUser?.telegram_id)
+        Number(
+            currentUser?.telegram_id
+        )
     ) {
 
         return;
@@ -2641,8 +2855,8 @@ async function visitSpecificTask(taskId) {
 
     } finally {
 
-        selectedTaskId = null;
-
+        selectedTaskId =
+            null;
     }
 }
 
@@ -2653,7 +2867,8 @@ async function visitSpecificTask(taskId) {
 
 async function awardPoints(
     points,
-    userId = currentUser?.telegram_id
+    userId =
+        currentUser?.telegram_id
 ) {
 
     const {
@@ -2663,8 +2878,11 @@ async function awardPoints(
         await supabase.rpc(
             'add_points',
             {
-                p_user_id: userId,
-                p_points: points
+                p_user_id:
+                    userId,
+
+                p_points:
+                    points
             }
         );
 
@@ -2675,7 +2893,9 @@ async function awardPoints(
     const balance =
         Number(data);
 
-    if (!Number.isFinite(balance)) {
+    if (
+        !Number.isFinite(balance)
+    ) {
 
         throw new Error(
             'Invalid balance returned by add_points'
@@ -2687,7 +2907,10 @@ async function awardPoints(
 
 
 /* =========================================================
-   VISIT TASK
+   COMPLETE TASK
+   IMPORTANT:
+   TASKS ARE COMPLETELY SEPARATE FROM TASK CREATION COST.
+   COMPLETING = +25 POINTS.
 ========================================================= */
 
 async function visitLink() {
@@ -2709,7 +2932,9 @@ async function visitLink() {
         Number(task.id);
 
     if (
-        visitedTasks.includes(taskId)
+        visitedTasks.includes(
+            taskId
+        )
     ) {
 
         return;
@@ -2720,13 +2945,11 @@ async function visitLink() {
         '_blank'
     );
 
-    let pointsAwarded = false;
-
     try {
 
         /*
-         * First check again from database
-         * to prevent duplicate visits.
+         * First check whether this user
+         * already completed the task.
          */
 
         const {
@@ -2761,7 +2984,9 @@ async function visitLink() {
                 )
             ) {
 
-                visitedTasks.push(taskId);
+                visitedTasks.push(
+                    taskId
+                );
             }
 
             render();
@@ -2770,21 +2995,15 @@ async function visitLink() {
         }
 
         /*
-         * Give one point.
-         */
-
-        pts =
-            await awardPoints(
-                1
-            );
-
-        pointsAwarded = true;
-
-        /*
-         * Record completion.
+         * IMPORTANT:
+         * Record completion FIRST.
+         *
+         * This means we only give the 25 points
+         * after the database accepts the completion.
          */
 
         const {
+            data: completedRow,
             error: completedError
         } =
             await supabase
@@ -2796,25 +3015,22 @@ async function visitLink() {
 
                     task_id:
                         taskId
-                });
+                })
+                .select()
+                .single();
 
         if (completedError) {
+
+            /*
+             * Unique constraint:
+             * task was already completed.
+             */
 
             if (
                 String(
                     completedError.code
                 ) === '23505'
             ) {
-
-                if (pointsAwarded) {
-
-                    pts =
-                        await awardPoints(
-                            -1
-                        );
-
-                    pointsAwarded = false;
-                }
 
                 if (
                     !visitedTasks.includes(
@@ -2836,7 +3052,53 @@ async function visitLink() {
         }
 
         /*
-         * Successfully completed.
+         * NOW give exactly 25 points.
+         */
+
+        let pointsAwarded = false;
+
+        try {
+
+            pts =
+                await awardPoints(
+                    TASK_REWARD
+                );
+
+            pointsAwarded =
+                true;
+
+        } catch (rewardError) {
+
+            /*
+             * If reward fails, remove the
+             * completion record so the user
+             * can retry instead of losing the reward.
+             */
+
+            if (
+                completedRow?.id
+            ) {
+
+                try {
+
+                    await supabase
+                        .from(
+                            'completed_tasks'
+                        )
+                        .delete()
+                        .eq(
+                            'id',
+                            completedRow.id
+                        );
+
+                } catch (_) {}
+            }
+
+            throw rewardError;
+        }
+
+        /*
+         * Mark task as completed locally.
          */
 
         if (
@@ -2853,15 +3115,24 @@ async function visitLink() {
         task.left =
             Math.max(
                 0,
-                Number(task.left || 0) - 1
+                Number(
+                    task.left || 0
+                ) - 1
             );
 
-        if (task.left <= 0) {
+        if (
+            task.left <= 0
+        ) {
 
-            task.is_active = false;
+            task.is_active =
+                false;
         }
 
         render();
+
+        alert(
+            `🎉 تم إكمال المهمة بنجاح!\nتمت إضافة ${TASK_REWARD} نقطة إلى رصيدك.`
+        );
 
     } catch (err) {
 
@@ -2869,24 +3140,6 @@ async function visitLink() {
             'visitLink:',
             err
         );
-
-        if (pointsAwarded) {
-
-            try {
-
-                pts =
-                    await awardPoints(
-                        -1
-                    );
-
-            } catch (refundError) {
-
-                console.error(
-                    'Visit refund failed:',
-                    refundError
-                );
-            }
-        }
 
         await loadData();
 
@@ -2943,7 +3196,9 @@ async function processReferral() {
     if (!match) return;
 
     const referrerId =
-        Number(match[1]);
+        Number(
+            match[1]
+        );
 
     const referredId =
         Number(
@@ -2957,15 +3212,11 @@ async function processReferral() {
     ) return;
 
     if (
-        referrerId === referredId
+        referrerId ===
+        referredId
     ) return;
 
     try {
-
-        /*
-         * Check if this referred user
-         * already has a referral.
-         */
 
         const {
             data: existing,
@@ -2992,10 +3243,6 @@ async function processReferral() {
             return;
         }
 
-        /*
-         * Check referrer exists.
-         */
-
         const {
             data: referrerRows,
             error: referrerError
@@ -3021,12 +3268,6 @@ async function processReferral() {
             return;
         }
 
-        /*
-         * Insert referral.
-         * The unique constraint on referred_id
-         * prevents duplicates.
-         */
-
         const {
             data: referralRow,
             error: insertError
@@ -3042,17 +3283,12 @@ async function processReferral() {
                         referredId,
 
                     reward_points:
-                        40
+                        REFERRAL_REWARD
                 })
                 .select('id')
                 .single();
 
         if (insertError) {
-
-            /*
-             * Duplicate referral:
-             * do NOT award another 40.
-             */
 
             if (
                 String(
@@ -3066,42 +3302,28 @@ async function processReferral() {
             throw insertError;
         }
 
-        /*
-         * Give 40 points to referrer.
-         */
-
         try {
 
             await awardPoints(
-                40,
+                REFERRAL_REWARD,
                 referrerId
             );
 
         } catch (rewardError) {
 
-            /*
-             * Roll back referral record
-             * if reward fails.
-             */
-
-            if (referralRow?.id) {
+            if (
+                referralRow?.id
+            ) {
 
                 try {
 
-                    await fetch(
-                        `${SUPABASE_URL}/rest/v1/referrals?id=eq.${encodeURIComponent(referralRow.id)}`,
-                        {
-                            method: 'DELETE',
-
-                            headers: {
-                                apikey:
-                                    SUPABASE_KEY,
-
-                                Authorization:
-                                    `Bearer ${SUPABASE_KEY}`
-                            }
-                        }
-                    );
+                    await supabase
+                        .from('referrals')
+                        .delete()
+                        .eq(
+                            'id',
+                            referralRow.id
+                        );
 
                 } catch (_) {}
             }
@@ -3110,26 +3332,11 @@ async function processReferral() {
         }
 
         /*
-         * Refresh current user's data.
+         * Reload data so the referrer
+         * sees the new balance.
          */
 
         await loadData();
-
-        /*
-         * Show notification only to the
-         * person who referred someone.
-         */
-
-        if (
-            Number(
-                currentUser.telegram_id
-            ) === referrerId
-        ) {
-
-            alert(
-                '🎉 تمت إحالة ناجحة! حصلت على 40 نقطة.'
-            );
-        }
 
     } catch (err) {
 
@@ -3155,20 +3362,18 @@ async function grantWelcomeBonusIfNew(
 
     const key =
         'welcomeBonusGranted_' +
-        String(user.telegram_id);
+        String(
+            user.telegram_id
+        );
 
     if (
-        localStorage.getItem(key) === '1'
+        localStorage.getItem(
+            key
+        ) === '1'
     ) {
 
         return;
     }
-
-    /*
-     * create_user should return the user's
-     * created_at. We only consider the account
-     * new when it was created very recently.
-     */
 
     const createdAt =
         user.created_at
@@ -3178,9 +3383,12 @@ async function grantWelcomeBonusIfNew(
             : NaN;
 
     const isNewUser =
-        Number.isFinite(createdAt) &&
+        Number.isFinite(
+            createdAt
+        ) &&
         Math.abs(
-            Date.now() - createdAt
+            Date.now() -
+            createdAt
         ) <
         5 * 60 * 1000;
 
@@ -3192,12 +3400,14 @@ async function grantWelcomeBonusIfNew(
 
         const newBalance =
             await awardPoints(
-                20,
+                WELCOME_REWARD,
                 user.telegram_id
             );
 
         pts =
-            Number(newBalance);
+            Number(
+                newBalance
+            );
 
         localStorage.setItem(
             key,
@@ -3222,11 +3432,15 @@ async function grantWelcomeBonusIfNew(
 
 /* =========================================================
    ADD TASK
+   IMPORTANT:
+   ADDING A TASK COSTS ZERO POINTS.
 ========================================================= */
 
 async function addLink() {
 
-    if (!isAdminUser()) {
+    if (
+        !isAdminUser()
+    ) {
 
         alert(
             'هذه الخاصية متاحة للإدارة فقط.'
@@ -3286,48 +3500,12 @@ async function addLink() {
     try {
 
         /*
-         * Check current balance first.
-         */
-
-        if (
-            Number(pts) < count
-        ) {
-
-            alert(
-                t(
-                    'insufficientPoints',
-                    {p: pts}
-                )
-            );
-
-            return;
-        }
-
-        /*
-         * Deduct task cost first.
-         */
-
-        const {
-            data: newPoints,
-            error: pointsError
-        } =
-            await supabase.rpc(
-                'subtract_points',
-                {
-                    p_user_id:
-                        currentUser.telegram_id,
-
-                    p_points:
-                        count
-                }
-            );
-
-        if (pointsError) {
-            throw pointsError;
-        }
-
-        /*
-         * Create task.
+         * NO POINT CHECK.
+         * NO subtract_points.
+         * NO task creation cost.
+         *
+         * The number of required visits is
+         * completely independent from the points system.
          */
 
         const {
@@ -3342,10 +3520,16 @@ async function addLink() {
                         url,
 
                     description:
-                        description || null,
+                        description ||
+                        null,
+
+                    /*
+                     * Fixed reward:
+                     * every completed task = 25 points.
+                     */
 
                     reward_points:
-                        1,
+                        TASK_REWARD,
 
                     url:
                         url,
@@ -3356,6 +3540,12 @@ async function addLink() {
                     owner_id:
                         currentUser.telegram_id,
 
+                    /*
+                     * This is ONLY the required
+                     * number of completions.
+                     * It is NOT a points cost.
+                     */
+
                     required_visits:
                         count
                 })
@@ -3363,27 +3553,8 @@ async function addLink() {
                 .single();
 
         if (taskError) {
-
-            /*
-             * Refund if task creation failed.
-             */
-
-            await supabase.rpc(
-                'add_points',
-                {
-                    p_user_id:
-                        currentUser.telegram_id,
-
-                    p_points:
-                        count
-                }
-            );
-
             throw taskError;
         }
-
-        pts =
-            Number(newPoints);
 
         myLink =
             insertedTask;
@@ -3418,7 +3589,7 @@ async function addLink() {
         );
 
         alert(
-            t('loadError')
+            'تعذر إضافة المهمة. تأكد من اتصال Supabase وصلاحيات جدول tasks.'
         );
     }
 }
@@ -3447,12 +3618,16 @@ function updateWithdrawPreview() {
     const points =
         Math.max(
             0,
-            Number(input.value) || 0
+            Number(
+                input.value
+            ) || 0
         );
 
     preview.innerText =
         (
-            points * 0.04 / 100
+            points *
+            USDT_PER_100_POINTS /
+            100
         ).toFixed(2) +
         ' USDT';
 }
@@ -3475,7 +3650,7 @@ function openWithdrawModal() {
 
     input.value =
         Math.max(
-            250,
+            MIN_WITHDRAW_POINTS,
             Math.floor(
                 Number(pts)
             )
@@ -3514,7 +3689,10 @@ async function submitWithdrawal() {
             'withdraw-wallet'
         ).value.trim();
 
-    if (points < 250) {
+    if (
+        points <
+        MIN_WITHDRAW_POINTS
+    ) {
 
         alert(
             'الحد الأدنى للسحب هو 250 نقطة = 0.10 USDT.'
@@ -3523,7 +3701,10 @@ async function submitWithdrawal() {
         return;
     }
 
-    if (points > Number(pts)) {
+    if (
+        points >
+        Number(pts)
+    ) {
 
         alert(
             `نقاطك غير كافية. رصيدك الحالي: ${pts}`
@@ -3547,7 +3728,9 @@ async function submitWithdrawal() {
     const amount =
         Number(
             (
-                points * 0.04 / 100
+                points *
+                USDT_PER_100_POINTS /
+                100
             ).toFixed(4)
         );
 
@@ -3557,14 +3740,12 @@ async function submitWithdrawal() {
     try {
 
         /*
-         * IMPORTANT:
-         * Deduct points BEFORE creating withdrawal.
-         * If creating withdrawal fails, refund points.
+         * Deduct points first.
          */
 
         const {
-            data: newBalance,
-            error: balanceError
+            data:newBalance,
+            error:balanceError
         } =
             await supabase.rpc(
                 'subtract_points',
@@ -3582,7 +3763,9 @@ async function submitWithdrawal() {
         }
 
         pts =
-            Number(newBalance);
+            Number(
+                newBalance
+            );
 
         pointsSubtracted =
             true;
@@ -3592,7 +3775,6 @@ async function submitWithdrawal() {
          */
 
         const {
-            data,
             error
         } =
             await supabase
@@ -3624,7 +3806,7 @@ async function submitWithdrawal() {
         if (error) {
 
             /*
-             * Refund the points.
+             * Refund because request creation failed.
              */
 
             await supabase.rpc(
@@ -3674,12 +3856,9 @@ async function submitWithdrawal() {
             err
         );
 
-        /*
-         * Safety refund if deduction happened
-         * but something failed afterwards.
-         */
-
-        if (pointsSubtracted) {
+        if (
+            pointsSubtracted
+        ) {
 
             try {
 
@@ -3730,11 +3909,6 @@ async function loadWithdrawals() {
 
     try {
 
-        /*
-         * Normal user can only request
-         * his own telegram_id.
-         */
-
         const {
             data,
             error
@@ -3751,7 +3925,7 @@ async function loadWithdrawals() {
                 .order(
                     'created_at',
                     {
-                        ascending: false
+                        ascending:false
                     }
                 );
 
@@ -3769,9 +3943,7 @@ async function loadWithdrawals() {
                     font-size:8.5pt;
                     color:var(--muted);
                     text-align:center;">
-
                     لا توجد طلبات سحب.
-
                 </div>
             `;
 
@@ -3779,7 +3951,8 @@ async function loadWithdrawals() {
         }
 
         box.innerHTML =
-            data.map(w => `
+            data.map(
+                w => `
 
                 <div class="withdraw-row">
 
@@ -3798,7 +3971,8 @@ async function loadWithdrawals() {
 
                             ${escapeHtml(
                                 String(
-                                    w.wallet_address || ''
+                                    w.wallet_address ||
+                                    ''
                                 ).slice(0,12)
                             )}…
 
@@ -3836,7 +4010,8 @@ async function loadWithdrawals() {
 
                 </div>
 
-            `).join('');
+            `
+            ).join('');
 
     } catch (err) {
 
@@ -3870,7 +4045,8 @@ let dailyVisitors =
     );
 
 if (
-    visitorDate !== todayKey
+    visitorDate !==
+    todayKey
 ) {
 
     visitorDate =
@@ -3929,15 +4105,10 @@ async function loadData() {
     ) {
 
         currentUser = null;
-
         pts = 0;
-
         tasks = [];
-
         visitedTasks = [];
-
         referralCount = 0;
-
         referralPoints = 0;
 
         render();
@@ -3948,18 +4119,15 @@ async function loadData() {
     const telegramUser =
         getTelegramUser();
 
-    if (!telegramUser?.id) {
+    if (
+        !telegramUser?.id
+    ) {
 
         currentUser = null;
-
         pts = 0;
-
         tasks = [];
-
         visitedTasks = [];
-
         referralCount = 0;
-
         referralPoints = 0;
 
         render();
@@ -3969,13 +4137,9 @@ async function loadData() {
 
     try {
 
-        /*
-         * Create or get user.
-         */
-
         const {
-            data: user,
-            error: userError
+            data:user,
+            error:userError
         } =
             await supabase.rpc(
                 'create_user',
@@ -4026,8 +4190,8 @@ async function loadData() {
          */
 
         const {
-            data: taskRows,
-            error: taskError
+            data:taskRows,
+            error:taskError
         } =
             await supabase
                 .from('tasks')
@@ -4041,7 +4205,7 @@ async function loadData() {
                 .order(
                     'created_at',
                     {
-                        ascending: true
+                        ascending:true
                     }
                 );
 
@@ -4054,8 +4218,8 @@ async function loadData() {
          */
 
         const {
-            data: completedRows,
-            error: completedError
+            data:completedRows,
+            error:completedError
         } =
             await supabase
                 .from('completed_tasks')
@@ -4076,8 +4240,8 @@ async function loadData() {
          */
 
         const {
-            data: allCompletedRows,
-            error: allCompletedError
+            data:allCompletedRows,
+            error:allCompletedError
         } =
             await supabase
                 .from('completed_tasks')
@@ -4092,26 +4256,31 @@ async function loadData() {
         const completedCounts = {};
 
         (
-            allCompletedRows || []
-        ).forEach(row => {
+            allCompletedRows ||
+            []
+        ).forEach(
+            row => {
 
-            const id =
-                Number(row.task_id);
+                const id =
+                    Number(
+                        row.task_id
+                    );
 
-            completedCounts[id] =
-                (
-                    completedCounts[id] ||
-                    0
-                ) + 1;
-        });
+                completedCounts[id] =
+                    (
+                        completedCounts[id] ||
+                        0
+                    ) + 1;
+            }
+        );
 
         /*
          * Referral statistics.
          */
 
         const {
-            data: referralRows,
-            error: referralError
+            data:referralRows,
+            error:referralError
         } =
             await supabase
                 .from('referrals')
@@ -4128,121 +4297,143 @@ async function loadData() {
         }
 
         /*
-         * Refresh balance from database.
+         * Refresh balance.
          */
 
         pts =
             Number(
-                user.points || 0
+                user.points ||
+                0
             );
 
         visitedTasks =
             (
-                completedRows || []
+                completedRows ||
+                []
             ).map(
-                r => Number(
-                    r.task_id
-                )
+                r =>
+                    Number(
+                        r.task_id
+                    )
             );
 
         referralCount =
             (
-                referralRows || []
+                referralRows ||
+                []
             ).length;
 
         referralPoints =
             (
-                referralRows || []
+                referralRows ||
+                []
             ).reduce(
-                (sum,row) =>
+                (
+                    sum,
+                    row
+                ) =>
                     sum +
                     Number(
-                        row.reward_points || 0
+                        row.reward_points ||
+                        0
                     ),
                 0
             );
 
         /*
-         * Convert DB tasks to UI tasks.
+         * Convert DB tasks to UI.
+         *
+         * IMPORTANT:
+         * reward_points is always treated as 25
+         * for task completion.
          */
 
         tasks =
             (
-                taskRows || []
-            ).map(row => {
+                taskRows ||
+                []
+            ).map(
+                row => {
 
-                const id =
-                    Number(row.id);
-
-                const required =
-                    Number(
-                        row.required_visits ||
-                        1
-                    );
-
-                const completed =
-                    Number(
-                        completedCounts[id] ||
-                        0
-                    );
-
-                return {
-
-                    id,
-
-                    user:
+                    const id =
                         Number(
-                            row.owner_id
-                        ) ===
-                        Number(
-                            telegramUser.id
-                        )
-                            ? (
-                                currentLang === 'en'
-                                    ? 'You'
-                                    : 'أنت'
-                              )
-                            : (
-                                row.title ||
-                                'User'
-                              ),
+                            row.id
+                        );
 
-                    title:
-                        row.title,
-
-                    description:
-                        row.description ||
-                        '',
-
-                    url:
-                        row.url,
-
-                    left:
+                    const required =
                         Math.max(
-                            0,
-                            required -
-                            completed
-                        ),
+                            1,
+                            Number(
+                                row.required_visits ||
+                                1
+                            )
+                        );
 
-                    required_visits:
-                        required,
-
-                    reward_points:
+                    const completed =
                         Number(
-                            row.reward_points ||
-                            1
-                        ),
+                            completedCounts[id] ||
+                            0
+                        );
 
-                    is_active:
-                        row.is_active,
+                    return {
 
-                    owner_id:
-                        row.owner_id
-                };
-            });
+                        id,
+
+                        user:
+                            Number(
+                                row.owner_id
+                            ) ===
+                            Number(
+                                telegramUser.id
+                            )
+                                ? (
+                                    currentLang === 'en'
+                                        ? 'You'
+                                        : 'أنت'
+                                  )
+                                : (
+                                    row.title ||
+                                    'User'
+                                  ),
+
+                        title:
+                            row.title,
+
+                        description:
+                            row.description ||
+                            '',
+
+                        url:
+                            row.url,
+
+                        left:
+                            Math.max(
+                                0,
+                                required -
+                                completed
+                            ),
+
+                        required_visits:
+                            required,
+
+                        /*
+                         * Fixed task reward.
+                         */
+
+                        reward_points:
+                            TASK_REWARD,
+
+                        is_active:
+                            row.is_active,
+
+                        owner_id:
+                            row.owner_id
+                    };
+                }
+            );
 
         /*
-         * User's own published task.
+         * Admin's published task.
          */
 
         myLink =
@@ -4286,11 +4477,20 @@ function escapeHtml(value) {
         .replace(
             /[&<>"']/g,
             ch => ({
-                '&':'&amp;',
-                '<':'&lt;',
-                '>':'&gt;',
-                '"':'&quot;',
-                "'":'&#039;'
+                '&':
+                    '&amp;',
+
+                '<':
+                    '&lt;',
+
+                '>':
+                    '&gt;',
+
+                '"':
+                    '&quot;',
+
+                "'":
+                    '&#039;'
             }[ch])
         );
 }
@@ -4302,7 +4502,9 @@ function escapeHtml(value) {
 
 async function loadAdminWithdrawals() {
 
-    if (!isAdminUser()) {
+    if (
+        !isAdminUser()
+    ) {
         return;
     }
 
@@ -4347,12 +4549,8 @@ async function loadAdminWithdrawals() {
         ) {
 
             box.innerHTML = `
-                <div style="
-                    color:#777;
-                    font-size:13px;">
-
+                <div style="color:#777;font-size:13px;">
                     لا توجد طلبات سحب حالياً.
-
                 </div>
             `;
 
@@ -4360,7 +4558,8 @@ async function loadAdminWithdrawals() {
         }
 
         box.innerHTML =
-            data.map(w => `
+            data.map(
+                w => `
 
                 <div class="admin-withdraw">
 
@@ -4391,7 +4590,9 @@ async function loadAdminWithdrawals() {
                         <br>
 
                         النقاط:
-                        ${Number(w.points)}
+                        ${Number(
+                            w.points
+                        )}
 
                         <br>
 
@@ -4465,7 +4666,8 @@ async function loadAdminWithdrawals() {
 
                 </div>
 
-            `).join('');
+            `
+            ).join('');
 
     } catch (err) {
 
@@ -4475,12 +4677,8 @@ async function loadAdminWithdrawals() {
         );
 
         box.innerHTML = `
-            <div style="
-                color:#c00;
-                font-size:13px;">
-
+            <div style="color:#c00;font-size:13px;">
                 تعذر تحميل طلبات السحب.
-
             </div>
         `;
     }
@@ -4496,7 +4694,9 @@ async function adminSetWithdrawal(
     status
 ) {
 
-    if (!isAdminUser()) {
+    if (
+        !isAdminUser()
+    ) {
 
         alert(
             'هذه الخاصية متاحة للإدارة فقط.'
@@ -4527,12 +4727,12 @@ async function adminSetWithdrawal(
     try {
 
         /*
-         * Read the request.
+         * Read current request.
          */
 
         const {
-            data: rows,
-            error: getError
+            data:rows,
+            error:getError
         } =
             await supabase
                 .from('withdrawals')
@@ -4567,49 +4767,28 @@ async function adminSetWithdrawal(
         }
 
         /*
-         * Update status FIRST.
+         * Change status.
          */
 
-        const response =
-            await fetch(
-                `${SUPABASE_URL}/rest/v1/withdrawals?id=eq.${encodeURIComponent(id)}`,
-                {
-                    method:'PATCH',
+        const {
+            error:updateError
+        } =
+            await supabase
+                .from('withdrawals')
+                .update({
+                    status
+                })
+                .eq(
+                    'id',
+                    id
+                );
 
-                    headers: {
-                        apikey:
-                            SUPABASE_KEY,
-
-                        Authorization:
-                            `Bearer ${SUPABASE_KEY}`,
-
-                        'Content-Type':
-                            'application/json',
-
-                        Prefer:
-                            'return=minimal'
-                    },
-
-                    body:
-                        JSON.stringify({
-                            status
-                        })
-                }
-            );
-
-        if (!response.ok) {
-
-            const text =
-                await response.text();
-
-            throw new Error(
-                text ||
-                `HTTP ${response.status}`
-            );
+        if (updateError) {
+            throw updateError;
         }
 
         /*
-         * If rejected, return points.
+         * Rejected = refund points.
          */
 
         if (
@@ -4617,7 +4796,7 @@ async function adminSetWithdrawal(
         ) {
 
             const {
-                error: refundError
+                error:refundError
             } =
                 await supabase.rpc(
                     'add_points',
@@ -4635,12 +4814,12 @@ async function adminSetWithdrawal(
             if (refundError) {
 
                 console.error(
-                    'Refund failed after rejection:',
+                    'Refund failed:',
                     refundError
                 );
 
                 alert(
-                    'تم رفض الطلب، لكن حدث خطأ أثناء إرجاع النقاط. يجب مراجعة رصيد المستخدم.'
+                    'تم تغيير حالة الطلب، لكن حدث خطأ أثناء إرجاع النقاط. يجب مراجعة رصيد المستخدم.'
                 );
 
                 await loadAdminWithdrawals();
@@ -4677,7 +4856,9 @@ async function adminSetWithdrawal(
 
 function addAdminButton() {
 
-    if (!isAdminUser()) {
+    if (
+        !isAdminUser()
+    ) {
         return;
     }
 
@@ -4740,6 +4921,7 @@ function addAdminButton() {
                             method:'HEAD',
 
                             headers: {
+
                                 apikey:
                                     SUPABASE_KEY,
 
