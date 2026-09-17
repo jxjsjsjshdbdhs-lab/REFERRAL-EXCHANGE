@@ -152,7 +152,7 @@
     <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <span style="font-weight:800; font-size:10pt;" data-i18n="yourPublishedLink">رابطك المنشور</span>
-            <button class="btn btn-emerald" style="width:auto; padding:4px 10px;" onclick="openModal('add-modal')" data-i18n="createTask">+ إنشاء مهمة</button>
+            <button id="create-task-btn" class="btn btn-emerald" style="width:auto; padding:4px 10px; display:none;" onclick="openModal('add-modal')" data-i18n="createTask">+ إنشاء مهمة</button>
         </div>
         <div id="my-task-info" style="font-size:8.5pt; color:var(--muted);">لا يوجد رابط مضاف حالياً.</div>
     </div>
@@ -758,6 +758,88 @@ function getTelegramUser() {
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        function isAdminUser(userId = getTelegramUserId()) {
+            return Number(userId) === 5339335944;
+        }
+
+        function getReferralStartParam() {
+            try {
+                const p = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+                if (p) return String(p);
+            } catch (_) {}
+            return '';
+        }
+
+        // احتساب الإحالة عند فتح البوت من رابط ref_<telegram_id>.
+        // الإحالة تُسجل مرة واحدة فقط بفضل القيد unique_referral على referred_id.
+        async function processReferral() {
+            if (!currentUser?.telegram_id || !ensureSupabase('احتساب الإحالة')) return;
+
+            const startParam = getReferralStartParam();
+            const match = startParam.match(/^ref_(\d+)$/i);
+            if (!match) return;
+
+            const referrerId = Number(match[1]);
+            const referredId = Number(currentUser.telegram_id);
+            if (!Number.isSafeInteger(referrerId) || referrerId === referredId) return;
+
+            try {
+                // لا نحتسب إحالة لنفس المستخدم أكثر من مرة.
+                const { data: existing, error: existingError } = await supabase
+                    .from('referrals')
+                    .select('id,reward_points')
+                    .eq('referred_id', referredId)
+                    .limit(1);
+                if (existingError) throw existingError;
+                if (existing && existing.length) return;
+
+                // تأكد أن صاحب الرابط موجود فعلاً.
+                const { data: referrerRows, error: referrerError } = await supabase
+                    .from('users')
+                    .select('telegram_id')
+                    .eq('telegram_id', referrerId)
+                    .limit(1);
+                if (referrerError) throw referrerError;
+                if (!referrerRows?.length) return;
+
+                // سجّل الإحالة أولاً؛ unique constraint يمنع التكرار في حال فتح الرابط مرتين.
+                const { data: referralRow, error: insertError } = await supabase
+                    .from('referrals')
+                    .insert({
+                        referrer_id: referrerId,
+                        referred_id: referredId,
+                        reward_points: 40
+                    })
+                    .select('id')
+                    .single();
+
+                if (insertError) {
+                    // 23505 = الإحالة موجودة مسبقاً، فلا نضيف 40 نقطة مرة ثانية.
+                    if (String(insertError.code) === '23505') return;
+                    throw insertError;
+                }
+
+                try {
+                    await awardPoints(40, referrerId);
+                } catch (rewardError) {
+                    // محاولة التراجع حتى لا تبقى إحالة بلا مكافأة.
+                    try {
+                        await fetch(`${SUPABASE_URL}/rest/v1/referrals?id=eq.${encodeURIComponent(referralRow.id)}`, {
+                            method: 'DELETE',
+                            headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+                        });
+                    } catch (_) {}
+                    throw rewardError;
+                }
+
+                if (Number(currentUser.telegram_id) === referrerId) return;
+                await loadData();
+                alert('🎉 تمت إحالة ناجحة! حصل صاحب الرابط على 40 نقطة.');
+            } catch (err) {
+                console.error('processReferral:', err);
+            }
+        }
+
         async function awardPoints(points, userId = currentUser?.telegram_id) {
             const { data, error } = await supabase.rpc('add_points', {
                 p_user_id: userId,
@@ -963,6 +1045,7 @@ function getTelegramUser() {
         }
 
         async function addLink() {
+    if (!isAdminUser()) { alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
     if (!ensureSupabase('إضافة المهمة')) return;
             const u = document.getElementById('add-url').value.trim();
             const description = document.getElementById('add-description').value.trim();
@@ -1084,6 +1167,7 @@ function getTelegramUser() {
 
                 currentUser = user;
                 await grantWelcomeBonusIfNew(user);
+                await processReferral();
 
                 const { data: taskRows, error: taskError } = await supabase
                     .from('tasks')
@@ -1152,6 +1236,13 @@ function getTelegramUser() {
             }
         }
 
+        function applyAdminVisibility() {
+            const admin = isAdminUser();
+            const createBtn = document.getElementById('create-task-btn');
+            if (createBtn) createBtn.style.display = admin ? 'inline-flex' : 'none';
+        }
+
+        applyAdminVisibility();
         applyLanguage();
         // Never block the UI waiting for a third-party script.
         setTimeout(() => loadData(), 0);
@@ -1327,6 +1418,7 @@ document.body.appendChild(button);
 </div>
 <script>
 async function loadAdminWithdrawals(){
+    if (!isAdminUser()) return;
     const box=document.getElementById('adminWithdrawals');
     if(!box) return;
     box.innerHTML='<div style="color:#777;font-size:13px;">جاري تحميل طلبات السحب...</div>';
@@ -1342,6 +1434,7 @@ async function loadAdminWithdrawals(){
     }catch(err){ console.error('loadAdminWithdrawals:',err); box.innerHTML='<div style="color:#c00;font-size:13px;">تعذر تحميل طلبات السحب.</div>'; }
 }
 async function adminSetWithdrawal(id,status){
+    if(!isAdminUser()) { alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
     if(!confirm(status==='paid'?'تأكيد أن الطلب تم دفعه؟':'رفض الطلب وإرجاع النقاط للمستخدم؟')) return;
     try{
         const {data:rows,error:getError}=await supabase.from('withdrawals').select('id,telegram_id,points,status').eq('id',id);
