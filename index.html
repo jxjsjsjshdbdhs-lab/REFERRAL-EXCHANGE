@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-title">منصة تبادل الإحالات</title>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg-1: #0f172a;
@@ -20,7 +22,12 @@
             --muted: #94a3b8;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
 
         body {
             background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
@@ -33,1284 +40,311 @@
             min-height: 100vh;
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .title { font-size: 18pt; font-weight: 900; color: var(--cyan); }
-        .pill { background: rgba(255,255,255,0.1); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 10pt; font-weight: 700; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 4px; text-align: center; }
-        .stat-val { font-size: 13pt; font-weight: 900; color: #fff; }
-        .stat-lbl { font-size: 7.5pt; color: var(--muted); margin-top: 2px; }
-
-        .banner {
-            background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.25));
-            border: 1px solid var(--amber); border-radius: 14px; padding: 12px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
+        .title {
+            font-size: 18pt;
+            font-weight: 900;
+            color: var(--cyan);
+        }
+
+        .pill {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 10pt;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 4px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 13pt;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .stat-lbl {
+            font-size: 7.5pt;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
 
         .btn {
-            border: none; border-radius: 10px; padding: 10px 14px;
-            font-weight: 800; font-size: 10pt; cursor: pointer; display: block; width: 100%; text-align: center;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 800;
+            font-size: 10pt;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            text-align: center;
         }
-        .btn-amber { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; }
-        .btn-purple { background: linear-gradient(135deg, var(--purple), #6366f1); color: #fff; }
-        .btn-emerald { background: rgba(52,211,153,0.2); color: var(--emerald); border: 1px solid var(--emerald); }
+
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .btn-amber {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, var(--purple), #6366f1);
+            color: #fff;
+        }
+
+        .btn-emerald {
+            background: rgba(52,211,153,0.2);
+            color: var(--emerald);
+            border: 1px solid var(--emerald);
+        }
 
         .link-box {
-            background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px;
-            padding: 8px; font-size: 9pt; color: var(--cyan); margin: 10px 0; direction: ltr; text-align: left; word-break: break-all;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 9pt;
+            color: var(--cyan);
+            margin: 10px 0;
+            direction: ltr;
+            text-align: left;
+            word-break: break-all;
         }
 
         .modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
         }
-        .modal-box { background: #1e293b; border: 1px solid var(--border); border-radius: 18px; padding: 18px; width: 100%; max-width: 360px; }
+
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            width: 100%;
+            max-width: 360px;
+        }
 
         .inp {
-            width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--border);
-            border-radius: 8px; color: #fff; margin: 6px 0 14px 0; outline: none; font-size: 10pt;
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            margin: 6px 0 14px 0;
+            outline: none;
+            font-size: 10pt;
+        }
+
+        textarea.inp {
+            resize: vertical;
         }
 
         .nav {
-            position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
-            width: calc(100% - 20px); max-width: 440px; background: rgba(15, 23, 42, 0.95);
-            border: 1px solid var(--border); border-radius: 16px; display: flex; justify-content: space-around; padding: 8px 0;
-        }
-        body.en { direction:ltr; }
-        body.en .link-box { direction:ltr; text-align:left; }
-        body.en .stat-box, body.en .card { text-align:left; }
-        body.en .header { direction:ltr; }
-        .nav-item { color: var(--muted); font-size: 8pt; font-weight: 700; text-align: center; cursor: pointer; }
-        body.en { direction:ltr; }
-        body.en .link-box { direction:ltr; text-align:left; }
-
-        .page-title { font-size:18pt; font-weight:900; color:var(--cyan); margin-bottom:12px; }
-        .task-item { background:rgba(0,0,0,.22); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; }
-        .task-item .task-meta { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:7px; }
-        .badge { padding:3px 7px; border-radius:7px; font-size:8pt; font-weight:800; }
-        .badge-green { background:rgba(52,211,153,.15); color:var(--emerald); }
-        .badge-cyan { background:rgba(34,211,238,.15); color:var(--cyan); }
-        .withdraw-balance { text-align:center; font-size:24pt; font-weight:900; color:var(--amber); margin:8px 0 2px; }
-        .withdraw-usdt { text-align:center; color:var(--emerald); font-weight:800; margin-bottom:14px; }
-        .withdraw-row { display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.08); font-size:8.5pt; }
-        .withdraw-row:last-child { border-bottom:0; }
-        .status-pending { color:var(--amber); } .status-paid { color:var(--emerald); } .status-rejected { color:#f87171; }
-        .admin-withdraw { background:#f7f7f7; border:1px solid #ddd; border-radius:14px; padding:12px; margin-top:10px; }
-        .admin-actions { display:flex; gap:7px; margin-top:9px; }
-        .admin-actions button { flex:1; border:0; border-radius:9px; padding:9px; font-weight:800; cursor:pointer; }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <div class="title" data-i18n="appName">تبادل الإحالات</div>
-        <div class="pill">💎 Gram: <span id="gram-bal" style="color:var(--amber);">0.50</span></div>
-    </div>
-
-    <div class="card" style="padding:10px;margin-bottom:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;">
-        <span style="font-size:9pt;color:var(--muted);" data-i18n="languageLabel">🌐 اللغة</span>
-        <button id="lang-toggle" class="btn btn-emerald" style="width:auto;padding:6px 12px;" onclick="toggleLanguage()">English</button>
-    </div>
-
-    <div class="card" style="text-align:center;">
-        <div style="font-size:24px;">🎁</div>
-        <div style="font-size:13pt;font-weight:900;" id="reward-title">مكافأة كل 12 ساعة</div>
-        <div style="font-size:9pt;color:var(--muted);margin:5px 0;" id="reward-status">احصل على 8 نقاط مجاناً</div>
-        <button class="btn btn-amber" id="reward-btn" onclick="claimReward()">استلام 8 نقاط</button>
-    </div>
-
-    <div id="home-page">
-        <div class="stats-grid">
-            <div class="stat-box"><div class="stat-val" id="total-tasks-cnt">2</div><div class="stat-lbl" data-i18n="availableLinks">الروابط المتاحة</div></div>
-            <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">0</div><div class="stat-lbl" data-i18n="currentBalance">رصيدك الحالي</div></div>
-            <div class="stat-box"><div class="stat-val" id="completed-cnt">0</div><div class="stat-lbl" data-i18n="visitedLinks">روابط زرتها</div></div>
-        </div>
-
-        <div class="card" style="text-align:center;">
-            <div style="font-size:24px;">👥</div>
-            <div style="font-size:16pt;font-weight:900;margin:4px 0;" id="daily-visitors">0</div>
-            <div style="font-size:8.5pt;color:var(--muted);" data-i18n="dailyVisitors">زائر البوت اليوم</div>
-        </div>
-
-    <!-- المتجر مؤجل حالياً -->
-
-    <!-- Active Task Card -->
-    <div class="card" id="task-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:800; font-size:10pt;" id="task-user">ناشر الرابط: Muktar</span>
-            <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">متبقي: 6</span>
-        </div>
-        <div id="task-description" style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-top:8px;"></div>
-        <div class="link-box" id="task-url">https://t.me/example_bot</div>
-        <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
-    </div>
-
-    <!-- My Link Card -->
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-weight:800; font-size:10pt;" data-i18n="yourPublishedLink">رابطك المنشور</span>
-            <button id="create-task-btn" class="btn btn-emerald" style="width:auto; padding:4px 10px; display:none;" onclick="openModal('add-modal')" data-i18n="createTask">+ إنشاء مهمة</button>
-        </div>
-        <div id="my-task-info" style="font-size:8.5pt; color:var(--muted);">لا يوجد رابط مضاف حالياً.</div>
-    </div>
-
-    <!-- Modal: Buy Points -->
-    <div class="modal" id="buy-modal">
-        <div class="modal-box">
-            <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="buyPointsTitle">شراء النقاط بعملة Gram 💎</h3>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="choosePackage">اختر الباقة:</label>
-            <select class="inp" id="buy-pkg">
-                <option value="100">100 نقطة = 0.05 Gram</option>
-                <option value="300">300 نقطة = 0.15 Gram</option>
-                <option value="500">500 نقطة = 0.25 Gram</option>
-                <option value="1000">1000 نقطة = 0.50 Gram</option>
-            </select>
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-amber" onclick="buyPoints()" data-i18n="confirmPurchase">تأكيد الشراء</button>
-                <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('buy-modal')" data-i18n="cancel">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Add Link -->
-    <div class="modal" id="add-modal">
-        <div class="modal-box">
-            <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="newTaskTitle">إنشاء مهمة جديدة 🔗</h3>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="referralLinkLabel">رابط الإحالة:</label>
-            <input type="url" class="inp" id="add-url" data-i18n-placeholder="urlPlaceholder" placeholder="https://t.me/your_bot">
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="taskDescriptionLabel">وصف المهمة:</label>
-            <textarea class="inp" id="add-description" data-i18n-placeholder="descriptionPlaceholder" placeholder="اكتب وصفاً مختصراً للمهمة" rows="3" style="resize:vertical;"></textarea>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="requiredVisits">عدد الزيارات المطلوبة:</label>
-            <input type="number" class="inp" id="add-cnt" data-i18n-placeholder="visitsPlaceholder" placeholder="من 1 إلى 20" min="1" max="20">
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-purple" style="background:var(--emerald); color:#0f172a;" onclick="addLink()" data-i18n="publishNow">نشر الآن</button>
-                <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('add-modal')">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    </div> <!-- /home-page -->
-
-    <div id="tasks-page" style="display:none;">
-        <div class="page-title" data-i18n="tasksTitle">📋 المهام</div>
-        <div class="card" style="text-align:center;">
-            <div style="font-size:9pt;color:var(--muted);" data-i18n="tasksIntro">نفّذ المهام المتاحة واحصل على نقطة مقابل كل زيارة.</div>
-        </div>
-        <div id="adminAddTaskBox" style="display:none;margin:10px 0;">
-            <button class="btn btn-purple" style="width:100%;background:var(--emerald);color:#0f172a;font-weight:bold;" onclick="openAdminAddTask()">➕ إضافة مهمة</button>
-        </div>
-        <div id="tasks-list"></div>
-    </div>
-
-    <div id="withdraw-page" style="display:none;">
-        <div class="page-title" data-i18n="withdrawTitle">💰 السحب</div>
-        <div class="card" style="text-align:center;">
-            <div style="font-size:9pt;color:var(--muted);" data-i18n="withdrawBalanceLabel">رصيد النقاط</div>
-            <div class="withdraw-balance" id="withdraw-points">0</div>
-            <div class="withdraw-usdt" id="withdraw-value">0.00 USDT</div>
-            <div style="font-size:8pt;color:var(--muted);line-height:1.6;" data-i18n="withdrawRate">كل 100 نقطة = 0.04 USDT — الحد الأدنى للسحب 0.10 USDT (250 نقطة).</div>
-            <button class="btn btn-emerald" style="margin-top:12px;" onclick="openWithdrawModal()" data-i18n="requestWithdraw">طلب سحب</button>
-        </div>
-        <div class="card">
-            <div style="font-weight:900;margin-bottom:8px;" data-i18n="withdrawHistory">سجل طلبات السحب</div>
-            <div id="withdraw-history"><div style="font-size:8.5pt;color:var(--muted);text-align:center;">لا توجد طلبات سحب.</div></div>
-        </div>
-    </div>
-
-    <!-- Modal: Withdraw -->
-    <div class="modal" id="withdraw-modal">
-        <div class="modal-box">
-            <h3 style="margin-bottom:10px;font-size:12pt;" data-i18n="withdrawRequestTitle">طلب سحب USDT 💰</h3>
-            <label style="font-size:8.5pt;color:var(--muted);" data-i18n="withdrawPointsLabel">عدد النقاط المراد سحبها:</label>
-            <input type="number" class="inp" id="withdraw-points-input" min="250" step="1" placeholder="250" oninput="updateWithdrawPreview()">
-            <div id="withdraw-preview" style="font-size:9pt;color:var(--emerald);font-weight:800;margin:-5px 0 10px;text-align:center;">0.00 USDT</div>
-            <label style="font-size:8.5pt;color:var(--muted);" data-i18n="walletLabel">عنوان محفظة USDT:</label>
-            <input type="text" class="inp" id="withdraw-wallet" placeholder="USDT wallet address" dir="ltr">
-            <div style="font-size:7.5pt;color:var(--muted);margin:-5px 0 12px;line-height:1.5;" data-i18n="walletWarning">تأكد من عنوان المحفظة قبل الإرسال. سيتم استخدام العنوان الذي تدخله للدفع.</div>
-            <div style="display:flex;gap:8px;">
-                <button class="btn btn-emerald" onclick="submitWithdrawal()" data-i18n="confirmWithdraw">إرسال الطلب</button>
-                <button class="btn btn-purple" style="background:rgba(255,255,255,.1);" onclick="closeModal('withdraw-modal')" data-i18n="cancel">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="referrals-page" style="display:none;">
-        <div class="card">
-            <div style="font-size:18pt;font-weight:900;color:var(--cyan);margin-bottom:6px;" data-i18n="referralsTitle">👥 الإحالات</div>
-            <p style="font-size:9pt;color:var(--muted);line-height:1.7;">
-                <span data-i18n="referralsIntro">شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.</span>
-            </p>
-        </div>
-
-    <!-- Referral Card -->
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-weight:800; font-size:10pt;" data-i18n="referralSystem">نظام الإحالة 👥</span>
-            <span style="font-size:8pt; background:rgba(52,211,153,0.15); color:var(--emerald); padding:3px 7px; border-radius:7px;">+40 نقطة</span>
-        </div>
-        <p style="font-size:8.5pt; color:var(--muted); margin-bottom:8px;">
-            <span data-i18n="referralDescription">ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.</span>
-        </p>
-        <div class="link-box" id="referral-url">جارٍ تجهيز رابط الإحالة...</div>
-        <div style="display:flex; gap:8px;">
-            <button class="btn btn-emerald" onclick="copyReferral()" data-i18n="copyLink">📋 نسخ الرابط</button>
-            <button class="btn btn-purple" onclick="shareReferral()" data-i18n="share">📤 مشاركة</button>
-        </div>
-        <div style="margin-top:10px; font-size:8.5pt; color:var(--muted);">
-            <span data-i18n="referralCountLabel">عدد الإحالات:</span> <b id="ref-count" style="color:#fff;">0</b>
-            &nbsp;|&nbsp;
-            <span data-i18n="referralPointsLabel">نقاط الإحالة:</span> <b id="ref-points" style="color:var(--amber);">0</b>
-        </div>
-    </div>
-
-
-    </div>
-
-    <!-- Bottom Navigation -->
-    <div class="nav">
-        <div id="nav-home" class="nav-item active" onclick="showPage('home')">🏠<br><span data-i18n="home">الرئيسية</span></div>
-        <div id="nav-tasks" class="nav-item" onclick="showPage('tasks')">📋<br><span data-i18n="tasks">المهام</span></div>
-        <div id="nav-referrals" class="nav-item" onclick="showPage('referrals')">👥<br><span data-i18n="referrals">الإحالات</span></div>
-        <div id="nav-withdraw" class="nav-item" onclick="showPage('withdraw')">💰<br><span data-i18n="withdraw">السحب</span></div>
-    </div>
-
-    <script>
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 20px);
+            max-width: 440px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 999;
         }
 
-        // Supabase configuration
-        // We use Supabase REST directly so the page does NOT depend on jsDelivr.
-        const SUPABASE_URL = "https://lquaccwytlxnosjbtdvk.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi";
-
-        class RestQuery {
-            constructor(client, table) {
-                this.client = client;
-                this.table = table;
-                this.params = new URLSearchParams();
-                this.headers = {};
-                this.method = 'GET';
-                this.body = null;
-                this.returnSingle = false;
-            }
-
-            select(columns='*') {
-                this.params.set('select', columns);
-                this.headers['Prefer'] = 'return=representation';
-                return this;
-            }
-
-            eq(column, value) {
-                this.params.set(column, `eq.${value}`);
-                return this;
-            }
-
-            order(column, options = {}) {
-                const direction = options.ascending === false ? 'desc' : 'asc';
-                this.params.set('order', `${column}.${direction}`);
-                return this;
-            }
-
-            insert(row) {
-                this.method = 'POST';
-                this.body = row;
-                this.headers['Prefer'] = 'return=representation';
-                return this;
-            }
-
-            single() {
-                this.returnSingle = true;
-                return this;
-            }
-
-            async execute() {
-                let url = `${this.client.url}/rest/v1/${encodeURIComponent(this.table)}`;
-                const options = {
-                    method: this.method,
-                    headers: {
-                        apikey: this.client.key,
-                        Authorization: `Bearer ${this.client.key}`,
-                        'Content-Type': 'application/json',
-                        ...this.headers
-                    }
-                };
-
-                if (this.method === 'GET') {
-                    const query = this.params.toString();
-                    if (query) url += `?${query}`;
-                } else {
-                    const query = this.params.toString();
-                    if (query) url += `?${query}`;
-                    options.body = JSON.stringify(this.body);
-                }
-
-                try {
-                    const response = await fetch(url, options);
-                    const raw = await response.text();
-                    let data = null;
-                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
-
-                    if (!response.ok) {
-                        const error = {
-                            message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
-                            code: data?.code,
-                            details: data?.details,
-                            hint: data?.hint,
-                            status: response.status
-                        };
-                        return { data: null, error };
-                    }
-
-                    if (this.returnSingle) {
-                        if (Array.isArray(data)) {
-                            if (data.length === 0) {
-                                return { data: null, error: { message: 'No rows returned', code: 'PGRST116' } };
-                            }
-                            return { data: data[0], error: null };
-                        }
-                    }
-
-                    return { data, error: null };
-                } catch (err) {
-                    return {
-                        data: null,
-                        error: {
-                            message: err?.message || 'Network error',
-                            code: 'NETWORK_ERROR'
-                        }
-                    };
-                }
-            }
-
-            then(resolve, reject) {
-                return this.execute().then(resolve, reject);
-            }
-
-            catch(reject) {
-                return this.execute().catch(reject);
-            }
+        .nav-item {
+            color: var(--muted);
+            font-size: 8pt;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            min-width: 60px;
         }
 
-        const supabase = {
-            url: SUPABASE_URL,
-            key: SUPABASE_KEY,
-
-            from(table) {
-                return new RestQuery(this, table);
-            },
-
-            async rpc(functionName, args = {}) {
-                const url = `${this.url}/rest/v1/rpc/${encodeURIComponent(functionName)}`;
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            apikey: this.key,
-                            Authorization: `Bearer ${this.key}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(args)
-                    });
-
-                    const raw = await response.text();
-                    let data = null;
-                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
-
-                    if (!response.ok) {
-                        return {
-                            data: null,
-                            error: {
-                                message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
-                                code: data?.code,
-                                details: data?.details,
-                                hint: data?.hint,
-                                status: response.status
-                            }
-                        };
-                    }
-
-                    // PostgreSQL scalar RPC results are returned directly.
-                    if (Array.isArray(data) && data.length === 1 && Object.keys(data[0] || {}).length === 1) {
-                        const key = Object.keys(data[0])[0];
-                        if (typeof data[0][key] !== 'object') data = data[0][key];
-                    }
-
-                    return { data, error: null };
-                } catch (err) {
-                    return {
-                        data: null,
-                        error: {
-                            message: err?.message || 'Network error',
-                            code: 'NETWORK_ERROR'
-                        }
-                    };
-                }
-            }
-        };
-
-        let supabaseReady = true;
-
-        // App state
-        let pts = 0;
-        let gram = 0.50;
-        let myLink = null;
-        let visitedTasks = [];
-        let referralCount = 0;
-        let referralPoints = 0;
-        let tasks = [];
-        let currentUser = null;
-
-        // Temporary client-side reward timer. Final anti-abuse protection belongs in Backend/Edge Function.
-        let rewardAt = parseInt(localStorage.getItem('rewardAt') || '0');
-        const REWARD_MS = 12 * 60 * 60 * 1000;
-
-        function getNextAvailableTask() {
-            return tasks.find(t =>
-                Number(t.owner_id) !== Number(currentUser?.telegram_id) &&
-                !visitedTasks.includes(Number(t.id)) &&
-                Number(t.left || t.required_visits || 0) > 0 &&
-                t.is_active !== false
-            );
+        .nav-item.active {
+            color: var(--cyan);
         }
 
-        // Visitor count is intentionally kept local for now.
-        // A global daily count requires a backend/Edge Function to avoid spoofing.
-        const todayKey = new Date().toISOString().slice(0, 10);
-        let visitorDate = localStorage.getItem('visitorDate');
-        let dailyVisitors = parseInt(localStorage.getItem('dailyVisitors')) || 0;
-        if (visitorDate !== todayKey) {
-            visitorDate = todayKey;
-            dailyVisitors = 0;
-            localStorage.setItem('visitorDate', visitorDate);
-            localStorage.setItem('dailyVisitors', '0');
-        }
-        const visitorSessionKey = 'visitorSession_' + todayKey;
-        if (!sessionStorage.getItem(visitorSessionKey)) {
-            dailyVisitors += 1;
-            localStorage.setItem('dailyVisitors', String(dailyVisitors));
-            sessionStorage.setItem(visitorSessionKey, '1');
+        body.en {
+            direction: ltr;
         }
 
-        const I18N = {
-            ar: {
-                appName:'تبادل الإحالات', languageLabel:'🌐 اللغة', availableLinks:'الروابط المتاحة', currentBalance:'رصيدك الحالي', visitedLinks:'روابط زرتها', dailyVisitors:'زائر البوت اليوم',
-                rewardTitle:'مكافأة كل 12 ساعة', rewardStatus:'احصل على 8 نقاط مجاناً', claimReward:'استلام 8 نقاط', rewardReady:'مكافأتك المجانية جاهزة', rewardComeBack:'ارجع بعد 12 ساعة',
-                yourPublishedLink:'رابطك المنشور', createTask:'+ إنشاء مهمة', noPublishedLink:'لا يوجد رابط مضاف حالياً.', buyPointsTitle:'شراء النقاط بعملة Gram 💎', choosePackage:'اختر الباقة:', confirmPurchase:'تأكيد الشراء', cancel:'إلغاء',
-                newTaskTitle:'إنشاء مهمة جديدة 🔗', taskDescriptionLabel:'وصف المهمة:', descriptionPlaceholder:'اكتب وصفاً مختصراً للمهمة', referralLinkLabel:'رابط الإحالة:', requiredVisits:'عدد الزيارات المطلوبة:', publishNow:'نشر الآن', referralsTitle:'👥 الإحالات',
-                referralsIntro:'شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.', referralSystem:'نظام الإحالة 👥', referralDescription:'ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.',
-                copyLink:'📋 نسخ الرابط', share:'📤 مشاركة', referralCountLabel:'عدد الإحالات:', referralPointsLabel:'نقاط الإحالة:', home:'الرئيسية', tasks:'المهام', referrals:'الإحالات', withdraw:'السحب', store:'المتجر', storeUnavailable:'المتجر غير متاح حالياً', tasksTitle:'📋 المهام', tasksIntro:'نفّذ المهام المتاحة واحصل على نقطة مقابل كل زيارة.', withdrawTitle:'💰 السحب', withdrawBalanceLabel:'رصيد النقاط', withdrawRate:'كل 100 نقطة = 0.04 USDT — الحد الأدنى للسحب 0.10 USDT (250 نقطة).', requestWithdraw:'طلب سحب', withdrawHistory:'سجل طلبات السحب', withdrawRequestTitle:'طلب سحب USDT 💰', withdrawPointsLabel:'عدد النقاط المراد سحبها:', walletLabel:'عنوان محفظة USDT:', walletWarning:'تأكد من عنوان المحفظة قبل الإرسال. سيتم استخدام العنوان الذي تدخله للدفع.', confirmWithdraw:'إرسال الطلب',
-                publisher:'ناشر الرابط:', remaining:'متبقي:', visitLink:'↗ زيارة الرابط (+1 نقطة)', allDone:'🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.', remainingVisits:'المتبقي:',
-                copySuccess:'تم نسخ رابط الإحالة ✅', shareText:'انضم عن طريقي واحصل على فرصة لجمع النقاط 👥', insufficientGram:'رصيدك من عملة Gram غير كافٍ!', purchaseSuccess:'تم شراء {p} نقطة بنجاح!',
-                invalidTask:'يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!', insufficientPoints:'نقاطك لا تكفي! رصيدك الحالي: {p}', taskSuccess:'تم إنشاء المهمة ونشر رابطك بنجاح!', rewardReceived:'تمت إضافة 8 نقاط إلى رصيدك 🎉',
-                rewardAvailable:'متاحة بعد {h}س {m}د {s}ث', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'من 1 إلى 20', preparingReferral:'جارٍ تجهيز رابط الإحالة...', loading:'جارٍ تحميل البيانات...', loadError:'تعذر تحميل البيانات من الخادم. حاول مرة أخرى.'
-            },
-            en: {
-                appName:'Referral Exchange', languageLabel:'🌐 Language', availableLinks:'Available Links', currentBalance:'Current Balance', visitedLinks:'Links Visited', dailyVisitors:'Bot Visitors Today',
-                rewardTitle:'Reward Every 12 Hours', rewardStatus:'Get 8 free points', claimReward:'Claim 8 Points', rewardReady:'Your free reward is ready', rewardComeBack:'Come back after 12 hours',
-                yourPublishedLink:'Your Published Link', createTask:'+ Create Task', noPublishedLink:'No link added yet.', buyPointsTitle:'Buy Points with Gram 💎', choosePackage:'Choose a package:', confirmPurchase:'Confirm Purchase', cancel:'Cancel',
-                newTaskTitle:'Create New Task 🔗', taskDescriptionLabel:'Task Description:', descriptionPlaceholder:'Write a short task description', referralLinkLabel:'Referral Link:', requiredVisits:'Required Visits:', publishNow:'Publish Now', referralsTitle:'👥 Referrals',
-                referralsIntro:'Share your link with friends. When a referral is counted successfully, you receive <b style="color:var(--emerald);">40 points</b>.', referralSystem:'Referral System 👥', referralDescription:'Invite friends using your link and get <b style="color:var(--emerald);">40 points</b> for each successful referral.',
-                copyLink:'📋 Copy Link', share:'📤 Share', referralCountLabel:'Referrals:', referralPointsLabel:'Referral Points:', home:'Home', tasks:'Tasks', referrals:'Referrals', withdraw:'Withdraw', store:'Store', storeUnavailable:'Store is currently unavailable', tasksTitle:'📋 Tasks', tasksIntro:'Complete available tasks and earn 1 point for each visit.', withdrawTitle:'💰 Withdraw', withdrawBalanceLabel:'Points Balance', withdrawRate:'100 points = 0.04 USDT — minimum withdrawal 0.10 USDT (250 points).', requestWithdraw:'Request Withdrawal', withdrawHistory:'Withdrawal History', withdrawRequestTitle:'USDT Withdrawal 💰', withdrawPointsLabel:'Points to withdraw:', walletLabel:'USDT Wallet Address:', walletWarning:'Check the wallet address carefully. The entered address will be used for payment.', confirmWithdraw:'Submit Request',
-                publisher:'Link Publisher:', remaining:'Remaining:', visitLink:'↗ Visit Link (+1 point)', allDone:'🎉 You completed all available links!<br>Come back later for new links.', remainingVisits:'Remaining:',
-                copySuccess:'Referral link copied ✅', shareText:'Join through my link and get a chance to earn points 👥', insufficientGram:'Your Gram balance is insufficient!', purchaseSuccess:'Successfully purchased {p} points!',
-                invalidTask:'Please enter a link and choose between 1 and 20 visits!', insufficientPoints:'Not enough points! Your current balance: {p}', taskSuccess:'Task created and your link was published successfully!', rewardReceived:'8 points added to your balance 🎉',
-                rewardAvailable:'Available in {h}h {m}m {s}s', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'1 to 20', preparingReferral:'Preparing your referral link...', loading:'Loading data...', loadError:'Could not load data from the server. Please try again.'
-            }
-        };
-        function t(key, vars={}) { let v=(I18N[currentLang]&&I18N[currentLang][key])||I18N.ar[key]||key; Object.keys(vars).forEach(k=>v=v.replaceAll('{'+k+'}',vars[k])); return v; }
-        function applyTranslations() {
-            document.querySelectorAll('[data-i18n]').forEach(el=>el.innerHTML=t(el.getAttribute('data-i18n')));
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-placeholder')));
-            document.getElementById('app-title').textContent=t('appName');
+        body.en .link-box {
+            direction: ltr;
+            text-align: left;
         }
 
-        let currentLang = localStorage.getItem('appLang') || 'ar';
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            localStorage.setItem('appLang', currentLang);
-            applyLanguage();
+        body.en .stat-box,
+        body.en .card {
+            text-align: left;
         }
 
-        function applyLanguage() {
-            const en = currentLang === 'en';
-            document.body.classList.toggle('en', en);
-            document.documentElement.lang = en ? 'en' : 'ar';
-            document.documentElement.dir = en ? 'ltr' : 'rtl';
-            document.getElementById('lang-toggle').innerText = en ? 'العربية' : 'English';
-            applyTranslations();
-            render();
-            updateRewardUI();
+        body.en .header {
+            direction: ltr;
         }
 
-        function updateRewardUI() {
-            const now = Date.now();
-            const ready = !rewardAt || now >= rewardAt;
-            const btn = document.getElementById('reward-btn');
-            const status = document.getElementById('reward-status');
-            if (ready) {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.innerText = t('claimReward');
-                status.innerText = t('rewardReady');
-            } else {
-                const remaining = rewardAt - now;
-                const h = Math.floor(remaining / 3600000);
-                const m = Math.floor((remaining % 3600000) / 60000);
-                const sec = Math.floor((remaining % 60000) / 1000);
-                btn.disabled = true;
-                btn.style.opacity = '.55';
-                btn.innerText = t('rewardAvailable',{h,m,s:sec});
-                status.innerText = t('rewardComeBack');
-            }
+        .page-title {
+            font-size: 18pt;
+            font-weight: 900;
+            color: var(--cyan);
+            margin-bottom: 12px;
         }
 
-        async function claimReward() {
-    if (!ensureSupabase('استلام المكافأة')) return;
-            if (rewardAt && Date.now() < rewardAt) return;
-            if (!currentUser) {
-                alert(t('loadError'));
-                return;
-            }
-
-            const btn = document.getElementById('reward-btn');
-            btn.disabled = true;
-
-            try {
-                const { data, error } = await supabase.rpc('add_points', {
-                    p_user_id: currentUser.telegram_id,
-                    p_points: 8
-                });
-
-                if (error) throw error;
-
-                pts = Number(data);
-                rewardAt = Date.now() + REWARD_MS;
-                localStorage.setItem('rewardAt', String(rewardAt));
-                render();
-                updateRewardUI();
-                alert(t('rewardReceived'));
-            } catch (err) {
-                console.error('claimReward:', err);
-                btn.disabled = false;
-                alert(t('loadError'));
-            }
+        .task-item {
+            background: rgba(0,0,0,.22);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
         }
 
-        setInterval(updateRewardUI, 1000);
-
-        function isAdminUser(){
-    const u = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    return !!u && Number(u.id) === 5339335944;
-}
-
-function openAdminAddTask(){
-    if(!isAdminUser()){ alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
-    const modal=document.getElementById('add-modal');
-    if(modal) modal.style.display='flex';
-}
-
-function updateAdminTaskButton(){
-    const box=document.getElementById('adminAddTaskBox');
-    if(box) box.style.display=isAdminUser()?'block':'none';
-}
-
-function showPage(page) {
-            const pages = { home:'home-page', tasks:'tasks-page', referrals:'referrals-page', withdraw:'withdraw-page' };
-            Object.entries(pages).forEach(([key,id]) => {
-                const el=document.getElementById(id);
-                if(el) el.style.display = key===page ? 'block' : 'none';
-            });
-            ['home','tasks','referrals','withdraw'].forEach(key => {
-                const nav=document.getElementById('nav-'+key);
-                if(nav) nav.classList.toggle('active', key===page);
-            });
-            if(page==='tasks') renderTasksPage();
-            if(page==='withdraw') { renderWithdrawPage(); loadWithdrawals(); }
-            window.scrollTo({top:0, behavior:'smooth'});
+        .task-item .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 7px;
         }
 
-        function showReferral() {
-            showPage('referrals');
+        .badge {
+            padding: 3px 7px;
+            border-radius: 7px;
+            font-size: 8pt;
+            font-weight: 800;
         }
 
-        function render() {
-            document.getElementById('pts-bal').innerText = pts;
-            document.getElementById('gram-bal').innerText = gram.toFixed(2);
-            document.getElementById('completed-cnt').innerText = visitedTasks.length;
-            document.getElementById('total-tasks-cnt').innerText = tasks.filter(t => Number(t.owner_id) !== Number(currentUser?.telegram_id) && t.left > 0).length;
-
-            let curTask = getNextAvailableTask();
-            let cardBox = document.getElementById('task-card');
-
-            if (curTask) {
-                cardBox.style.display = 'block';
-                cardBox.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:10pt;" id="task-user">${t('publisher')} ${escapeHtml(curTask.user)}</span>
-                        <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">${t('remaining')} ${curTask.left}</span>
-                    </div>
-                    ${curTask.description ? `<div style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-top:8px;">${escapeHtml(curTask.description)}</div>` : ''}
-                    <div class="link-box" id="task-url">${escapeHtml(curTask.url)}</div>
-                    <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
-                `;
-            } else {
-                cardBox.innerHTML = `<div style="text-align:center; padding:15px; color:var(--muted); font-size:10pt;">${t('allDone')}</div>`;
-            }
-
-            let infoBox = document.getElementById('my-task-info');
-            if (myLink) {
-                infoBox.innerHTML = `<b style="color:var(--cyan);">${escapeHtml(myLink.url)}</b><br>${t('remainingVisits')} ${myLink.cnt}`;
-            } else {
-                infoBox.innerText = t('noPublishedLink');
-            }
-
-            document.getElementById('ref-count').innerText = referralCount;
-            document.getElementById('ref-points').innerText = referralPoints;
-            const dailyBox = document.getElementById('daily-visitors');
-            if (dailyBox) dailyBox.innerText = dailyVisitors;
-            const wp=document.getElementById('withdraw-points');
-            if(wp) wp.innerText=pts;
-            const wu=document.getElementById('withdraw-value');
-            if(wu) wu.innerText=(Number(pts)*0.04/100).toFixed(2)+' USDT';
-            renderTasksPage();
-
-            buildReferralLink();
+        .badge-green {
+            background: rgba(52,211,153,.15);
+            color: var(--emerald);
         }
 
-        function escapeHtml(value) {
-            return String(value).replace(/[&<>"']/g, ch => ({
-                '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
-            }[ch]));
+        .badge-cyan {
+            background: rgba(34,211,238,.15);
+            color: var(--cyan);
         }
 
-        function getTelegramUserId() {
-            try {
-                return window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
-            } catch (_) {
-                return null;
-            }
+        .withdraw-balance {
+            text-align: center;
+            font-size: 24pt;
+            font-weight: 900;
+            color: var(--amber);
+            margin: 8px 0 2px;
         }
 
-        function ensureSupabase(actionName = 'هذه العملية') {
-    if (!navigator.onLine) {
-        alert('لا يوجد اتصال بالإنترنت حالياً.\n\n' + actionName + ' تحتاج اتصالاً بالإنترنت.');
-        return false;
-    }
-    if (!supabaseReady || !supabase) {
-        alert('تعذر الاتصال بخدمة البيانات الآن.\n\n' + actionName + ' تحتاج اتصال Supabase. جرّب تحديث الصفحة والتأكد من الإنترنت.');
-        return false;
-    }
-    return true;
-}
-
-function isTelegramMode() {
-    return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
-}
-
-function getTelegramUser() {
-            try {
-                return window.Telegram?.WebApp?.initDataUnsafe?.user || null;
-            } catch (_) {
-                return null;
-            }
+        .withdraw-usdt {
+            text-align: center;
+            color: var(--emerald);
+            font-weight: 800;
+            margin-bottom: 14px;
         }
 
-        function buildReferralLink() {
-            const box = document.getElementById('referral-url');
-            if (!box) return;
-
-            const userId = getTelegramUserId();
-            const configuredBot = window.APP_BOT_USERNAME || "Getttttsbot";
-            const link = `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
-
-            box.innerText = link;
-            box.dataset.referral = link;
+        .withdraw-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            font-size: 8.5pt;
         }
 
-        function copyReferral() {
-            const box = document.getElementById('referral-url');
-            const link = box?.dataset?.referral || box?.innerText || '';
-            if (!link) return;
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(link).then(() => alert(t('copySuccess')));
-            } else {
-                const temp = document.createElement('textarea');
-                temp.value = link;
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand('copy');
-                temp.remove();
-                alert(t('copySuccess'));
-            }
+        .withdraw-row:last-child {
+            border-bottom: 0;
         }
 
-        function shareReferral() {
-            const box = document.getElementById('referral-url');
-            const link = box?.dataset?.referral || box?.innerText || '';
-            if (!link) return;
-
-            const text = t('shareText');
-            if (window.Telegram?.WebApp?.openTelegramLink) {
-                window.Telegram.WebApp.openTelegramLink(
-                    `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`
-                );
-            } else if (navigator.share) {
-                navigator.share({ text, url: link }).catch(() => {});
-            } else {
-                copyReferral();
-            }
+        .status-pending {
+            color: var(--amber);
         }
 
-        function showReferral() {
-            document.getElementById('referral-url')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        .status-paid {
+            color: var(--emerald);
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function isAdminUser(userId = getTelegramUserId()) {
-            return Number(userId) === 5339335944;
+        .status-rejected {
+            color: #f87171;
         }
 
-        function getReferralStartParam() {
-            try {
-                const p = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
-                if (p) return String(p);
-            } catch (_) {}
-            return '';
+        .admin-withdraw {
+            background: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            padding: 12px;
+            margin-top: 10px;
         }
 
-        // احتساب الإحالة عند فتح البوت من رابط ref_<telegram_id>.
-        // الإحالة تُسجل مرة واحدة فقط بفضل القيد unique_referral على referred_id.
-        async function processReferral() {
-            if (!currentUser?.telegram_id || !ensureSupabase('احتساب الإحالة')) return;
-
-            const startParam = getReferralStartParam();
-            const match = startParam.match(/^ref_(\d+)$/i);
-            if (!match) return;
-
-            const referrerId = Number(match[1]);
-            const referredId = Number(currentUser.telegram_id);
-            if (!Number.isSafeInteger(referrerId) || referrerId === referredId) return;
-
-            try {
-                // لا نحتسب إحالة لنفس المستخدم أكثر من مرة.
-                const { data: existing, error: existingError } = await supabase
-                    .from('referrals')
-                    .select('id,reward_points')
-                    .eq('referred_id', referredId)
-                    .limit(1);
-                if (existingError) throw existingError;
-                if (existing && existing.length) return;
-
-                // تأكد أن صاحب الرابط موجود فعلاً.
-                const { data: referrerRows, error: referrerError } = await supabase
-                    .from('users')
-                    .select('telegram_id')
-                    .eq('telegram_id', referrerId)
-                    .limit(1);
-                if (referrerError) throw referrerError;
-                if (!referrerRows?.length) return;
-
-                // سجّل الإحالة أولاً؛ unique constraint يمنع التكرار في حال فتح الرابط مرتين.
-                const { data: referralRow, error: insertError } = await supabase
-                    .from('referrals')
-                    .insert({
-                        referrer_id: referrerId,
-                        referred_id: referredId,
-                        reward_points: 40
-                    })
-                    .select('id')
-                    .single();
-
-                if (insertError) {
-                    // 23505 = الإحالة موجودة مسبقاً، فلا نضيف 40 نقطة مرة ثانية.
-                    if (String(insertError.code) === '23505') return;
-                    throw insertError;
-                }
-
-                try {
-                    await awardPoints(40, referrerId);
-                } catch (rewardError) {
-                    // محاولة التراجع حتى لا تبقى إحالة بلا مكافأة.
-                    try {
-                        await fetch(`${SUPABASE_URL}/rest/v1/referrals?id=eq.${encodeURIComponent(referralRow.id)}`, {
-                            method: 'DELETE',
-                            headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
-                        });
-                    } catch (_) {}
-                    throw rewardError;
-                }
-
-                if (Number(currentUser.telegram_id) === referrerId) return;
-                await loadData();
-                alert('🎉 تمت إحالة ناجحة! حصل صاحب الرابط على 40 نقطة.');
-            } catch (err) {
-                console.error('processReferral:', err);
-            }
+        .admin-actions {
+            display: flex;
+            gap: 7px;
+            margin-top: 9px;
         }
 
-        async function awardPoints(points, userId = currentUser?.telegram_id) {
-            const { data, error } = await supabase.rpc('add_points', {
-                p_user_id: userId,
-                p_points: points
-            });
-            if (error) throw error;
-            const newBalance = Number(data);
-            if (!Number.isFinite(newBalance)) {
-                throw new Error('Invalid balance returned by add_points');
-            }
-            return newBalance;
+        .admin-actions button {
+            flex: 1;
+            border: 0;
+            border-radius: 9px;
+            padding: 9px;
+            font-weight: 800;
+            cursor: pointer;
         }
 
-        async function visitLink() {
-    if (!ensureSupabase('تنفيذ المهمة')) return;
-            const curTask = getNextAvailableTask();
-            if (!curTask || !currentUser) return;
-
-            const taskId = Number(curTask.id);
-            if (visitedTasks.includes(taskId)) return;
-
-            window.open(curTask.url, '_blank');
-
-            let pointsAwarded = false;
-            try {
-                // Award the point first. If recording the visit fails, roll the point back.
-                // This prevents the old bug where a successful completed_tasks insert
-                // could happen while add_points failed, leaving the task completed but unpaid.
-                pts = await awardPoints(1);
-                pointsAwarded = true;
-
-                const { error: completedError } = await supabase
-                    .from('completed_tasks')
-                    .insert({
-                        user_id: currentUser.telegram_id,
-                        task_id: taskId
-                    });
-
-                if (completedError) {
-                    // Duplicate means the task was already completed; don't keep the extra point.
-                    if (String(completedError.code) === '23505') {
-                        await supabase.rpc('subtract_points', {
-                            p_user_id: currentUser.telegram_id,
-                            p_points: 1
-                        });
-                        pointsAwarded = false;
-                        if (!visitedTasks.includes(taskId)) visitedTasks.push(taskId);
-                        render();
-                        return;
-                    }
-                    throw completedError;
-                }
-
-                visitedTasks.push(taskId);
-
-                // Update the local display immediately; server remains the source of truth.
-                curTask.left = Math.max(0, Number(curTask.left || curTask.required_visits || 0) - 1);
-                if (curTask.left === 0) curTask.is_active = false;
-                render();
-            } catch (err) {
-                // If the visit could not be recorded after awarding the point, refund it.
-                if (pointsAwarded) {
-                    try {
-                        pts = await supabase.rpc('add_points', {
-                            p_user_id: currentUser.telegram_id,
-                            p_points: -1
-                        }).then(r => {
-                            if (r.error) throw r.error;
-                            return Number(r.data);
-                        });
-                    } catch (refundErr) {
-                        console.error('visitLink refund failed:', refundErr);
-                    }
-                }
-                console.error('visitLink:', err);
-                alert((err?.message || '').includes('23505') ? 'تم احتساب هذه المهمة مسبقاً.' : t('loadError'));
-                await loadData();
-            }
+        #connectionStatus {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            z-index: 9999;
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            background: rgba(0,0,0,.55);
+            color: #fff;
+            backdrop-filter: blur(6px);
         }
 
-        function renderTasksPage() {
-            updateAdminTaskButton();
-            const box=document.getElementById('tasks-list');
-            if(!box) return;
-            const available=tasks.filter(t=>Number(t.owner_id)!==Number(currentUser?.telegram_id) && Number(t.left||0)>0 && t.is_active!==false && !visitedTasks.includes(Number(t.id)));
-            if(!available.length){
-                box.innerHTML=`<div class="card" style="text-align:center;color:var(--muted);font-size:9pt;">${t('allDone')}</div>`;
-                return;
-            }
-            box.innerHTML=available.map(task=>`<div class="task-item">
-                <div class="task-meta"><b>${t('publisher')} ${escapeHtml(task.user)}</b><span class="badge badge-cyan">${t('remaining')} ${task.left}</span></div>
-                ${task.description?`<div style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-bottom:7px;">${escapeHtml(task.description)}</div>`:''}
-                <div class="link-box">${escapeHtml(task.url)}</div>
-                <button class="btn btn-purple" onclick="visitSpecificTask(${Number(task.id)})">${t('visitLink')}</button>
-            </div>`).join('');
-        }
-
-        async function visitSpecificTask(taskId){
-            const curTask=tasks.find(x=>Number(x.id)===Number(taskId));
-            if(!curTask) return;
-            // Temporarily make the selected task the next task so the existing secure flow is reused.
-            const original=getNextAvailableTask;
-            window.__selectedTaskId=Number(taskId);
-            try { await visitLink(taskId); } finally { window.__selectedTaskId=null; }
-        }
-
-        // Existing visit flow also accepts an explicit task id for the Tasks page.
-        const _originalVisitLink = visitLink;
-        visitLink = async function(explicitTaskId=null) {
-            if(explicitTaskId!==null){
-                const target=tasks.find(x=>Number(x.id)===Number(explicitTaskId));
-                if(!target) return;
-                const originalGet=getNextAvailableTask;
-                window.__forcedTask=target;
-                try { return await _originalVisitLink(); } finally { window.__forcedTask=null; }
-            }
-            return _originalVisitLink();
-        };
-
-        // Override task selection only while a Tasks-page task is being processed.
-        const __getNextAvailableTask = getNextAvailableTask;
-        getNextAvailableTask = function(){ return window.__forcedTask || __getNextAvailableTask(); };
-
-        function updateWithdrawPreview(){
-            const input=document.getElementById('withdraw-points-input');
-            const preview=document.getElementById('withdraw-preview');
-            if(!input||!preview) return;
-            const p=Math.max(0,Number(input.value)||0);
-            preview.innerText=(p*0.04/100).toFixed(2)+' USDT';
-        }
-
-        function openWithdrawModal(){
-            if(!currentUser){ alert(t('loadError')); return; }
-            document.getElementById('withdraw-points-input').value=Math.max(250, Math.floor(Number(pts)));
-            updateWithdrawPreview();
-            openModal('withdraw-modal');
-        }
-
-        async function submitWithdrawal(){
-            if(!ensureSupabase('طلب السحب') || !currentUser) return;
-            const points=Math.floor(Number(document.getElementById('withdraw-points-input').value)||0);
-            const wallet=document.getElementById('withdraw-wallet').value.trim();
-            if(points<250){ alert('الحد الأدنى للسحب هو 250 نقطة = 0.10 USDT.'); return; }
-            if(points>Number(pts)){ alert(`نقاطك غير كافية. رصيدك الحالي: ${pts}`); return; }
-            if(!wallet || wallet.length<10){ alert('يرجى إدخال عنوان محفظة USDT صحيح.'); return; }
-            const amount=Number((points*0.04/100).toFixed(4));
-            try{
-                // The table stores the exact requester identity, points, amount and wallet for admin payment.
-                const {data,error}=await supabase.from('withdrawals').insert({
-                    telegram_id: currentUser.telegram_id,
-                    username: currentUser.username || null,
-                    points: points,
-                    amount_usdt: amount,
-                    wallet_address: wallet,
-                    status: 'pending'
-                }).select().single();
-                if(error) throw error;
-                const {data:newBalance,error:balanceError}=await supabase.rpc('subtract_points',{
-                    p_user_id:currentUser.telegram_id,p_points:points
-                });
-                if(balanceError) throw balanceError;
-                pts=Number(newBalance);
-                closeModal('withdraw-modal');
-                document.getElementById('withdraw-wallet').value='';
-                document.getElementById('withdraw-points-input').value='';
-                render();
-                await loadWithdrawals();
-                alert('تم إرسال طلب السحب بنجاح ✅\nالمبلغ: '+amount.toFixed(2)+' USDT');
-            }catch(err){
-                console.error('submitWithdrawal:',err);
-                alert('تعذر إرسال طلب السحب. تأكد من إعداد جدول withdrawals وسياسات Supabase.');
-            }
-        }
-
-        async function loadWithdrawals(){
-            const box=document.getElementById('withdraw-history');
-            if(!box||!currentUser) return;
-            try{
-                const {data,error}=await supabase.from('withdrawals').select('id,points,amount_usdt,wallet_address,status,created_at').eq('telegram_id',currentUser.telegram_id).order('created_at',{ascending:false});
-                if(error) throw error;
-                if(!data?.length){ box.innerHTML='<div style="font-size:8.5pt;color:var(--muted);text-align:center;">لا توجد طلبات سحب.</div>'; return; }
-                box.innerHTML=data.map(w=>`<div class="withdraw-row"><span>#${escapeHtml(w.id)} · ${Number(w.points)} نقطة<br><span style="font-size:7.5pt;color:var(--muted);">${escapeHtml(String(w.wallet_address).slice(0,12))}…</span></span><span style="text-align:left;"><b>${Number(w.amount_usdt).toFixed(2)} USDT</b><br><span class="status-${escapeHtml(w.status)}">${w.status==='paid'?'تم الدفع':w.status==='rejected'?'مرفوض':'قيد المراجعة'}</span></span></div>`).join('');
-            }catch(err){ console.error('loadWithdrawals:',err); }
-        }
-
-        function buyPoints() {
-            let p = parseInt(document.getElementById('buy-pkg').value);
-            let cost = (p / 100) * 0.05;
-
-            if(gram < cost) {
-                alert(t('insufficientGram'));
-                return;
-            }
-
-            gram -= cost;
-            pts += p;
-
-            localStorage.setItem('gram', gram);
-            localStorage.setItem('pts', pts);
-
-            closeModal('buy-modal');
-            render();
-            alert(t('purchaseSuccess',{p}));
-        }
-
-        async function addLink() {
-    if (!isAdminUser()) { alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
-    if (!ensureSupabase('إضافة المهمة')) return;
-            const u = document.getElementById('add-url').value.trim();
-            const description = document.getElementById('add-description').value.trim();
-            const c = parseInt(document.getElementById('add-cnt').value);
-
-            if (!u || !/^https?:\/\//i.test(u) || c < 1 || c > 20) {
-                alert(t('invalidTask'));
-                return;
-            }
-
-            if (!currentUser) {
-                alert(t('loadError'));
-                return;
-            }
-
-            try {
-                const { data: newPoints, error: pointsError } = await supabase.rpc('subtract_points', {
-                    p_user_id: currentUser.telegram_id,
-                    p_points: c
-                });
-                if (pointsError) throw pointsError;
-
-                const { data: insertedTask, error: taskError } = await supabase
-                    .from('tasks')
-                    .insert({
-                        title: u,
-                        description: description || null,
-                        reward_points: 1,
-                        url: u,
-                        is_active: true,
-                        owner_id: currentUser.telegram_id,
-                        required_visits: c
-                    })
-                    .select()
-                    .single();
-
-                if (taskError) {
-                    // Refund points if task creation failed.
-                    await supabase.rpc('add_points', {
-                        p_user_id: currentUser.telegram_id,
-                        p_points: c
-                    });
-                    throw taskError;
-                }
-
-                pts = Number(newPoints);
-                myLink = insertedTask;
-
-                closeModal('add-modal');
-                document.getElementById('add-url').value = '';
-                document.getElementById('add-description').value = '';
-                document.getElementById('add-cnt').value = '';
-
-                await loadData();
-                alert(t('taskSuccess'));
-            } catch (err) {
-                console.error('addLink:', err);
-                if (String(err?.message || '').toLowerCase().includes('insufficient points')) {
-                    alert(t('insufficientPoints', {p: pts}));
-                } else {
-                    alert(t('loadError'));
-                }
-            }
-        }
-
-        // Give each newly-created Telegram account a one-time 20-point welcome bonus.
-        // The server-side create_user RPC should ideally perform this atomically as well.
-        async function grantWelcomeBonusIfNew(user) {
-            if (!user?.telegram_id) return;
-            const key = 'welcomeBonusGranted_' + String(user.telegram_id);
-            if (localStorage.getItem(key) === '1') return;
-
-            const createdAt = user.created_at ? new Date(user.created_at).getTime() : NaN;
-            const isNewUser = Number.isFinite(createdAt) && (Date.now() - createdAt) < 2 * 60 * 1000;
-            if (!isNewUser) return;
-
-            try {
-                const newBalance = await awardPoints(20, user.telegram_id);
-                pts = Number(newBalance);
-                localStorage.setItem(key, '1');
-                render();
-                alert('🎁 أهلاً بك! تمت إضافة 20 نقطة مجانية إلى حسابك.');
-            } catch (err) {
-                console.error('welcome bonus:', err);
-                // Do not mark as granted if the server rejected it; retry on next load.
-            }
-        }
-
-        // Gram purchases remain a UI placeholder until a real payment/backend flow is implemented.
-        async function loadData() {
-    if (!ensureSupabase('تحميل بيانات الحساب')) {
-        currentUser = null;
-        pts = Number(localStorage.getItem('pts') || 0);
-        render();
-        return;
-    }
-            const telegramUser = getTelegramUser();
-
-            if (!telegramUser?.id) {
-                // Browser preview: no Telegram user exists, so do not create fake DB users.
-                currentUser = null;
-                pts = 0;
-                tasks = [];
-                visitedTasks = [];
-                referralCount = 0;
-                referralPoints = 0;
-                render();
-                return;
-            }
-
-            try {
-                const { data: user, error: userError } = await supabase.rpc('create_user', {
-                    p_telegram_id: telegramUser.id,
-                    p_username: telegramUser.username || null,
-                    p_first_name: telegramUser.first_name || null
-                });
-
-                if (userError) throw userError;
-
-                currentUser = user;
-                await grantWelcomeBonusIfNew(user);
-                await processReferral();
-
-                const { data: taskRows, error: taskError } = await supabase
-                    .from('tasks')
-                    .select('id,title,description,reward_points,url,is_active,created_at,owner_id,required_visits')
-                    .eq('is_active', true)
-                    .order('created_at', { ascending: true });
-
-                if (taskError) throw taskError;
-
-                const { data: completedRows, error: completedError } = await supabase
-                    .from('completed_tasks')
-                    .select('task_id')
-                    .eq('user_id', telegramUser.id);
-
-                if (completedError) throw completedError;
-
-                const { data: allCompletedRows, error: allCompletedError } = await supabase
-                    .from('completed_tasks')
-                    .select('task_id');
-
-                if (allCompletedError) throw allCompletedError;
-
-                const completedCounts = {};
-                (allCompletedRows || []).forEach(row => {
-                    const id = Number(row.task_id);
-                    completedCounts[id] = (completedCounts[id] || 0) + 1;
-                });
-
-                const { data: referralRows, error: referralError } = await supabase
-                    .from('referrals')
-                    .select('reward_points')
-                    .eq('referrer_id', telegramUser.id);
-
-                if (referralError) throw referralError;
-
-                pts = Number(user.points || 0);
-                visitedTasks = (completedRows || []).map(r => Number(r.task_id));
-                referralCount = (referralRows || []).length;
-                referralPoints = (referralRows || []).reduce((sum, r) => sum + Number(r.reward_points || 0), 0);
-
-                // Map DB tasks to the UI. "left" is derived from required_visits minus completed visits
-                // for the current task; exact global remaining counters should eventually be handled server-side.
-                tasks = (taskRows || []).map(row => ({
-                    id: Number(row.id),
-                    user: Number(row.owner_id) === Number(telegramUser.id)
-                        ? (currentLang === 'en' ? 'You' : 'أنت')
-                        : (row.title || 'User'),
-                    title: row.title,
-                    description: row.description || '',
-                    url: row.url,
-                    left: Math.max(0, Number(row.required_visits || 1) - Number(completedCounts[Number(row.id)] || 0)),
-                    required_visits: Number(row.required_visits || 1),
-                    reward_points: Number(row.reward_points || 1),
-                    is_active: row.is_active,
-                    owner_id: row.owner_id
-                }));
-
-                myLink = tasks.find(t => Number(t.owner_id) === Number(telegramUser.id)) || null;
-
-                render();
-            } catch (err) {
-                console.error('loadData:', err);
-                currentUser = null;
-                render();
-                alert(t('loadError'));
-            }
-        }
-
-        function applyAdminVisibility() {
-            const admin = isAdminUser();
-            const createBtn = document.getElementById('create-task-btn');
-            if (createBtn) createBtn.style.display = admin ? 'inline-flex' : 'none';
-        }
-
-        applyAdminVisibility();
-        applyLanguage();
-        // Never block the UI waiting for a third-party script.
-        setTimeout(() => loadData(), 0);
-    </script>
-
-<div id="connectionStatus" style="
-position:fixed;left:10px;bottom:10px;z-index:9999;
-padding:7px 10px;border-radius:10px;font-size:11px;
-background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
-">
-جاري فحص الاتصال...
-</div>
-<script>
-(function(){
-    function updateConnectionStatus(){
-        const el=document.getElementById('connectionStatus');
-        if(!el) return;
-        const telegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
-        const online = navigator.onLine;
-        let text = telegram ? 'Telegram ✓' : 'Chrome/Browser';
-        text += online ? ' • Internet ✓' : ' • Internet ✕';
-        text += (typeof supabaseReady !== 'undefined' && supabaseReady) ? ' • Supabase ✓' : ' • Supabase ✕';
-        el.textContent=text;
-    }
-    window.addEventListener('online',updateConnectionStatus);
-    window.addEventListener('offline',updateConnectionStatus);
-    setTimeout(updateConnectionStatus,500);
-})();
-</script>
-<script>
-(function () {
-    const ADMIN_ID = 5339335944;
-
-    function addAdminButton() {
-        if (!window.Telegram || !window.Telegram.WebApp) return;
-
-        const tg = window.Telegram.WebApp;
-        const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
-
-        if (!user || Number(user.id) !== ADMIN_ID) return;
-
-        if (document.getElementById('adminButton')) return;
-
-        const button = document.createElement('button');
-        button.id = 'adminButton';
-        button.textContent = '⚙️ الإدارة';
-
-        button.style.cssText = `
+        #adminButton {
             position: fixed;
             top: 12px;
             left: 12px;
@@ -1323,162 +357,4558 @@ background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-        `;
+        }
 
-        button.onclick = async function () {
-    const panel = document.getElementById('adminPanel');
-    const countElement = document.getElementById('adminUsersCount');
-    loadAdminWithdrawals();
+        #adminPanel {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 999998;
+            background: #f5f5f5;
+            color: #222;
+            padding: 20px;
+            overflow: auto;
+            direction: rtl;
+        }
 
-    if (panel) {
-        panel.style.display = 'block';
+        .admin-inner {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="title" data-i18n="appName">تبادل الإحالات</div>
+
+        <div class="pill">
+            💎 Gram:
+            <span id="gram-bal" style="color:var(--amber);">0.50</span>
+        </div>
+    </div>
+
+    <div class="card" style="padding:10px;margin-bottom:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;">
+        <span style="font-size:9pt;color:var(--muted);" data-i18n="languageLabel">
+            🌐 اللغة
+        </span>
+
+        <button
+            id="lang-toggle"
+            class="btn btn-emerald"
+            style="width:auto;padding:6px 12px;"
+            onclick="toggleLanguage()">
+            English
+        </button>
+    </div>
+
+    <div class="card" style="text-align:center;">
+        <div style="font-size:24px;">🎁</div>
+
+        <div
+            style="font-size:13pt;font-weight:900;"
+            id="reward-title"
+            data-i18n="rewardTitle">
+            مكافأة كل 12 ساعة
+        </div>
+
+        <div
+            style="font-size:9pt;color:var(--muted);margin:5px 0;"
+            id="reward-status">
+            احصل على 8 نقاط مجاناً
+        </div>
+
+        <button
+            class="btn btn-amber"
+            id="reward-btn"
+            onclick="claimReward()"
+            data-i18n="claimReward">
+            استلام 8 نقاط
+        </button>
+    </div>
+
+    <!-- HOME -->
+
+    <div id="home-page">
+
+        <div class="stats-grid">
+
+            <div class="stat-box">
+                <div class="stat-val" id="total-tasks-cnt">0</div>
+                <div class="stat-lbl" data-i18n="availableLinks">
+                    الروابط المتاحة
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div
+                    class="stat-val"
+                    id="pts-bal"
+                    style="color:var(--amber);">
+                    0
+                </div>
+
+                <div class="stat-lbl" data-i18n="currentBalance">
+                    رصيدك الحالي
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-val" id="completed-cnt">
+                    0
+                </div>
+
+                <div class="stat-lbl" data-i18n="visitedLinks">
+                    روابط زرتها
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card" style="text-align:center;">
+            <div style="font-size:24px;">👥</div>
+
+            <div
+                style="font-size:16pt;font-weight:900;margin:4px 0;"
+                id="daily-visitors">
+                0
+            </div>
+
+            <div
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="dailyVisitors">
+                زائر البوت اليوم
+            </div>
+        </div>
+
+        <!-- Active Task -->
+
+        <div class="card" id="task-card">
+
+            <div style="text-align:center;padding:15px;color:var(--muted);">
+                جارٍ تحميل المهام...
+            </div>
+
+        </div>
+
+        <!-- My Link -->
+
+        <div class="card">
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+
+                <span
+                    style="font-weight:800;font-size:10pt;"
+                    data-i18n="yourPublishedLink">
+                    رابطك المنشور
+                </span>
+
+                <button
+                    id="create-task-btn"
+                    class="btn btn-emerald"
+                    style="width:auto;padding:4px 10px;display:none;"
+                    onclick="openModal('add-modal')"
+                    data-i18n="createTask">
+                    + إنشاء مهمة
+                </button>
+
+            </div>
+
+            <div
+                id="my-task-info"
+                style="font-size:8.5pt;color:var(--muted);">
+                لا يوجد رابط مضاف حالياً.
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TASKS PAGE -->
+
+    <div id="tasks-page" style="display:none;">
+
+        <div class="page-title" data-i18n="tasksTitle">
+            📋 المهام
+        </div>
+
+        <div class="card" style="text-align:center;">
+            <div
+                style="font-size:9pt;color:var(--muted);"
+                data-i18n="tasksIntro">
+                نفّذ المهام المتاحة واحصل على نقطة مقابل كل زيارة.
+            </div>
+        </div>
+
+        <!-- Admin only -->
+
+        <div
+            id="adminAddTaskBox"
+            style="display:none;margin:10px 0;">
+
+            <button
+                class="btn btn-purple"
+                style="width:100%;background:var(--emerald);color:#0f172a;font-weight:bold;"
+                onclick="openAdminAddTask()">
+
+                ➕ إضافة مهمة
+
+            </button>
+
+        </div>
+
+        <div id="tasks-list"></div>
+
+    </div>
+
+    <!-- WITHDRAW PAGE -->
+
+    <div id="withdraw-page" style="display:none;">
+
+        <div class="page-title" data-i18n="withdrawTitle">
+            💰 السحب
+        </div>
+
+        <div class="card" style="text-align:center;">
+
+            <div
+                style="font-size:9pt;color:var(--muted);"
+                data-i18n="withdrawBalanceLabel">
+                رصيد النقاط
+            </div>
+
+            <div
+                class="withdraw-balance"
+                id="withdraw-points">
+                0
+            </div>
+
+            <div
+                class="withdraw-usdt"
+                id="withdraw-value">
+                0.00 USDT
+            </div>
+
+            <div
+                style="font-size:8pt;color:var(--muted);line-height:1.6;"
+                data-i18n="withdrawRate">
+                كل 100 نقطة = 0.04 USDT — الحد الأدنى للسحب 0.10 USDT (250 نقطة).
+            </div>
+
+            <button
+                class="btn btn-emerald"
+                style="margin-top:12px;"
+                onclick="openWithdrawModal()"
+                data-i18n="requestWithdraw">
+                طلب سحب
+            </button>
+
+        </div>
+
+        <div class="card">
+
+            <div
+                style="font-weight:900;margin-bottom:8px;"
+                data-i18n="withdrawHistory">
+                سجل طلبات السحب
+            </div>
+
+            <div id="withdraw-history">
+                <div
+                    style="font-size:8.5pt;color:var(--muted);text-align:center;">
+                    لا توجد طلبات سحب.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- REFERRALS PAGE -->
+
+    <div id="referrals-page" style="display:none;">
+
+        <div class="card">
+
+            <div
+                style="font-size:18pt;font-weight:900;color:var(--cyan);margin-bottom:6px;"
+                data-i18n="referralsTitle">
+                👥 الإحالات
+            </div>
+
+            <p
+                style="font-size:9pt;color:var(--muted);line-height:1.7;"
+                data-i18n="referralsIntro">
+                شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على
+                <b style="color:var(--emerald);">40 نقطة</b>.
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+
+                <span
+                    style="font-weight:800;font-size:10pt;"
+                    data-i18n="referralSystem">
+                    نظام الإحالة 👥
+                </span>
+
+                <span
+                    style="font-size:8pt;background:rgba(52,211,153,0.15);color:var(--emerald);padding:3px 7px;border-radius:7px;">
+                    +40 نقطة
+                </span>
+
+            </div>
+
+            <p
+                style="font-size:8.5pt;color:var(--muted);margin-bottom:8px;"
+                data-i18n="referralDescription">
+                ادعُ أصدقاءك عبر رابطك، وتحصل على
+                <b style="color:var(--emerald);">40 نقطة</b>
+                عن كل إحالة ناجحة.
+            </p>
+
+            <div
+                class="link-box"
+                id="referral-url">
+                جارٍ تجهيز رابط الإحالة...
+            </div>
+
+            <div style="display:flex;gap:8px;">
+
+                <button
+                    class="btn btn-emerald"
+                    onclick="copyReferral()"
+                    data-i18n="copyLink">
+                    📋 نسخ الرابط
+                </button>
+
+                <button
+                    class="btn btn-purple"
+                    onclick="shareReferral()"
+                    data-i18n="share">
+                    📤 مشاركة
+                </button>
+
+            </div>
+
+            <div
+                style="margin-top:10px;font-size:8.5pt;color:var(--muted);">
+
+                <span data-i18n="referralCountLabel">
+                    عدد الإحالات:
+                </span>
+
+                <b
+                    id="ref-count"
+                    style="color:#fff;">
+                    0
+                </b>
+
+                &nbsp;|&nbsp;
+
+                <span data-i18n="referralPointsLabel">
+                    نقاط الإحالة:
+                </span>
+
+                <b
+                    id="ref-points"
+                    style="color:var(--amber);">
+                    0
+                </b>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ADD TASK MODAL -->
+
+    <div class="modal" id="add-modal">
+
+        <div class="modal-box">
+
+            <h3
+                style="margin-bottom:10px;font-size:12pt;"
+                data-i18n="newTaskTitle">
+                إنشاء مهمة جديدة 🔗
+            </h3>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="referralLinkLabel">
+                رابط الإحالة:
+            </label>
+
+            <input
+                type="url"
+                class="inp"
+                id="add-url"
+                placeholder="https://t.me/your_bot"
+                data-i18n-placeholder="urlPlaceholder">
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="taskDescriptionLabel">
+                وصف المهمة:
+            </label>
+
+            <textarea
+                class="inp"
+                id="add-description"
+                placeholder="اكتب وصفاً مختصراً للمهمة"
+                data-i18n-placeholder="descriptionPlaceholder"
+                rows="3"></textarea>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="requiredVisits">
+                عدد الزيارات المطلوبة:
+            </label>
+
+            <input
+                type="number"
+                class="inp"
+                id="add-cnt"
+                placeholder="من 1 إلى 20"
+                data-i18n-placeholder="visitsPlaceholder"
+                min="1"
+                max="20">
+
+            <div style="display:flex;gap:8px;">
+
+                <button
+                    class="btn btn-purple"
+                    style="background:var(--emerald);color:#0f172a;"
+                    onclick="addLink()"
+                    data-i18n="publishNow">
+                    نشر الآن
+                </button>
+
+                <button
+                    class="btn btn-purple"
+                    style="background:rgba(255,255,255,0.1);"
+                    onclick="closeModal('add-modal')"
+                    data-i18n="cancel">
+                    إلغاء
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- WITHDRAW MODAL -->
+
+    <div class="modal" id="withdraw-modal">
+
+        <div class="modal-box">
+
+            <h3
+                style="margin-bottom:10px;font-size:12pt;"
+                data-i18n="withdrawRequestTitle">
+                طلب سحب USDT 💰
+            </h3>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="withdrawPointsLabel">
+                عدد النقاط المراد سحبها:
+            </label>
+
+            <input
+                type="number"
+                class="inp"
+                id="withdraw-points-input"
+                min="250"
+                step="1"
+                placeholder="250"
+                oninput="updateWithdrawPreview()">
+
+            <div
+                id="withdraw-preview"
+                style="font-size:9pt;color:var(--emerald);font-weight:800;margin:-5px 0 10px;text-align:center;">
+                0.00 USDT
+            </div>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="walletLabel">
+                عنوان محفظة USDT:
+            </label>
+
+            <input
+                type="text"
+                class="inp"
+                id="withdraw-wallet"
+                placeholder="USDT wallet address"
+                dir="ltr">
+
+            <div
+                style="font-size:7.5pt;color:var(--muted);margin:-5px 0 12px;line-height:1.5;"
+                data-i18n="walletWarning">
+                تأكد من عنوان المحفظة قبل الإرسال. سيتم استخدام العنوان الذي تدخله للدفع.
+            </div>
+
+            <div style="display:flex;gap:8px;">
+
+                <button
+                    class="btn btn-emerald"
+                    onclick="submitWithdrawal()"
+                    data-i18n="confirmWithdraw">
+                    إرسال الطلب
+                </button>
+
+                <button
+                    class="btn btn-purple"
+                    style="background:rgba(255,255,255,.1);"
+                    onclick="closeModal('withdraw-modal')"
+                    data-i18n="cancel">
+                    إلغاء
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- NAV -->
+
+    <div class="nav">
+
+        <div
+            id="nav-home"
+            class="nav-item active"
+            onclick="showPage('home')">
+            🏠<br>
+            <span data-i18n="home">الرئيسية</span>
+        </div>
+
+        <div
+            id="nav-tasks"
+            class="nav-item"
+            onclick="showPage('tasks')">
+            📋<br>
+            <span data-i18n="tasks">المهام</span>
+        </div>
+
+        <div
+            id="nav-referrals"
+            class="nav-item"
+            onclick="showPage('referrals')">
+            👥<br>
+            <span data-i18n="referrals">الإحالات</span>
+        </div>
+
+        <div
+            id="nav-withdraw"
+            class="nav-item"
+            onclick="showPage('withdraw')">
+            💰<br>
+            <span data-i18n="withdraw">السحب</span>
+        </div>
+
+    </div>
+
+    <div id="connectionStatus">
+        جاري فحص الاتصال...
+    </div>
+
+    <!-- ADMIN PANEL -->
+
+    <div id="adminPanel">
+
+        <div class="admin-inner">
+
+            <h2 style="margin-top:0;">
+                ⚙️ لوحة الإدارة
+            </h2>
+
+            <div
+                style="background:#f0f0f0;border-radius:14px;padding:18px;margin-top:20px;">
+
+                <div style="font-size:15px;">
+                    👥 عدد المستخدمين
+                </div>
+
+                <div
+                    id="adminUsersCount"
+                    style="font-size:32px;font-weight:bold;margin-top:8px;">
+                    --
+                </div>
+
+            </div>
+
+            <div style="margin-top:20px;">
+
+                <div style="font-size:15px;font-weight:bold;">
+                    💰 طلبات السحب
+                </div>
+
+                <div
+                    id="adminWithdrawals"
+                    style="margin-top:8px;">
+                    <div style="color:#777;font-size:13px;">
+                        جاري تحميل طلبات السحب...
+                    </div>
+                </div>
+
+            </div>
+
+            <button
+                id="closeAdminPanel"
+                style="width:100%;margin-top:20px;padding:13px;border:0;border-radius:12px;background:#222;color:white;font-size:16px;">
+                إغلاق
+            </button>
+
+        </div>
+
+    </div>
+
+<script>
+/* =========================================================
+   TELEGRAM
+========================================================= */
+
+if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+}
+
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+    "https://lquaccwytlxnosjbtdvk.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi";
+
+const ADMIN_ID = 5339335944;
+
+
+/* =========================================================
+   REST QUERY
+========================================================= */
+
+class RestQuery {
+
+    constructor(client, table) {
+        this.client = client;
+        this.table = table;
+        this.params = new URLSearchParams();
+        this.headers = {};
+        this.method = 'GET';
+        this.body = null;
+        this.returnSingle = false;
     }
 
-    if (!countElement) return;
+    select(columns='*') {
+        this.params.set('select', columns);
+        this.headers['Prefer'] = 'return=representation';
+        return this;
+    }
 
-    countElement.textContent = 'جاري التحميل...';
+    eq(column, value) {
+        this.params.set(column, `eq.${value}`);
+        return this;
+    }
+
+    order(column, options={}) {
+        const direction =
+            options.ascending === false ? 'desc' : 'asc';
+
+        this.params.set(
+            'order',
+            `${column}.${direction}`
+        );
+
+        return this;
+    }
+
+    limit(number) {
+        this.params.set(
+            'limit',
+            String(Math.max(0, Number(number) || 0))
+        );
+
+        return this;
+    }
+
+    insert(row) {
+        this.method = 'POST';
+        this.body = row;
+        this.headers['Prefer'] =
+            'return=representation';
+
+        return this;
+    }
+
+    single() {
+        this.returnSingle = true;
+        return this;
+    }
+
+    async execute() {
+
+        let url =
+            `${this.client.url}/rest/v1/${encodeURIComponent(this.table)}`;
+
+        const query = this.params.toString();
+
+        if (query) {
+            url += `?${query}`;
+        }
+
+        const options = {
+            method: this.method,
+
+            headers: {
+                apikey: this.client.key,
+                Authorization:
+                    `Bearer ${this.client.key}`,
+                'Content-Type': 'application/json',
+                ...this.headers
+            }
+        };
+
+        if (this.method !== 'GET') {
+            options.body =
+                JSON.stringify(this.body);
+        }
+
+        try {
+
+            const response =
+                await fetch(url, options);
+
+            const raw =
+                await response.text();
+
+            let data = null;
+
+            try {
+                data = raw ? JSON.parse(raw) : null;
+            } catch (_) {
+                data = raw;
+            }
+
+            if (!response.ok) {
+
+                return {
+                    data: null,
+
+                    error: {
+                        message:
+                            data?.message ||
+                            data?.error_description ||
+                            data?.hint ||
+                            `HTTP ${response.status}`,
+
+                        code: data?.code,
+
+                        details: data?.details,
+
+                        hint: data?.hint,
+
+                        status: response.status
+                    }
+                };
+            }
+
+            if (this.returnSingle) {
+
+                if (Array.isArray(data)) {
+
+                    if (!data.length) {
+
+                        return {
+                            data: null,
+                            error: {
+                                message:
+                                    'No rows returned',
+                                code: 'PGRST116'
+                            }
+                        };
+                    }
+
+                    return {
+                        data: data[0],
+                        error: null
+                    };
+                }
+            }
+
+            return {
+                data,
+                error: null
+            };
+
+        } catch (err) {
+
+            return {
+                data: null,
+
+                error: {
+                    message:
+                        err?.message ||
+                        'Network error',
+
+                    code:
+                        'NETWORK_ERROR'
+                }
+            };
+        }
+    }
+
+    then(resolve, reject) {
+        return this.execute()
+            .then(resolve, reject);
+    }
+
+    catch(reject) {
+        return this.execute()
+            .catch(reject);
+    }
+}
+
+
+/* =========================================================
+   SUPABASE CLIENT
+========================================================= */
+
+const supabase = {
+
+    url: SUPABASE_URL,
+
+    key: SUPABASE_KEY,
+
+    from(table) {
+        return new RestQuery(this, table);
+    },
+
+    async rpc(functionName, args={}) {
+
+        const url =
+            `${this.url}/rest/v1/rpc/${encodeURIComponent(functionName)}`;
+
+        try {
+
+            const response =
+                await fetch(url, {
+
+                    method: 'POST',
+
+                    headers: {
+                        apikey: this.key,
+
+                        Authorization:
+                            `Bearer ${this.key}`,
+
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify(args)
+                });
+
+            const raw =
+                await response.text();
+
+            let data = null;
+
+            try {
+                data =
+                    raw ? JSON.parse(raw) : null;
+            } catch (_) {
+                data = raw;
+            }
+
+            if (!response.ok) {
+
+                return {
+                    data: null,
+
+                    error: {
+                        message:
+                            data?.message ||
+                            data?.error_description ||
+                            data?.hint ||
+                            `HTTP ${response.status}`,
+
+                        code: data?.code,
+
+                        details: data?.details,
+
+                        hint: data?.hint,
+
+                        status:
+                            response.status
+                    }
+                };
+            }
+
+            if (
+                Array.isArray(data) &&
+                data.length === 1 &&
+                Object.keys(data[0] || {}).length === 1
+            ) {
+
+                const key =
+                    Object.keys(data[0])[0];
+
+                if (
+                    typeof data[0][key] !== 'object'
+                ) {
+                    data = data[0][key];
+                }
+            }
+
+            return {
+                data,
+                error: null
+            };
+
+        } catch (err) {
+
+            return {
+                data: null,
+
+                error: {
+                    message:
+                        err?.message ||
+                        'Network error',
+
+                    code:
+                        'NETWORK_ERROR'
+                }
+            };
+        }
+    }
+};
+
+let supabaseReady = true;
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let pts = 0;
+
+let gram = 0.50;
+
+let myLink = null;
+
+let visitedTasks = [];
+
+let referralCount = 0;
+
+let referralPoints = 0;
+
+let tasks = [];
+
+let currentUser = null;
+
+let selectedTaskId = null;
+
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+let currentLang =
+    localStorage.getItem('appLang') || 'ar';
+
+const I18N = {
+
+    ar: {
+
+        appName:'تبادل الإحالات',
+
+        languageLabel:'🌐 اللغة',
+
+        availableLinks:'الروابط المتاحة',
+
+        currentBalance:'رصيدك الحالي',
+
+        visitedLinks:'روابط زرتها',
+
+        dailyVisitors:'زائر البوت اليوم',
+
+        rewardTitle:'مكافأة كل 12 ساعة',
+
+        rewardStatus:'احصل على 8 نقاط مجاناً',
+
+        claimReward:'استلام 8 نقاط',
+
+        rewardReady:'مكافأتك المجانية جاهزة',
+
+        rewardComeBack:'ارجع بعد 12 ساعة',
+
+        yourPublishedLink:'رابطك المنشور',
+
+        createTask:'+ إنشاء مهمة',
+
+        noPublishedLink:'لا يوجد رابط مضاف حالياً.',
+
+        newTaskTitle:'إنشاء مهمة جديدة 🔗',
+
+        taskDescriptionLabel:'وصف المهمة:',
+
+        descriptionPlaceholder:'اكتب وصفاً مختصراً للمهمة',
+
+        referralLinkLabel:'رابط الإحالة:',
+
+        requiredVisits:'عدد الزيارات المطلوبة:',
+
+        publishNow:'نشر الآن',
+
+        cancel:'إلغاء',
+
+        referralsTitle:'👥 الإحالات',
+
+        referralsIntro:
+            'شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.',
+
+        referralSystem:'نظام الإحالة 👥',
+
+        referralDescription:
+            'ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.',
+
+        copyLink:'📋 نسخ الرابط',
+
+        share:'📤 مشاركة',
+
+        referralCountLabel:'عدد الإحالات:',
+
+        referralPointsLabel:'نقاط الإحالة:',
+
+        home:'الرئيسية',
+
+        tasks:'المهام',
+
+        referrals:'الإحالات',
+
+        withdraw:'السحب',
+
+        tasksTitle:'📋 المهام',
+
+        tasksIntro:
+            'نفّذ المهام المتاحة واحصل على نقطة مقابل كل زيارة.',
+
+        withdrawTitle:'💰 السحب',
+
+        withdrawBalanceLabel:'رصيد النقاط',
+
+        withdrawRate:
+            'كل 100 نقطة = 0.04 USDT — الحد الأدنى للسحب 0.10 USDT (250 نقطة).',
+
+        requestWithdraw:'طلب سحب',
+
+        withdrawHistory:'سجل طلبات السحب',
+
+        withdrawRequestTitle:'طلب سحب USDT 💰',
+
+        withdrawPointsLabel:'عدد النقاط المراد سحبها:',
+
+        walletLabel:'عنوان محفظة USDT:',
+
+        walletWarning:
+            'تأكد من عنوان المحفظة قبل الإرسال. سيتم استخدام العنوان الذي تدخله للدفع.',
+
+        confirmWithdraw:'إرسال الطلب',
+
+        publisher:'ناشر الرابط:',
+
+        remaining:'متبقي:',
+
+        visitLink:'↗ زيارة الرابط (+1 نقطة)',
+
+        allDone:
+            '🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.',
+
+        remainingVisits:'المتبقي:',
+
+        copySuccess:'تم نسخ رابط الإحالة ✅',
+
+        shareText:
+            'انضم عن طريقي واحصل على فرصة لجمع النقاط 👥',
+
+        invalidTask:
+            'يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!',
+
+        insufficientPoints:
+            'نقاطك لا تكفي! رصيدك الحالي: {p}',
+
+        taskSuccess:
+            'تم إنشاء المهمة ونشر رابطك بنجاح!',
+
+        rewardReceived:
+            'تمت إضافة 8 نقاط إلى رصيدك 🎉',
+
+        rewardAvailable:
+            'متاحة بعد {h}س {m}د {s}ث',
+
+        urlPlaceholder:
+            'https://t.me/your_bot',
+
+        visitsPlaceholder:
+            'من 1 إلى 20',
+
+        preparingReferral:
+            'جارٍ تجهيز رابط الإحالة...',
+
+        loading:
+            'جارٍ تحميل البيانات...',
+
+        loadError:
+            'تعذر تحميل البيانات من الخادم. حاول مرة أخرى.'
+    },
+
+    en: {
+
+        appName:'Referral Exchange',
+
+        languageLabel:'🌐 Language',
+
+        availableLinks:'Available Links',
+
+        currentBalance:'Current Balance',
+
+        visitedLinks:'Links Visited',
+
+        dailyVisitors:'Bot Visitors Today',
+
+        rewardTitle:'Reward Every 12 Hours',
+
+        rewardStatus:'Get 8 free points',
+
+        claimReward:'Claim 8 Points',
+
+        rewardReady:'Your free reward is ready',
+
+        rewardComeBack:'Come back after 12 hours',
+
+        yourPublishedLink:'Your Published Link',
+
+        createTask:'+ Create Task',
+
+        noPublishedLink:'No link added yet.',
+
+        newTaskTitle:'Create New Task 🔗',
+
+        taskDescriptionLabel:'Task Description:',
+
+        descriptionPlaceholder:'Write a short task description',
+
+        referralLinkLabel:'Referral Link:',
+
+        requiredVisits:'Required Visits:',
+
+        publishNow:'Publish Now',
+
+        cancel:'Cancel',
+
+        referralsTitle:'👥 Referrals',
+
+        referralsIntro:
+            'Share your link with friends. When a referral is counted successfully, you receive <b style="color:var(--emerald);">40 points</b>.',
+
+        referralSystem:'Referral System 👥',
+
+        referralDescription:
+            'Invite friends using your link and get <b style="color:var(--emerald);">40 points</b> for each successful referral.',
+
+        copyLink:'📋 Copy Link',
+
+        share:'📤 Share',
+
+        referralCountLabel:'Referrals:',
+
+        referralPointsLabel:'Referral Points:',
+
+        home:'Home',
+
+        tasks:'Tasks',
+
+        referrals:'Referrals',
+
+        withdraw:'Withdraw',
+
+        tasksTitle:'📋 Tasks',
+
+        tasksIntro:
+            'Complete available tasks and earn 1 point for each visit.',
+
+        withdrawTitle:'💰 Withdraw',
+
+        withdrawBalanceLabel:'Points Balance',
+
+        withdrawRate:
+            '100 points = 0.04 USDT — minimum withdrawal 0.10 USDT (250 points).',
+
+        requestWithdraw:'Request Withdrawal',
+
+        withdrawHistory:'Withdrawal History',
+
+        withdrawRequestTitle:'USDT Withdrawal 💰',
+
+        withdrawPointsLabel:'Points to withdraw:',
+
+        walletLabel:'USDT Wallet Address:',
+
+        walletWarning:
+            'Check the wallet address carefully. The entered address will be used for payment.',
+
+        confirmWithdraw:'Submit Request',
+
+        publisher:'Link Publisher:',
+
+        remaining:'Remaining:',
+
+        visitLink:'↗ Visit Link (+1 Point)',
+
+        allDone:
+            '🎉 You completed all available links!<br>Come back later for new links.',
+
+        remainingVisits:'Remaining:',
+
+        copySuccess:'Referral link copied ✅',
+
+        shareText:
+            'Join through my link and get a chance to earn points 👥',
+
+        invalidTask:
+            'Please enter a link and choose between 1 and 20 visits!',
+
+        insufficientPoints:
+            'Not enough points! Your current balance: {p}',
+
+        taskSuccess:
+            'Task created and your link was published successfully!',
+
+        rewardReceived:
+            '8 points added to your balance 🎉',
+
+        rewardAvailable:
+            'Available in {h}h {m}m {s}s',
+
+        urlPlaceholder:
+            'https://t.me/your_bot',
+
+        visitsPlaceholder:
+            '1 to 20',
+
+        preparingReferral:
+            'Preparing your referral link...',
+
+        loading:
+            'Loading data...',
+
+        loadError:
+            'Could not load data from the server. Please try again.'
+    }
+};
+
+function t(key, vars={}) {
+
+    let value =
+        (I18N[currentLang] &&
+         I18N[currentLang][key]) ||
+        I18N.ar[key] ||
+        key;
+
+    Object.keys(vars).forEach(k => {
+
+        value =
+            value.replaceAll(
+                '{' + k + '}',
+                vars[k]
+            );
+    });
+
+    return value;
+}
+
+function applyTranslations() {
+
+    document
+        .querySelectorAll('[data-i18n]')
+        .forEach(el => {
+
+            el.innerHTML =
+                t(el.getAttribute('data-i18n'));
+        });
+
+    document
+        .querySelectorAll('[data-i18n-placeholder]')
+        .forEach(el => {
+
+            el.placeholder =
+                t(el.getAttribute('data-i18n-placeholder'));
+        });
+
+    document.getElementById('app-title')
+        .textContent = t('appName');
+}
+
+function toggleLanguage() {
+
+    currentLang =
+        currentLang === 'ar' ? 'en' : 'ar';
+
+    localStorage.setItem(
+        'appLang',
+        currentLang
+    );
+
+    applyLanguage();
+}
+
+function applyLanguage() {
+
+    const en =
+        currentLang === 'en';
+
+    document.body.classList.toggle(
+        'en',
+        en
+    );
+
+    document.documentElement.lang =
+        en ? 'en' : 'ar';
+
+    document.documentElement.dir =
+        en ? 'ltr' : 'rtl';
+
+    const btn =
+        document.getElementById('lang-toggle');
+
+    if (btn) {
+        btn.innerText =
+            en ? 'العربية' : 'English';
+    }
+
+    applyTranslations();
+
+    render();
+
+    updateRewardUI();
+}
+
+
+/* =========================================================
+   TELEGRAM USER
+========================================================= */
+
+function getTelegramUser() {
 
     try {
-        // Ask Supabase for the exact row count without downloading user records.
-        const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/users?select=telegram_id`,
-            {
-                method: 'HEAD',
-                headers: {
-                    apikey: SUPABASE_KEY,
-                    Authorization: `Bearer ${SUPABASE_KEY}`,
-                    Prefer: 'count=exact'
+
+        return window.Telegram
+            ?.WebApp
+            ?.initDataUnsafe
+            ?.user || null;
+
+    } catch (_) {
+
+        return null;
+    }
+}
+
+function getTelegramUserId() {
+
+    const user =
+        getTelegramUser();
+
+    return user?.id || null;
+}
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+function isAdminUser(
+    userId = getTelegramUserId()
+) {
+
+    return Number(userId) === ADMIN_ID;
+}
+
+function updateAdminVisibility() {
+
+    const admin =
+        isAdminUser();
+
+    const createBtn =
+        document.getElementById(
+            'create-task-btn'
+        );
+
+    if (createBtn) {
+
+        createBtn.style.display =
+            admin ? 'inline-flex' : 'none';
+    }
+
+    const box =
+        document.getElementById(
+            'adminAddTaskBox'
+        );
+
+    if (box) {
+
+        box.style.display =
+            admin ? 'block' : 'none';
+    }
+}
+
+function openAdminAddTask() {
+
+    if (!isAdminUser()) {
+
+        alert(
+            'هذه الخاصية متاحة للإدارة فقط.'
+        );
+
+        return;
+    }
+
+    openModal('add-modal');
+}
+
+
+/* =========================================================
+   CONNECTION
+========================================================= */
+
+function ensureSupabase(
+    actionName='هذه العملية'
+) {
+
+    if (!navigator.onLine) {
+
+        alert(
+            'لا يوجد اتصال بالإنترنت حالياً.\n\n' +
+            actionName +
+            ' تحتاج اتصالاً بالإنترنت.'
+        );
+
+        return false;
+    }
+
+    if (!supabaseReady) {
+
+        alert(
+            'تعذر الاتصال بخدمة البيانات الآن.'
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+
+/* =========================================================
+   REFERRAL LINK
+========================================================= */
+
+function buildReferralLink() {
+
+    const box =
+        document.getElementById(
+            'referral-url'
+        );
+
+    if (!box) return;
+
+    const userId =
+        getTelegramUserId();
+
+    const configuredBot =
+        window.APP_BOT_USERNAME ||
+        'Getttttsbot';
+
+    const link =
+        `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
+
+    box.innerText = link;
+
+    box.dataset.referral = link;
+}
+
+function copyReferral() {
+
+    const box =
+        document.getElementById(
+            'referral-url'
+        );
+
+    const link =
+        box?.dataset?.referral ||
+        box?.innerText ||
+        '';
+
+    if (!link) return;
+
+    if (
+        navigator.clipboard &&
+        window.isSecureContext
+    ) {
+
+        navigator.clipboard
+            .writeText(link)
+            .then(() =>
+                alert(t('copySuccess'))
+            );
+
+    } else {
+
+        const temp =
+            document.createElement('textarea');
+
+        temp.value = link;
+
+        document.body.appendChild(temp);
+
+        temp.select();
+
+        document.execCommand('copy');
+
+        temp.remove();
+
+        alert(t('copySuccess'));
+    }
+}
+
+function shareReferral() {
+
+    const box =
+        document.getElementById(
+            'referral-url'
+        );
+
+    const link =
+        box?.dataset?.referral ||
+        box?.innerText ||
+        '';
+
+    if (!link) return;
+
+    const text =
+        t('shareText');
+
+    if (
+        window.Telegram?.WebApp
+            ?.openTelegramLink
+    ) {
+
+        window.Telegram.WebApp
+            .openTelegramLink(
+                `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`
+            );
+
+    } else if (navigator.share) {
+
+        navigator.share({
+            text,
+            url: link
+        }).catch(() => {});
+
+    } else {
+
+        copyReferral();
+    }
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openModal(id) {
+
+    const modal =
+        document.getElementById(id);
+
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function closeModal(id) {
+
+    const modal =
+        document.getElementById(id);
+
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+
+/* =========================================================
+   PAGES
+========================================================= */
+
+function showPage(page) {
+
+    const pages = {
+
+        home:'home-page',
+
+        tasks:'tasks-page',
+
+        referrals:'referrals-page',
+
+        withdraw:'withdraw-page'
+    };
+
+    Object.entries(pages)
+        .forEach(([key,id]) => {
+
+            const el =
+                document.getElementById(id);
+
+            if (el) {
+
+                el.style.display =
+                    key === page
+                        ? 'block'
+                        : 'none';
+            }
+        });
+
+    [
+        'home',
+        'tasks',
+        'referrals',
+        'withdraw'
+    ].forEach(key => {
+
+        const nav =
+            document.getElementById(
+                'nav-' + key
+            );
+
+        if (nav) {
+
+            nav.classList.toggle(
+                'active',
+                key === page
+            );
+        }
+    });
+
+    if (page === 'tasks') {
+
+        renderTasksPage();
+    }
+
+    if (page === 'withdraw') {
+
+        renderWithdrawPage();
+
+        loadWithdrawals();
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+function renderWithdrawPage() {
+
+    const points =
+        document.getElementById(
+            'withdraw-points'
+        );
+
+    const value =
+        document.getElementById(
+            'withdraw-value'
+        );
+
+    if (points) {
+        points.innerText = pts;
+    }
+
+    if (value) {
+
+        value.innerText =
+            (
+                Number(pts) * 0.04 / 100
+            ).toFixed(2) +
+            ' USDT';
+    }
+}
+
+
+/* =========================================================
+   REWARD EVERY 12 HOURS
+========================================================= */
+
+let rewardAt =
+    parseInt(
+        localStorage.getItem(
+            'rewardAt'
+        ) || '0'
+    );
+
+const REWARD_MS =
+    12 * 60 * 60 * 1000;
+
+function updateRewardUI() {
+
+    const now =
+        Date.now();
+
+    const ready =
+        !rewardAt ||
+        now >= rewardAt;
+
+    const btn =
+        document.getElementById(
+            'reward-btn'
+        );
+
+    const status =
+        document.getElementById(
+            'reward-status'
+        );
+
+    if (!btn || !status) return;
+
+    if (ready) {
+
+        btn.disabled = false;
+
+        btn.style.opacity = '1';
+
+        btn.innerText =
+            t('claimReward');
+
+        status.innerText =
+            t('rewardReady');
+
+    } else {
+
+        const remaining =
+            rewardAt - now;
+
+        const h =
+            Math.floor(
+                remaining / 3600000
+            );
+
+        const m =
+            Math.floor(
+                (remaining % 3600000) /
+                60000
+            );
+
+        const s =
+            Math.floor(
+                (remaining % 60000) /
+                1000
+            );
+
+        btn.disabled = true;
+
+        btn.style.opacity = '.55';
+
+        btn.innerText =
+            t('rewardAvailable', {
+                h,
+                m,
+                s
+            });
+
+        status.innerText =
+            t('rewardComeBack');
+    }
+}
+
+async function claimReward() {
+
+    if (
+        !ensureSupabase(
+            'استلام المكافأة'
+        )
+    ) return;
+
+    if (
+        rewardAt &&
+        Date.now() < rewardAt
+    ) return;
+
+    if (!currentUser) {
+
+        alert(t('loadError'));
+
+        return;
+    }
+
+    const btn =
+        document.getElementById(
+            'reward-btn'
+        );
+
+    btn.disabled = true;
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabase.rpc(
+                'add_points',
+                {
+                    p_user_id:
+                        currentUser.telegram_id,
+
+                    p_points: 8
                 }
+            );
+
+        if (error) throw error;
+
+        pts = Number(data);
+
+        rewardAt =
+            Date.now() +
+            REWARD_MS;
+
+        localStorage.setItem(
+            'rewardAt',
+            String(rewardAt)
+        );
+
+        render();
+
+        updateRewardUI();
+
+        alert(
+            t('rewardReceived')
+        );
+
+    } catch (err) {
+
+        console.error(
+            'claimReward:',
+            err
+        );
+
+        btn.disabled = false;
+
+        alert(t('loadError'));
+    }
+}
+
+setInterval(
+    updateRewardUI,
+    1000
+);
+
+
+/* =========================================================
+   TASK SELECTION
+========================================================= */
+
+function getNextAvailableTask() {
+
+    if (selectedTaskId !== null) {
+
+        const selected =
+            tasks.find(
+                t =>
+                    Number(t.id) ===
+                    Number(selectedTaskId)
+            );
+
+        if (
+            selected &&
+            Number(selected.owner_id) !==
+                Number(currentUser?.telegram_id) &&
+            !visitedTasks.includes(
+                Number(selected.id)
+            ) &&
+            Number(selected.left || 0) > 0 &&
+            selected.is_active !== false
+        ) {
+
+            return selected;
+        }
+    }
+
+    return tasks.find(task =>
+
+        Number(task.owner_id) !==
+            Number(currentUser?.telegram_id) &&
+
+        !visitedTasks.includes(
+            Number(task.id)
+        ) &&
+
+        Number(task.left || 0) > 0 &&
+
+        task.is_active !== false
+    );
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render() {
+
+    const ptsBal =
+        document.getElementById(
+            'pts-bal'
+        );
+
+    if (ptsBal) {
+        ptsBal.innerText = pts;
+    }
+
+    const gramBal =
+        document.getElementById(
+            'gram-bal'
+        );
+
+    if (gramBal) {
+        gramBal.innerText =
+            Number(gram).toFixed(2);
+    }
+
+    const completed =
+        document.getElementById(
+            'completed-cnt'
+        );
+
+    if (completed) {
+        completed.innerText =
+            visitedTasks.length;
+    }
+
+    const availableCount =
+        tasks.filter(task =>
+
+            Number(task.owner_id) !==
+                Number(currentUser?.telegram_id) &&
+
+            Number(task.left || 0) > 0 &&
+
+            task.is_active !== false &&
+
+            !visitedTasks.includes(
+                Number(task.id)
+            )
+
+        ).length;
+
+    const total =
+        document.getElementById(
+            'total-tasks-cnt'
+        );
+
+    if (total) {
+        total.innerText =
+            availableCount;
+    }
+
+    const daily =
+        document.getElementById(
+            'daily-visitors'
+        );
+
+    if (daily) {
+        daily.innerText =
+            dailyVisitors;
+    }
+
+    renderActiveTask();
+
+    renderTasksPage();
+
+    renderMyLink();
+
+    renderWithdrawPage();
+
+    const refCount =
+        document.getElementById(
+            'ref-count'
+        );
+
+    if (refCount) {
+        refCount.innerText =
+            referralCount;
+    }
+
+    const refPoints =
+        document.getElementById(
+            'ref-points'
+        );
+
+    if (refPoints) {
+        refPoints.innerText =
+            referralPoints;
+    }
+
+    buildReferralLink();
+
+    updateAdminVisibility();
+}
+
+function renderActiveTask() {
+
+    const card =
+        document.getElementById(
+            'task-card'
+        );
+
+    if (!card) return;
+
+    const task =
+        getNextAvailableTask();
+
+    if (!task) {
+
+        card.innerHTML = `
+            <div style="text-align:center;padding:15px;color:var(--muted);font-size:10pt;">
+                ${t('allDone')}
+            </div>
+        `;
+
+        return;
+    }
+
+    card.innerHTML = `
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;">
+
+            <span style="
+                font-weight:800;
+                font-size:10pt;">
+
+                ${t('publisher')}
+                ${escapeHtml(task.user)}
+
+            </span>
+
+            <span style="
+                font-size:8pt;
+                background:rgba(34,211,238,0.2);
+                color:var(--cyan);
+                padding:2px 6px;
+                border-radius:6px;">
+
+                ${t('remaining')}
+                ${task.left}
+
+            </span>
+
+        </div>
+
+        ${
+            task.description
+                ? `
+                    <div style="
+                        font-size:8.5pt;
+                        color:var(--muted);
+                        line-height:1.6;
+                        margin-top:8px;">
+
+                        ${escapeHtml(
+                            task.description
+                        )}
+
+                    </div>
+                `
+                : ''
+        }
+
+        <div class="link-box">
+
+            ${escapeHtml(task.url)}
+
+        </div>
+
+        <button
+            class="btn btn-purple"
+            onclick="visitSpecificTask(${Number(task.id)})">
+
+            ${t('visitLink')}
+
+        </button>
+    `;
+}
+
+function renderMyLink() {
+
+    const box =
+        document.getElementById(
+            'my-task-info'
+        );
+
+    if (!box) return;
+
+    if (!myLink) {
+
+        box.innerText =
+            t('noPublishedLink');
+
+        return;
+    }
+
+    box.innerHTML = `
+
+        <b style="color:var(--cyan);">
+
+            ${escapeHtml(
+                myLink.url
+            )}
+
+        </b>
+
+        <br>
+
+        ${t('remainingVisits')}
+        ${Number(myLink.left || myLink.required_visits || 0)}
+
+    `;
+}
+
+
+/* =========================================================
+   TASKS PAGE
+========================================================= */
+
+function renderTasksPage() {
+
+    updateAdminVisibility();
+
+    const box =
+        document.getElementById(
+            'tasks-list'
+        );
+
+    if (!box) return;
+
+    const available =
+        tasks.filter(task =>
+
+            Number(task.owner_id) !==
+                Number(currentUser?.telegram_id) &&
+
+            Number(task.left || 0) > 0 &&
+
+            task.is_active !== false &&
+
+            !visitedTasks.includes(
+                Number(task.id)
+            )
+        );
+
+    if (!available.length) {
+
+        box.innerHTML = `
+            <div class="card"
+                style="text-align:center;color:var(--muted);font-size:9pt;">
+
+                ${t('allDone')}
+
+            </div>
+        `;
+
+        return;
+    }
+
+    box.innerHTML =
+        available.map(task => `
+
+            <div class="task-item">
+
+                <div class="task-meta">
+
+                    <b>
+                        ${t('publisher')}
+                        ${escapeHtml(task.user)}
+                    </b>
+
+                    <span class="badge badge-cyan">
+
+                        ${t('remaining')}
+                        ${task.left}
+
+                    </span>
+
+                </div>
+
+                ${
+                    task.description
+                        ? `
+                            <div style="
+                                font-size:8.5pt;
+                                color:var(--muted);
+                                line-height:1.6;
+                                margin-bottom:7px;">
+
+                                ${escapeHtml(
+                                    task.description
+                                )}
+
+                            </div>
+                        `
+                        : ''
+                }
+
+                <div class="link-box">
+
+                    ${escapeHtml(task.url)}
+
+                </div>
+
+                <button
+                    class="btn btn-purple"
+                    onclick="visitSpecificTask(${Number(task.id)})">
+
+                    ${t('visitLink')}
+
+                </button>
+
+            </div>
+
+        `).join('');
+}
+
+async function visitSpecificTask(taskId) {
+
+    const task =
+        tasks.find(
+            item =>
+                Number(item.id) ===
+                Number(taskId)
+        );
+
+    if (!task) return;
+
+    if (
+        Number(task.owner_id) ===
+        Number(currentUser?.telegram_id)
+    ) {
+
+        return;
+    }
+
+    if (
+        visitedTasks.includes(
+            Number(taskId)
+        )
+    ) {
+
+        return;
+    }
+
+    selectedTaskId =
+        Number(taskId);
+
+    try {
+
+        await visitLink();
+
+    } finally {
+
+        selectedTaskId = null;
+
+    }
+}
+
+
+/* =========================================================
+   POINTS
+========================================================= */
+
+async function awardPoints(
+    points,
+    userId = currentUser?.telegram_id
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabase.rpc(
+            'add_points',
+            {
+                p_user_id: userId,
+                p_points: points
             }
         );
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+    if (error) {
+        throw error;
+    }
+
+    const balance =
+        Number(data);
+
+    if (!Number.isFinite(balance)) {
+
+        throw new Error(
+            'Invalid balance returned by add_points'
+        );
+    }
+
+    return balance;
+}
+
+
+/* =========================================================
+   VISIT TASK
+========================================================= */
+
+async function visitLink() {
+
+    if (
+        !ensureSupabase(
+            'تنفيذ المهمة'
+        )
+    ) return;
+
+    if (!currentUser) return;
+
+    const task =
+        getNextAvailableTask();
+
+    if (!task) return;
+
+    const taskId =
+        Number(task.id);
+
+    if (
+        visitedTasks.includes(taskId)
+    ) {
+
+        return;
+    }
+
+    window.open(
+        task.url,
+        '_blank'
+    );
+
+    let pointsAwarded = false;
+
+    try {
+
+        /*
+         * First check again from database
+         * to prevent duplicate visits.
+         */
+
+        const {
+            data: existing,
+            error: existingError
+        } =
+            await supabase
+                .from('completed_tasks')
+                .select('task_id')
+                .eq(
+                    'user_id',
+                    currentUser.telegram_id
+                )
+                .eq(
+                    'task_id',
+                    taskId
+                )
+                .limit(1);
+
+        if (existingError) {
+            throw existingError;
         }
 
-        const range = response.headers.get('content-range');
+        if (
+            existing &&
+            existing.length
+        ) {
 
-        if (!range) {
-            throw new Error('Supabase did not return a row count');
+            if (
+                !visitedTasks.includes(
+                    taskId
+                )
+            ) {
+
+                visitedTasks.push(taskId);
+            }
+
+            render();
+
+            return;
         }
 
-        const total = range.split('/')[1];
+        /*
+         * Give one point.
+         */
 
-        if (total === undefined || total === '*') {
-            throw new Error('Invalid user count');
+        pts =
+            await awardPoints(
+                1
+            );
+
+        pointsAwarded = true;
+
+        /*
+         * Record completion.
+         */
+
+        const {
+            error: completedError
+        } =
+            await supabase
+                .from('completed_tasks')
+                .insert({
+
+                    user_id:
+                        currentUser.telegram_id,
+
+                    task_id:
+                        taskId
+                });
+
+        if (completedError) {
+
+            if (
+                String(
+                    completedError.code
+                ) === '23505'
+            ) {
+
+                if (pointsAwarded) {
+
+                    pts =
+                        await awardPoints(
+                            -1
+                        );
+
+                    pointsAwarded = false;
+                }
+
+                if (
+                    !visitedTasks.includes(
+                        taskId
+                    )
+                ) {
+
+                    visitedTasks.push(
+                        taskId
+                    );
+                }
+
+                render();
+
+                return;
+            }
+
+            throw completedError;
         }
 
-        countElement.textContent = Number(total);
+        /*
+         * Successfully completed.
+         */
+
+        if (
+            !visitedTasks.includes(
+                taskId
+            )
+        ) {
+
+            visitedTasks.push(
+                taskId
+            );
+        }
+
+        task.left =
+            Math.max(
+                0,
+                Number(task.left || 0) - 1
+            );
+
+        if (task.left <= 0) {
+
+            task.is_active = false;
+        }
+
+        render();
+
     } catch (err) {
-        console.error('Admin users count:', err);
-        countElement.textContent = 'خطأ';
-    }
-};
 
-document.body.appendChild(button);
-    }
+        console.error(
+            'visitLink:',
+            err
+        );
 
-    setTimeout(addAdminButton, 1000);
-})();
-</script>
-<div id="adminPanel" style="
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:999998;
-    background:#f5f5f5;
-    color:#222;
-    padding:20px;
-    overflow:auto;
-    direction:rtl;
-">
-    <div style="
-        max-width:500px;
-        margin:40px auto;
-        background:white;
-        border-radius:18px;
-        padding:20px;
-        box-shadow:0 4px 20px rgba(0,0,0,.15);
-    ">
-        <h2 style="margin-top:0;">⚙️ لوحة الإدارة</h2>
+        if (pointsAwarded) {
 
-        <div style="
-            background:#f0f0f0;
-            border-radius:14px;
-            padding:18px;
-            margin-top:20px;
-        ">
-            <div style="font-size:15px;">👥 عدد المستخدمين</div>
-            <div id="adminUsersCount" style="
-                font-size:32px;
-                font-weight:bold;
-                margin-top:8px;
-            ">--</div>
-        </div>
+            try {
 
+                pts =
+                    await awardPoints(
+                        -1
+                    );
 
-        <div style="margin-top:20px;">
-            <div style="font-size:15px;font-weight:bold;">💰 طلبات السحب</div>
-            <div id="adminWithdrawals" style="margin-top:8px;"><div style="color:#777;font-size:13px;">جاري تحميل طلبات السحب...</div></div>
-        </div>
+            } catch (refundError) {
 
-        <button id="closeAdminPanel" style="
-            width:100%;
-            margin-top:20px;
-            padding:13px;
-            border:0;
-            border-radius:12px;
-            background:#222;
-            color:white;
-            font-size:16px;
-        ">
-            إغلاق
-        </button>
-    </div>
-</div>
-<script>
-async function loadAdminWithdrawals(){
-    if (!isAdminUser()) return;
-    const box=document.getElementById('adminWithdrawals');
-    if(!box) return;
-    box.innerHTML='<div style="color:#777;font-size:13px;">جاري تحميل طلبات السحب...</div>';
-    try{
-        const {data,error}=await supabase.from('withdrawals').select('id,telegram_id,username,points,amount_usdt,wallet_address,status,created_at').order('created_at',{ascending:false});
-        if(error) throw error;
-        if(!data?.length){ box.innerHTML='<div style="color:#777;font-size:13px;">لا توجد طلبات سحب حالياً.</div>'; return; }
-        box.innerHTML=data.map(w=>`<div class="admin-withdraw">
-            <div><b>#${escapeHtml(w.id)}</b> — ${escapeHtml(w.username||'بدون username')}</div>
-            <div style="font-size:12px;color:#666;margin-top:4px;">Telegram ID: ${escapeHtml(w.telegram_id)}<br>النقاط: ${Number(w.points)}<br>المبلغ: <b>${Number(w.amount_usdt).toFixed(2)} USDT</b><br>المحفظة: <span style="word-break:break-all;direction:ltr;display:inline-block;">${escapeHtml(w.wallet_address)}</span><br>الحالة: <b>${w.status==='paid'?'تم الدفع':w.status==='rejected'?'مرفوض':'قيد المراجعة'}</b></div>
-            ${w.status==='pending'?`<div class="admin-actions"><button style="background:#16a34a;color:white;" onclick="adminSetWithdrawal(${Number(w.id)},'paid')">✅ تم الدفع</button><button style="background:#dc2626;color:white;" onclick="adminSetWithdrawal(${Number(w.id)},'rejected')">❌ رفض</button></div>`:''}
-        </div>`).join('');
-    }catch(err){ console.error('loadAdminWithdrawals:',err); box.innerHTML='<div style="color:#c00;font-size:13px;">تعذر تحميل طلبات السحب.</div>'; }
-}
-async function adminSetWithdrawal(id,status){
-    if(!isAdminUser()) { alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
-    if(!confirm(status==='paid'?'تأكيد أن الطلب تم دفعه؟':'رفض الطلب وإرجاع النقاط للمستخدم؟')) return;
-    try{
-        const {data:rows,error:getError}=await supabase.from('withdrawals').select('id,telegram_id,points,status').eq('id',id);
-        if(getError) throw getError;
-        const row=rows?.[0];
-        if(!row || row.status!=='pending'){ alert('هذا الطلب تمت معالجته مسبقاً.'); return; }
-        if(status==='rejected'){
-            const {error:refundError}=await supabase.rpc('add_points',{p_user_id:row.telegram_id,p_points:Number(row.points)});
-            if(refundError) throw refundError;
+                console.error(
+                    'Visit refund failed:',
+                    refundError
+                );
+            }
         }
-        // RestQuery has no update() method, so use REST directly for the status change.
-        const response=await fetch(`${SUPABASE_URL}/rest/v1/withdrawals?id=eq.${encodeURIComponent(id)}`,{
-            method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({status})
-        });
-        if(!response.ok) throw new Error('HTTP '+response.status);
-        await loadAdminWithdrawals();
-        alert(status==='paid'?'تم تسجيل الدفع ✅':'تم رفض الطلب وإرجاع النقاط للمستخدم ✅');
-    }catch(err){ console.error('adminSetWithdrawal:',err); alert('تعذر تحديث الطلب. تأكد من صلاحيات Supabase.'); }
+
+        await loadData();
+
+        alert(
+            t('loadError')
+        );
+    }
 }
+
+
+/* =========================================================
+   REFERRAL
+========================================================= */
+
+function getReferralStartParam() {
+
+    try {
+
+        const p =
+            window.Telegram
+                ?.WebApp
+                ?.initDataUnsafe
+                ?.start_param;
+
+        if (p) {
+            return String(p);
+        }
+
+    } catch (_) {}
+
+    return '';
+}
+
+async function processReferral() {
+
+    if (
+        !currentUser?.telegram_id
+    ) return;
+
+    if (
+        !ensureSupabase(
+            'احتساب الإحالة'
+        )
+    ) return;
+
+    const startParam =
+        getReferralStartParam();
+
+    const match =
+        startParam.match(
+            /^ref_(\d+)$/i
+        );
+
+    if (!match) return;
+
+    const referrerId =
+        Number(match[1]);
+
+    const referredId =
+        Number(
+            currentUser.telegram_id
+        );
+
+    if (
+        !Number.isSafeInteger(
+            referrerId
+        )
+    ) return;
+
+    if (
+        referrerId === referredId
+    ) return;
+
+    try {
+
+        /*
+         * Check if this referred user
+         * already has a referral.
+         */
+
+        const {
+            data: existing,
+            error: existingError
+        } =
+            await supabase
+                .from('referrals')
+                .select('id,reward_points')
+                .eq(
+                    'referred_id',
+                    referredId
+                )
+                .limit(1);
+
+        if (existingError) {
+            throw existingError;
+        }
+
+        if (
+            existing &&
+            existing.length
+        ) {
+
+            return;
+        }
+
+        /*
+         * Check referrer exists.
+         */
+
+        const {
+            data: referrerRows,
+            error: referrerError
+        } =
+            await supabase
+                .from('users')
+                .select('telegram_id')
+                .eq(
+                    'telegram_id',
+                    referrerId
+                )
+                .limit(1);
+
+        if (referrerError) {
+            throw referrerError;
+        }
+
+        if (
+            !referrerRows ||
+            !referrerRows.length
+        ) {
+
+            return;
+        }
+
+        /*
+         * Insert referral.
+         * The unique constraint on referred_id
+         * prevents duplicates.
+         */
+
+        const {
+            data: referralRow,
+            error: insertError
+        } =
+            await supabase
+                .from('referrals')
+                .insert({
+
+                    referrer_id:
+                        referrerId,
+
+                    referred_id:
+                        referredId,
+
+                    reward_points:
+                        40
+                })
+                .select('id')
+                .single();
+
+        if (insertError) {
+
+            /*
+             * Duplicate referral:
+             * do NOT award another 40.
+             */
+
+            if (
+                String(
+                    insertError.code
+                ) === '23505'
+            ) {
+
+                return;
+            }
+
+            throw insertError;
+        }
+
+        /*
+         * Give 40 points to referrer.
+         */
+
+        try {
+
+            await awardPoints(
+                40,
+                referrerId
+            );
+
+        } catch (rewardError) {
+
+            /*
+             * Roll back referral record
+             * if reward fails.
+             */
+
+            if (referralRow?.id) {
+
+                try {
+
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/referrals?id=eq.${encodeURIComponent(referralRow.id)}`,
+                        {
+                            method: 'DELETE',
+
+                            headers: {
+                                apikey:
+                                    SUPABASE_KEY,
+
+                                Authorization:
+                                    `Bearer ${SUPABASE_KEY}`
+                            }
+                        }
+                    );
+
+                } catch (_) {}
+            }
+
+            throw rewardError;
+        }
+
+        /*
+         * Refresh current user's data.
+         */
+
+        await loadData();
+
+        /*
+         * Show notification only to the
+         * person who referred someone.
+         */
+
+        if (
+            Number(
+                currentUser.telegram_id
+            ) === referrerId
+        ) {
+
+            alert(
+                '🎉 تمت إحالة ناجحة! حصلت على 40 نقطة.'
+            );
+        }
+
+    } catch (err) {
+
+        console.error(
+            'processReferral:',
+            err
+        );
+    }
+}
+
+
+/* =========================================================
+   WELCOME BONUS
+========================================================= */
+
+async function grantWelcomeBonusIfNew(
+    user
+) {
+
+    if (!user?.telegram_id) {
+        return;
+    }
+
+    const key =
+        'welcomeBonusGranted_' +
+        String(user.telegram_id);
+
+    if (
+        localStorage.getItem(key) === '1'
+    ) {
+
+        return;
+    }
+
+    /*
+     * create_user should return the user's
+     * created_at. We only consider the account
+     * new when it was created very recently.
+     */
+
+    const createdAt =
+        user.created_at
+            ? new Date(
+                user.created_at
+              ).getTime()
+            : NaN;
+
+    const isNewUser =
+        Number.isFinite(createdAt) &&
+        Math.abs(
+            Date.now() - createdAt
+        ) <
+        5 * 60 * 1000;
+
+    if (!isNewUser) {
+        return;
+    }
+
+    try {
+
+        const newBalance =
+            await awardPoints(
+                20,
+                user.telegram_id
+            );
+
+        pts =
+            Number(newBalance);
+
+        localStorage.setItem(
+            key,
+            '1'
+        );
+
+        render();
+
+        alert(
+            '🎁 أهلاً بك! تمت إضافة 20 نقطة مجانية إلى حسابك.'
+        );
+
+    } catch (err) {
+
+        console.error(
+            'welcome bonus:',
+            err
+        );
+    }
+}
+
+
+/* =========================================================
+   ADD TASK
+========================================================= */
+
+async function addLink() {
+
+    if (!isAdminUser()) {
+
+        alert(
+            'هذه الخاصية متاحة للإدارة فقط.'
+        );
+
+        return;
+    }
+
+    if (
+        !ensureSupabase(
+            'إضافة المهمة'
+        )
+    ) return;
+
+    if (!currentUser) {
+
+        alert(
+            t('loadError')
+        );
+
+        return;
+    }
+
+    const url =
+        document.getElementById(
+            'add-url'
+        ).value.trim();
+
+    const description =
+        document.getElementById(
+            'add-description'
+        ).value.trim();
+
+    const count =
+        parseInt(
+            document.getElementById(
+                'add-cnt'
+            ).value,
+            10
+        );
+
+    if (
+        !url ||
+        !/^https?:\/\//i.test(url) ||
+        !Number.isInteger(count) ||
+        count < 1 ||
+        count > 20
+    ) {
+
+        alert(
+            t('invalidTask')
+        );
+
+        return;
+    }
+
+    try {
+
+        /*
+         * Check current balance first.
+         */
+
+        if (
+            Number(pts) < count
+        ) {
+
+            alert(
+                t(
+                    'insufficientPoints',
+                    {p: pts}
+                )
+            );
+
+            return;
+        }
+
+        /*
+         * Deduct task cost first.
+         */
+
+        const {
+            data: newPoints,
+            error: pointsError
+        } =
+            await supabase.rpc(
+                'subtract_points',
+                {
+                    p_user_id:
+                        currentUser.telegram_id,
+
+                    p_points:
+                        count
+                }
+            );
+
+        if (pointsError) {
+            throw pointsError;
+        }
+
+        /*
+         * Create task.
+         */
+
+        const {
+            data: insertedTask,
+            error: taskError
+        } =
+            await supabase
+                .from('tasks')
+                .insert({
+
+                    title:
+                        url,
+
+                    description:
+                        description || null,
+
+                    reward_points:
+                        1,
+
+                    url:
+                        url,
+
+                    is_active:
+                        true,
+
+                    owner_id:
+                        currentUser.telegram_id,
+
+                    required_visits:
+                        count
+                })
+                .select()
+                .single();
+
+        if (taskError) {
+
+            /*
+             * Refund if task creation failed.
+             */
+
+            await supabase.rpc(
+                'add_points',
+                {
+                    p_user_id:
+                        currentUser.telegram_id,
+
+                    p_points:
+                        count
+                }
+            );
+
+            throw taskError;
+        }
+
+        pts =
+            Number(newPoints);
+
+        myLink =
+            insertedTask;
+
+        closeModal(
+            'add-modal'
+        );
+
+        document.getElementById(
+            'add-url'
+        ).value = '';
+
+        document.getElementById(
+            'add-description'
+        ).value = '';
+
+        document.getElementById(
+            'add-cnt'
+        ).value = '';
+
+        await loadData();
+
+        alert(
+            t('taskSuccess')
+        );
+
+    } catch (err) {
+
+        console.error(
+            'addLink:',
+            err
+        );
+
+        alert(
+            t('loadError')
+        );
+    }
+}
+
+
+/* =========================================================
+   WITHDRAW
+========================================================= */
+
+function updateWithdrawPreview() {
+
+    const input =
+        document.getElementById(
+            'withdraw-points-input'
+        );
+
+    const preview =
+        document.getElementById(
+            'withdraw-preview'
+        );
+
+    if (!input || !preview) {
+        return;
+    }
+
+    const points =
+        Math.max(
+            0,
+            Number(input.value) || 0
+        );
+
+    preview.innerText =
+        (
+            points * 0.04 / 100
+        ).toFixed(2) +
+        ' USDT';
+}
+
+function openWithdrawModal() {
+
+    if (!currentUser) {
+
+        alert(
+            t('loadError')
+        );
+
+        return;
+    }
+
+    const input =
+        document.getElementById(
+            'withdraw-points-input'
+        );
+
+    input.value =
+        Math.max(
+            250,
+            Math.floor(
+                Number(pts)
+            )
+        );
+
+    updateWithdrawPreview();
+
+    openModal(
+        'withdraw-modal'
+    );
+}
+
+async function submitWithdrawal() {
+
+    if (
+        !ensureSupabase(
+            'طلب السحب'
+        )
+    ) return;
+
+    if (!currentUser) {
+        return;
+    }
+
+    const points =
+        Math.floor(
+            Number(
+                document.getElementById(
+                    'withdraw-points-input'
+                ).value
+            ) || 0
+        );
+
+    const wallet =
+        document.getElementById(
+            'withdraw-wallet'
+        ).value.trim();
+
+    if (points < 250) {
+
+        alert(
+            'الحد الأدنى للسحب هو 250 نقطة = 0.10 USDT.'
+        );
+
+        return;
+    }
+
+    if (points > Number(pts)) {
+
+        alert(
+            `نقاطك غير كافية. رصيدك الحالي: ${pts}`
+        );
+
+        return;
+    }
+
+    if (
+        !wallet ||
+        wallet.length < 10
+    ) {
+
+        alert(
+            'يرجى إدخال عنوان محفظة USDT صحيح.'
+        );
+
+        return;
+    }
+
+    const amount =
+        Number(
+            (
+                points * 0.04 / 100
+            ).toFixed(4)
+        );
+
+    let pointsSubtracted =
+        false;
+
+    try {
+
+        /*
+         * IMPORTANT:
+         * Deduct points BEFORE creating withdrawal.
+         * If creating withdrawal fails, refund points.
+         */
+
+        const {
+            data: newBalance,
+            error: balanceError
+        } =
+            await supabase.rpc(
+                'subtract_points',
+                {
+                    p_user_id:
+                        currentUser.telegram_id,
+
+                    p_points:
+                        points
+                }
+            );
+
+        if (balanceError) {
+            throw balanceError;
+        }
+
+        pts =
+            Number(newBalance);
+
+        pointsSubtracted =
+            true;
+
+        /*
+         * Create withdrawal request.
+         */
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from('withdrawals')
+                .insert({
+
+                    telegram_id:
+                        currentUser.telegram_id,
+
+                    username:
+                        currentUser.username ||
+                        null,
+
+                    points:
+                        points,
+
+                    amount_usdt:
+                        amount,
+
+                    wallet_address:
+                        wallet,
+
+                    status:
+                        'pending'
+                })
+                .select()
+                .single();
+
+        if (error) {
+
+            /*
+             * Refund the points.
+             */
+
+            await supabase.rpc(
+                'add_points',
+                {
+                    p_user_id:
+                        currentUser.telegram_id,
+
+                    p_points:
+                        points
+                }
+            );
+
+            pointsSubtracted =
+                false;
+
+            throw error;
+        }
+
+        closeModal(
+            'withdraw-modal'
+        );
+
+        document.getElementById(
+            'withdraw-wallet'
+        ).value = '';
+
+        document.getElementById(
+            'withdraw-points-input'
+        ).value = '';
+
+        render();
+
+        await loadWithdrawals();
+
+        alert(
+            'تم إرسال طلب السحب بنجاح ✅\n' +
+            'المبلغ: ' +
+            amount.toFixed(2) +
+            ' USDT'
+        );
+
+    } catch (err) {
+
+        console.error(
+            'submitWithdrawal:',
+            err
+        );
+
+        /*
+         * Safety refund if deduction happened
+         * but something failed afterwards.
+         */
+
+        if (pointsSubtracted) {
+
+            try {
+
+                await supabase.rpc(
+                    'add_points',
+                    {
+                        p_user_id:
+                            currentUser.telegram_id,
+
+                        p_points:
+                            points
+                    }
+                );
+
+            } catch (refundError) {
+
+                console.error(
+                    'Withdrawal refund failed:',
+                    refundError
+                );
+            }
+        }
+
+        alert(
+            'تعذر إرسال طلب السحب. حاول مرة أخرى.'
+        );
+
+        await loadData();
+    }
+}
+
+
+/* =========================================================
+   USER WITHDRAWAL HISTORY
+========================================================= */
+
+async function loadWithdrawals() {
+
+    const box =
+        document.getElementById(
+            'withdraw-history'
+        );
+
+    if (
+        !box ||
+        !currentUser
+    ) return;
+
+    try {
+
+        /*
+         * Normal user can only request
+         * his own telegram_id.
+         */
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from('withdrawals')
+                .select(
+                    'id,points,amount_usdt,wallet_address,status,created_at'
+                )
+                .eq(
+                    'telegram_id',
+                    currentUser.telegram_id
+                )
+                .order(
+                    'created_at',
+                    {
+                        ascending: false
+                    }
+                );
+
+        if (error) {
+            throw error;
+        }
+
+        if (
+            !data ||
+            !data.length
+        ) {
+
+            box.innerHTML = `
+                <div style="
+                    font-size:8.5pt;
+                    color:var(--muted);
+                    text-align:center;">
+
+                    لا توجد طلبات سحب.
+
+                </div>
+            `;
+
+            return;
+        }
+
+        box.innerHTML =
+            data.map(w => `
+
+                <div class="withdraw-row">
+
+                    <span>
+
+                        #${escapeHtml(w.id)}
+                        ·
+                        ${Number(w.points)}
+                        نقطة
+
+                        <br>
+
+                        <span style="
+                            font-size:7.5pt;
+                            color:var(--muted);">
+
+                            ${escapeHtml(
+                                String(
+                                    w.wallet_address || ''
+                                ).slice(0,12)
+                            )}…
+
+                        </span>
+
+                    </span>
+
+                    <span style="text-align:left;">
+
+                        <b>
+                            ${Number(
+                                w.amount_usdt
+                            ).toFixed(2)}
+                            USDT
+                        </b>
+
+                        <br>
+
+                        <span class="
+                            status-${escapeHtml(
+                                w.status
+                            )}">
+
+                            ${
+                                w.status === 'paid'
+                                    ? 'تم الدفع'
+                                    : w.status === 'rejected'
+                                        ? 'مرفوض'
+                                        : 'قيد المراجعة'
+                            }
+
+                        </span>
+
+                    </span>
+
+                </div>
+
+            `).join('');
+
+    } catch (err) {
+
+        console.error(
+            'loadWithdrawals:',
+            err
+        );
+    }
+}
+
+
+/* =========================================================
+   DAILY VISITORS
+========================================================= */
+
+const todayKey =
+    new Date()
+        .toISOString()
+        .slice(0,10);
+
+let visitorDate =
+    localStorage.getItem(
+        'visitorDate'
+    );
+
+let dailyVisitors =
+    parseInt(
+        localStorage.getItem(
+            'dailyVisitors'
+        ) || '0'
+    );
+
+if (
+    visitorDate !== todayKey
+) {
+
+    visitorDate =
+        todayKey;
+
+    dailyVisitors =
+        0;
+
+    localStorage.setItem(
+        'visitorDate',
+        visitorDate
+    );
+
+    localStorage.setItem(
+        'dailyVisitors',
+        '0'
+    );
+}
+
+const visitorSessionKey =
+    'visitorSession_' +
+    todayKey;
+
+if (
+    !sessionStorage.getItem(
+        visitorSessionKey
+    )
+) {
+
+    dailyVisitors += 1;
+
+    localStorage.setItem(
+        'dailyVisitors',
+        String(
+            dailyVisitors
+        )
+    );
+
+    sessionStorage.setItem(
+        visitorSessionKey,
+        '1'
+    );
+}
+
+
+/* =========================================================
+   LOAD DATA
+========================================================= */
+
+async function loadData() {
+
+    if (
+        !ensureSupabase(
+            'تحميل بيانات الحساب'
+        )
+    ) {
+
+        currentUser = null;
+
+        pts = 0;
+
+        tasks = [];
+
+        visitedTasks = [];
+
+        referralCount = 0;
+
+        referralPoints = 0;
+
+        render();
+
+        return;
+    }
+
+    const telegramUser =
+        getTelegramUser();
+
+    if (!telegramUser?.id) {
+
+        currentUser = null;
+
+        pts = 0;
+
+        tasks = [];
+
+        visitedTasks = [];
+
+        referralCount = 0;
+
+        referralPoints = 0;
+
+        render();
+
+        return;
+    }
+
+    try {
+
+        /*
+         * Create or get user.
+         */
+
+        const {
+            data: user,
+            error: userError
+        } =
+            await supabase.rpc(
+                'create_user',
+                {
+                    p_telegram_id:
+                        telegramUser.id,
+
+                    p_username:
+                        telegramUser.username ||
+                        null,
+
+                    p_first_name:
+                        telegramUser.first_name ||
+                        null
+                }
+            );
+
+        if (userError) {
+            throw userError;
+        }
+
+        if (!user) {
+
+            throw new Error(
+                'create_user returned no user'
+            );
+        }
+
+        currentUser =
+            user;
+
+        /*
+         * Welcome bonus.
+         */
+
+        await grantWelcomeBonusIfNew(
+            user
+        );
+
+        /*
+         * Referral.
+         */
+
+        await processReferral();
+
+        /*
+         * Load active tasks.
+         */
+
+        const {
+            data: taskRows,
+            error: taskError
+        } =
+            await supabase
+                .from('tasks')
+                .select(
+                    'id,title,description,reward_points,url,is_active,created_at,owner_id,required_visits'
+                )
+                .eq(
+                    'is_active',
+                    true
+                )
+                .order(
+                    'created_at',
+                    {
+                        ascending: true
+                    }
+                );
+
+        if (taskError) {
+            throw taskError;
+        }
+
+        /*
+         * Current user's completed tasks.
+         */
+
+        const {
+            data: completedRows,
+            error: completedError
+        } =
+            await supabase
+                .from('completed_tasks')
+                .select(
+                    'task_id'
+                )
+                .eq(
+                    'user_id',
+                    telegramUser.id
+                );
+
+        if (completedError) {
+            throw completedError;
+        }
+
+        /*
+         * Global completion count.
+         */
+
+        const {
+            data: allCompletedRows,
+            error: allCompletedError
+        } =
+            await supabase
+                .from('completed_tasks')
+                .select(
+                    'task_id'
+                );
+
+        if (allCompletedError) {
+            throw allCompletedError;
+        }
+
+        const completedCounts = {};
+
+        (
+            allCompletedRows || []
+        ).forEach(row => {
+
+            const id =
+                Number(row.task_id);
+
+            completedCounts[id] =
+                (
+                    completedCounts[id] ||
+                    0
+                ) + 1;
+        });
+
+        /*
+         * Referral statistics.
+         */
+
+        const {
+            data: referralRows,
+            error: referralError
+        } =
+            await supabase
+                .from('referrals')
+                .select(
+                    'reward_points'
+                )
+                .eq(
+                    'referrer_id',
+                    telegramUser.id
+                );
+
+        if (referralError) {
+            throw referralError;
+        }
+
+        /*
+         * Refresh balance from database.
+         */
+
+        pts =
+            Number(
+                user.points || 0
+            );
+
+        visitedTasks =
+            (
+                completedRows || []
+            ).map(
+                r => Number(
+                    r.task_id
+                )
+            );
+
+        referralCount =
+            (
+                referralRows || []
+            ).length;
+
+        referralPoints =
+            (
+                referralRows || []
+            ).reduce(
+                (sum,row) =>
+                    sum +
+                    Number(
+                        row.reward_points || 0
+                    ),
+                0
+            );
+
+        /*
+         * Convert DB tasks to UI tasks.
+         */
+
+        tasks =
+            (
+                taskRows || []
+            ).map(row => {
+
+                const id =
+                    Number(row.id);
+
+                const required =
+                    Number(
+                        row.required_visits ||
+                        1
+                    );
+
+                const completed =
+                    Number(
+                        completedCounts[id] ||
+                        0
+                    );
+
+                return {
+
+                    id,
+
+                    user:
+                        Number(
+                            row.owner_id
+                        ) ===
+                        Number(
+                            telegramUser.id
+                        )
+                            ? (
+                                currentLang === 'en'
+                                    ? 'You'
+                                    : 'أنت'
+                              )
+                            : (
+                                row.title ||
+                                'User'
+                              ),
+
+                    title:
+                        row.title,
+
+                    description:
+                        row.description ||
+                        '',
+
+                    url:
+                        row.url,
+
+                    left:
+                        Math.max(
+                            0,
+                            required -
+                            completed
+                        ),
+
+                    required_visits:
+                        required,
+
+                    reward_points:
+                        Number(
+                            row.reward_points ||
+                            1
+                        ),
+
+                    is_active:
+                        row.is_active,
+
+                    owner_id:
+                        row.owner_id
+                };
+            });
+
+        /*
+         * User's own published task.
+         */
+
+        myLink =
+            tasks.find(
+                task =>
+                    Number(
+                        task.owner_id
+                    ) ===
+                    Number(
+                        telegramUser.id
+                    )
+            ) || null;
+
+        render();
+
+    } catch (err) {
+
+        console.error(
+            'loadData:',
+            err
+        );
+
+        currentUser = null;
+
+        alert(
+            t('loadError')
+        );
+
+        render();
+    }
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(
+            /[&<>"']/g,
+            ch => ({
+                '&':'&amp;',
+                '<':'&lt;',
+                '>':'&gt;',
+                '"':'&quot;',
+                "'":'&#039;'
+            }[ch])
+        );
+}
+
+
+/* =========================================================
+   ADMIN WITHDRAWALS
+========================================================= */
+
+async function loadAdminWithdrawals() {
+
+    if (!isAdminUser()) {
+        return;
+    }
+
+    const box =
+        document.getElementById(
+            'adminWithdrawals'
+        );
+
+    if (!box) return;
+
+    box.innerHTML = `
+        <div style="color:#777;font-size:13px;">
+            جاري تحميل طلبات السحب...
+        </div>
+    `;
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .from('withdrawals')
+                .select(
+                    'id,telegram_id,username,points,amount_usdt,wallet_address,status,created_at'
+                )
+                .order(
+                    'created_at',
+                    {
+                        ascending:false
+                    }
+                );
+
+        if (error) {
+            throw error;
+        }
+
+        if (
+            !data ||
+            !data.length
+        ) {
+
+            box.innerHTML = `
+                <div style="
+                    color:#777;
+                    font-size:13px;">
+
+                    لا توجد طلبات سحب حالياً.
+
+                </div>
+            `;
+
+            return;
+        }
+
+        box.innerHTML =
+            data.map(w => `
+
+                <div class="admin-withdraw">
+
+                    <div>
+
+                        <b>
+                            #${escapeHtml(w.id)}
+                        </b>
+
+                        —
+                        ${escapeHtml(
+                            w.username ||
+                            'بدون username'
+                        )}
+
+                    </div>
+
+                    <div style="
+                        font-size:12px;
+                        color:#666;
+                        margin-top:4px;">
+
+                        Telegram ID:
+                        ${escapeHtml(
+                            w.telegram_id
+                        )}
+
+                        <br>
+
+                        النقاط:
+                        ${Number(w.points)}
+
+                        <br>
+
+                        المبلغ:
+
+                        <b>
+                            ${Number(
+                                w.amount_usdt
+                            ).toFixed(2)}
+                            USDT
+                        </b>
+
+                        <br>
+
+                        المحفظة:
+
+                        <span style="
+                            word-break:break-all;
+                            direction:ltr;
+                            display:inline-block;">
+
+                            ${escapeHtml(
+                                w.wallet_address
+                            )}
+
+                        </span>
+
+                        <br>
+
+                        الحالة:
+
+                        <b>
+
+                            ${
+                                w.status === 'paid'
+                                    ? 'تم الدفع'
+                                    : w.status === 'rejected'
+                                        ? 'مرفوض'
+                                        : 'قيد المراجعة'
+                            }
+
+                        </b>
+
+                    </div>
+
+                    ${
+                        w.status === 'pending'
+                            ? `
+                                <div class="admin-actions">
+
+                                    <button
+                                        style="background:#16a34a;color:white;"
+                                        onclick="adminSetWithdrawal(${Number(w.id)},'paid')">
+
+                                        ✅ تم الدفع
+
+                                    </button>
+
+                                    <button
+                                        style="background:#dc2626;color:white;"
+                                        onclick="adminSetWithdrawal(${Number(w.id)},'rejected')">
+
+                                        ❌ رفض
+
+                                    </button>
+
+                                </div>
+                            `
+                            : ''
+                    }
+
+                </div>
+
+            `).join('');
+
+    } catch (err) {
+
+        console.error(
+            'loadAdminWithdrawals:',
+            err
+        );
+
+        box.innerHTML = `
+            <div style="
+                color:#c00;
+                font-size:13px;">
+
+                تعذر تحميل طلبات السحب.
+
+            </div>
+        `;
+    }
+}
+
+
+/* =========================================================
+   ADMIN PROCESS WITHDRAWAL
+========================================================= */
+
+async function adminSetWithdrawal(
+    id,
+    status
+) {
+
+    if (!isAdminUser()) {
+
+        alert(
+            'هذه الخاصية متاحة للإدارة فقط.'
+        );
+
+        return;
+    }
+
+    if (
+        status !== 'paid' &&
+        status !== 'rejected'
+    ) {
+
+        return;
+    }
+
+    const confirmed =
+        confirm(
+            status === 'paid'
+                ? 'تأكيد أن الطلب تم دفعه؟'
+                : 'رفض الطلب وإرجاع النقاط للمستخدم؟'
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        /*
+         * Read the request.
+         */
+
+        const {
+            data: rows,
+            error: getError
+        } =
+            await supabase
+                .from('withdrawals')
+                .select(
+                    'id,telegram_id,points,status'
+                )
+                .eq(
+                    'id',
+                    id
+                )
+                .limit(1);
+
+        if (getError) {
+            throw getError;
+        }
+
+        const row =
+            rows?.[0];
+
+        if (
+            !row ||
+            row.status !== 'pending'
+        ) {
+
+            alert(
+                'هذا الطلب تمت معالجته مسبقاً.'
+            );
+
+            await loadAdminWithdrawals();
+
+            return;
+        }
+
+        /*
+         * Update status FIRST.
+         */
+
+        const response =
+            await fetch(
+                `${SUPABASE_URL}/rest/v1/withdrawals?id=eq.${encodeURIComponent(id)}`,
+                {
+                    method:'PATCH',
+
+                    headers: {
+                        apikey:
+                            SUPABASE_KEY,
+
+                        Authorization:
+                            `Bearer ${SUPABASE_KEY}`,
+
+                        'Content-Type':
+                            'application/json',
+
+                        Prefer:
+                            'return=minimal'
+                    },
+
+                    body:
+                        JSON.stringify({
+                            status
+                        })
+                }
+            );
+
+        if (!response.ok) {
+
+            const text =
+                await response.text();
+
+            throw new Error(
+                text ||
+                `HTTP ${response.status}`
+            );
+        }
+
+        /*
+         * If rejected, return points.
+         */
+
+        if (
+            status === 'rejected'
+        ) {
+
+            const {
+                error: refundError
+            } =
+                await supabase.rpc(
+                    'add_points',
+                    {
+                        p_user_id:
+                            row.telegram_id,
+
+                        p_points:
+                            Number(
+                                row.points
+                            )
+                    }
+                );
+
+            if (refundError) {
+
+                console.error(
+                    'Refund failed after rejection:',
+                    refundError
+                );
+
+                alert(
+                    'تم رفض الطلب، لكن حدث خطأ أثناء إرجاع النقاط. يجب مراجعة رصيد المستخدم.'
+                );
+
+                await loadAdminWithdrawals();
+
+                return;
+            }
+        }
+
+        await loadAdminWithdrawals();
+
+        alert(
+            status === 'paid'
+                ? 'تم تسجيل الدفع ✅'
+                : 'تم رفض الطلب وإرجاع النقاط للمستخدم ✅'
+        );
+
+    } catch (err) {
+
+        console.error(
+            'adminSetWithdrawal:',
+            err
+        );
+
+        alert(
+            'تعذر تحديث الطلب. تأكد من صلاحيات Supabase.'
+        );
+    }
+}
+
+
+/* =========================================================
+   ADMIN PANEL
+========================================================= */
+
+function addAdminButton() {
+
+    if (!isAdminUser()) {
+        return;
+    }
+
+    if (
+        document.getElementById(
+            'adminButton'
+        )
+    ) {
+        return;
+    }
+
+    const button =
+        document.createElement(
+            'button'
+        );
+
+    button.id =
+        'adminButton';
+
+    button.textContent =
+        '⚙️ الإدارة';
+
+    button.onclick =
+        async function() {
+
+            const panel =
+                document.getElementById(
+                    'adminPanel'
+                );
+
+            const countElement =
+                document.getElementById(
+                    'adminUsersCount'
+                );
+
+            if (panel) {
+
+                panel.style.display =
+                    'block';
+            }
+
+            if (countElement) {
+
+                countElement.textContent =
+                    'جاري التحميل...';
+            }
+
+            await loadAdminWithdrawals();
+
+            if (!countElement) {
+                return;
+            }
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/users?select=telegram_id`,
+                        {
+                            method:'HEAD',
+
+                            headers: {
+                                apikey:
+                                    SUPABASE_KEY,
+
+                                Authorization:
+                                    `Bearer ${SUPABASE_KEY}`,
+
+                                Prefer:
+                                    'count=exact'
+                            }
+                        }
+                    );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `HTTP ${response.status}`
+                    );
+                }
+
+                const range =
+                    response.headers.get(
+                        'content-range'
+                    );
+
+                if (!range) {
+
+                    throw new Error(
+                        'No content-range'
+                    );
+                }
+
+                const total =
+                    range.split('/')[1];
+
+                if (
+                    total === undefined ||
+                    total === '*'
+                ) {
+
+                    throw new Error(
+                        'Invalid user count'
+                    );
+                }
+
+                countElement.textContent =
+                    Number(total);
+
+            } catch (err) {
+
+                console.error(
+                    'Admin users count:',
+                    err
+                );
+
+                countElement.textContent =
+                    'خطأ';
+            }
+        };
+
+    document.body.appendChild(
+        button
+    );
+}
+
+
+/* =========================================================
+   CONNECTION STATUS
+========================================================= */
+
+function updateConnectionStatus() {
+
+    const el =
+        document.getElementById(
+            'connectionStatus'
+        );
+
+    if (!el) return;
+
+    const telegram =
+        !!(
+            window.Telegram &&
+            window.Telegram.WebApp &&
+            window.Telegram.WebApp
+                .initDataUnsafe
+        );
+
+    const online =
+        navigator.onLine;
+
+    let text =
+        telegram
+            ? 'Telegram ✓'
+            : 'Chrome/Browser';
+
+    text +=
+        online
+            ? ' • Internet ✓'
+            : ' • Internet ✕';
+
+    text +=
+        supabaseReady
+            ? ' • Supabase ✓'
+            : ' • Supabase ✕';
+
+    el.textContent =
+        text;
+}
+
+
+/* =========================================================
+   CLOSE ADMIN
+========================================================= */
+
+document
+    .getElementById(
+        'closeAdminPanel'
+    )
+    ?.addEventListener(
+        'click',
+        function() {
+
+            const panel =
+                document.getElementById(
+                    'adminPanel'
+                );
+
+            if (panel) {
+
+                panel.style.display =
+                    'none';
+            }
+        }
+    );
+
+
+/* =========================================================
+   START
+========================================================= */
+
+window.addEventListener(
+    'online',
+    updateConnectionStatus
+);
+
+window.addEventListener(
+    'offline',
+    updateConnectionStatus
+);
+
+applyLanguage();
+
+updateAdminVisibility();
+
+setTimeout(
+    addAdminButton,
+    500
+);
+
+setTimeout(
+    updateConnectionStatus,
+    500
+);
+
+setTimeout(
+    loadData,
+    0
+);
+
 </script>
-<script>
-document.getElementById('closeAdminPanel').onclick = function () {
-    document.getElementById('adminPanel').style.display = 'none';
-};
-</script>
+
 </body>
 </html>
