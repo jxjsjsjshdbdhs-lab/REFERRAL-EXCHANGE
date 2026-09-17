@@ -199,6 +199,9 @@
         <div class="card" style="text-align:center;">
             <div style="font-size:9pt;color:var(--muted);" data-i18n="tasksIntro">نفّذ المهام المتاحة واحصل على نقطة مقابل كل زيارة.</div>
         </div>
+        <div id="adminAddTaskBox" style="display:none;margin:10px 0;">
+            <button class="btn btn-purple" style="width:100%;background:var(--emerald);color:#0f172a;font-weight:bold;" onclick="openAdminAddTask()">➕ إضافة مهمة</button>
+        </div>
         <div id="tasks-list"></div>
     </div>
 
@@ -603,7 +606,23 @@
 
         setInterval(updateRewardUI, 1000);
 
-        function showPage(page) {
+        function isAdminUser(){
+    const u = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    return !!u && Number(u.id) === 5339335944;
+}
+
+function openAdminAddTask(){
+    if(!isAdminUser()){ alert('هذه الخاصية متاحة للإدارة فقط.'); return; }
+    const modal=document.getElementById('add-modal');
+    if(modal) modal.style.display='flex';
+}
+
+function updateAdminTaskButton(){
+    const box=document.getElementById('adminAddTaskBox');
+    if(box) box.style.display=isAdminUser()?'block':'none';
+}
+
+function showPage(page) {
             const pages = { home:'home-page', tasks:'tasks-page', referrals:'referrals-page', withdraw:'withdraw-page' };
             Object.entries(pages).forEach(([key,id]) => {
                 const el=document.getElementById(id);
@@ -921,6 +940,7 @@ function getTelegramUser() {
         }
 
         function renderTasksPage() {
+            updateAdminTaskButton();
             const box=document.getElementById('tasks-list');
             if(!box) return;
             const available=tasks.filter(t=>Number(t.owner_id)!==Number(currentUser?.telegram_id) && Number(t.left||0)>0 && t.is_active!==false && !visitedTasks.includes(Number(t.id)));
