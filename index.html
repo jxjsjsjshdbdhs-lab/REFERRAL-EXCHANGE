@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-title">منصة تبادل الإحالات</title>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg-1: #0f172a;
@@ -20,7 +23,12 @@
             --muted: #94a3b8;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
 
         body {
             background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
@@ -33,1243 +41,4216 @@
             min-height: 100vh;
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .title { font-size: 18pt; font-weight: 900; color: var(--cyan); }
-        .pill { background: rgba(255,255,255,0.1); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 10pt; font-weight: 700; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 4px; text-align: center; }
-        .stat-val { font-size: 13pt; font-weight: 900; color: #fff; }
-        .stat-lbl { font-size: 7.5pt; color: var(--muted); margin-top: 2px; }
-
-        .banner {
-            background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.25));
-            border: 1px solid var(--amber); border-radius: 14px; padding: 12px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
+        .title {
+            font-size: 18pt;
+            font-weight: 900;
+            color: var(--cyan);
+        }
+
+        .pill {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 10pt;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 4px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 13pt;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .stat-lbl {
+            font-size: 7.5pt;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
 
         .btn {
-            border: none; border-radius: 10px; padding: 10px 14px;
-            font-weight: 800; font-size: 10pt; cursor: pointer; display: block; width: 100%; text-align: center;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 800;
+            font-size: 10pt;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            text-align: center;
         }
-        .btn-amber { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; }
-        .btn-purple { background: linear-gradient(135deg, var(--purple), #6366f1); color: #fff; }
-        .btn-emerald { background: rgba(52,211,153,0.2); color: var(--emerald); border: 1px solid var(--emerald); }
+
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .btn-amber {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, var(--purple), #6366f1);
+            color: #fff;
+        }
+
+        .btn-emerald {
+            background: rgba(52,211,153,0.2);
+            color: var(--emerald);
+            border: 1px solid var(--emerald);
+        }
 
         .link-box {
-            background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px;
-            padding: 8px; font-size: 9pt; color: var(--cyan); margin: 10px 0; direction: ltr; text-align: left; word-break: break-all;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 9pt;
+            color: var(--cyan);
+            margin: 10px 0;
+            direction: ltr;
+            text-align: left;
+            word-break: break-all;
         }
 
         .modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
         }
-        .modal-box { background: #1e293b; border: 1px solid var(--border); border-radius: 18px; padding: 18px; width: 100%; max-width: 360px; }
+
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            width: 100%;
+            max-width: 360px;
+        }
 
         .inp {
-            width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--border);
-            border-radius: 8px; color: #fff; margin: 6px 0 14px 0; outline: none; font-size: 10pt;
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            margin: 6px 0 14px 0;
+            outline: none;
+            font-size: 10pt;
+        }
+
+        textarea.inp {
+            min-height: 80px;
         }
 
         .nav {
-            position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
-            width: calc(100% - 20px); max-width: 440px; background: rgba(15, 23, 42, 0.95);
-            border: 1px solid var(--border); border-radius: 16px; display: flex; justify-content: space-around; padding: 8px 0;
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 20px);
+            max-width: 440px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 999;
         }
-        body.en { direction:ltr; }
-        body.en .link-box { direction:ltr; text-align:left; }
-        body.en .stat-box, body.en .card { text-align:left; }
-        body.en .header { direction:ltr; }
-        .nav-item { color: var(--muted); font-size: 8pt; font-weight: 700; text-align: center; cursor: pointer; }
-        body.en { direction:ltr; }
-        body.en .link-box { direction:ltr; text-align:left; }
+
+        .nav-item {
+            color: var(--muted);
+            font-size: 8pt;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            min-width: 70px;
+        }
+
+        .nav-item.active {
+            color: var(--cyan);
+        }
+
+        body.en {
+            direction: ltr;
+        }
+
+        body.en .link-box {
+            direction: ltr;
+            text-align: left;
+        }
+
+        body.en .stat-box,
+        body.en .card {
+            text-align: left;
+        }
+
+        body.en .header {
+            direction: ltr;
+        }
+
+        #connectionStatus {
+            pointer-events: none;
+        }
     </style>
 </head>
+
 <body>
 
+    <!-- Header -->
     <div class="header">
         <div class="title" data-i18n="appName">تبادل الإحالات</div>
-        <div class="pill">💎 Gram: <span id="gram-bal" style="color:var(--amber);">0.50</span></div>
+
+        <div class="pill">
+            💎 Gram:
+            <span id="gram-bal" style="color:var(--amber);">0.50</span>
+        </div>
     </div>
 
-    <div class="card" style="padding:10px;margin-bottom:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;">
-        <span style="font-size:9pt;color:var(--muted);" data-i18n="languageLabel">🌐 اللغة</span>
-        <button id="lang-toggle" class="btn btn-emerald" style="width:auto;padding:6px 12px;" onclick="toggleLanguage()">English</button>
+    <!-- Language -->
+    <div class="card" style="
+        padding:10px;
+        margin-bottom:12px;
+        display:flex;
+        gap:8px;
+        align-items:center;
+        justify-content:space-between;
+    ">
+        <span style="font-size:9pt;color:var(--muted);" data-i18n="languageLabel">
+            🌐 اللغة
+        </span>
+
+        <button
+            id="lang-toggle"
+            class="btn btn-emerald"
+            style="width:auto;padding:6px 12px;"
+            onclick="toggleLanguage()"
+        >
+            English
+        </button>
     </div>
 
+    <!-- Reward -->
     <div class="card" style="text-align:center;">
         <div style="font-size:24px;">🎁</div>
-        <div style="font-size:13pt;font-weight:900;" id="reward-title">مكافأة كل 12 ساعة</div>
-        <div style="font-size:9pt;color:var(--muted);margin:5px 0;" id="reward-status">احصل على 8 نقاط مجاناً</div>
-        <button class="btn btn-amber" id="reward-btn" onclick="claimReward()">استلام 8 نقاط</button>
-    </div>
 
-    <div id="home-page">
-        <div class="stats-grid">
-            <div class="stat-box"><div class="stat-val" id="total-tasks-cnt">2</div><div class="stat-lbl" data-i18n="availableLinks">الروابط المتاحة</div></div>
-            <div class="stat-box"><div class="stat-val" id="pts-bal" style="color:var(--amber);">0</div><div class="stat-lbl" data-i18n="currentBalance">رصيدك الحالي</div></div>
-            <div class="stat-box"><div class="stat-val" id="completed-cnt">0</div><div class="stat-lbl" data-i18n="visitedLinks">روابط زرتها</div></div>
+        <div
+            style="font-size:13pt;font-weight:900;"
+            id="reward-title"
+            data-i18n="rewardTitle"
+        >
+            مكافأة كل 12 ساعة
         </div>
 
+        <div
+            style="font-size:9pt;color:var(--muted);margin:5px 0;"
+            id="reward-status"
+        >
+            احصل على 15 نقطة مجاناً
+        </div>
+
+        <button
+            class="btn btn-amber"
+            id="reward-btn"
+            onclick="claimReward()"
+        >
+            استلام 15 نقطة
+        </button>
+    </div>
+
+    <!-- Home -->
+    <div id="home-page">
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+
+            <div class="stat-box">
+                <div class="stat-val" id="total-tasks-cnt">0</div>
+                <div class="stat-lbl" data-i18n="availableLinks">
+                    الروابط المتاحة
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div
+                    class="stat-val"
+                    id="pts-bal"
+                    style="color:var(--amber);"
+                >
+                    0
+                </div>
+
+                <div class="stat-lbl" data-i18n="currentBalance">
+                    رصيدك الحالي
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-val" id="completed-cnt">0</div>
+
+                <div class="stat-lbl" data-i18n="visitedLinks">
+                    روابط زرتها
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Daily Visitors -->
         <div class="card" style="text-align:center;">
             <div style="font-size:24px;">👥</div>
-            <div style="font-size:16pt;font-weight:900;margin:4px 0;" id="daily-visitors">0</div>
-            <div style="font-size:8.5pt;color:var(--muted);" data-i18n="dailyVisitors">زائر البوت اليوم</div>
+
+            <div
+                style="font-size:16pt;font-weight:900;margin:4px 0;"
+                id="daily-visitors"
+            >
+                0
+            </div>
+
+            <div
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="dailyVisitors"
+            >
+                زائر البوت اليوم
+            </div>
         </div>
 
-    <!-- المتجر مؤجل حالياً -->
+        <!-- Active Task -->
+        <div class="card" id="task-card">
 
-    <!-- Active Task Card -->
-    <div class="card" id="task-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:800; font-size:10pt;" id="task-user">ناشر الرابط: Muktar</span>
-            <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">متبقي: 6</span>
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+            ">
+                <span
+                    style="font-weight:800;font-size:10pt;"
+                    id="task-user"
+                >
+                    ناشر الرابط
+                </span>
+
+                <span
+                    style="
+                        font-size:8pt;
+                        background:rgba(34,211,238,0.2);
+                        color:var(--cyan);
+                        padding:2px 6px;
+                        border-radius:6px;
+                    "
+                    id="task-left"
+                >
+                    متبقي: 0
+                </span>
+            </div>
+
+            <div
+                id="task-description"
+                style="
+                    font-size:8.5pt;
+                    color:var(--muted);
+                    line-height:1.6;
+                    margin-top:8px;
+                "
+            ></div>
+
+            <div class="link-box" id="task-url">
+                لا توجد مهمة حالياً
+            </div>
+
+            <button
+                class="btn btn-purple"
+                onclick="visitLink()"
+            >
+                ↗ زيارة الرابط (+2 نقطة)
+            </button>
+
         </div>
-        <div id="task-description" style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-top:8px;"></div>
-        <div class="link-box" id="task-url">https://t.me/example_bot</div>
-        <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
+
+        <!-- My Link -->
+        <div class="card">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:8px;
+            ">
+
+                <span
+                    style="font-weight:800;font-size:10pt;"
+                    data-i18n="yourPublishedLink"
+                >
+                    رابطك المنشور
+                </span>
+
+                <button
+                    class="btn btn-emerald"
+                    style="width:auto;padding:4px 10px;"
+                    onclick="openModal('add-modal')"
+                    data-i18n="createTask"
+                >
+                    + إنشاء مهمة
+                </button>
+
+            </div>
+
+            <div
+                id="my-task-info"
+                style="font-size:8.5pt;color:var(--muted);"
+            >
+                لا يوجد رابط مضاف حالياً.
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- My Link Card -->
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-weight:800; font-size:10pt;" data-i18n="yourPublishedLink">رابطك المنشور</span>
-            <button class="btn btn-emerald" style="width:auto; padding:4px 10px;" onclick="openModal('add-modal')" data-i18n="createTask">+ إنشاء مهمة</button>
-        </div>
-        <div id="my-task-info" style="font-size:8.5pt; color:var(--muted);">لا يوجد رابط مضاف حالياً.</div>
-    </div>
-
-    <!-- Modal: Buy Points -->
+    <!-- Buy Points Modal -->
     <div class="modal" id="buy-modal">
+
         <div class="modal-box">
-            <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="buyPointsTitle">شراء النقاط بعملة Gram 💎</h3>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="choosePackage">اختر الباقة:</label>
+
+            <h3
+                style="margin-bottom:10px;font-size:12pt;"
+                data-i18n="buyPointsTitle"
+            >
+                شراء النقاط بعملة Gram 💎
+            </h3>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="choosePackage"
+            >
+                اختر الباقة:
+            </label>
+
             <select class="inp" id="buy-pkg">
                 <option value="100">100 نقطة = 0.05 Gram</option>
                 <option value="300">300 نقطة = 0.15 Gram</option>
                 <option value="500">500 نقطة = 0.25 Gram</option>
                 <option value="1000">1000 نقطة = 0.50 Gram</option>
             </select>
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-amber" onclick="buyPoints()" data-i18n="confirmPurchase">تأكيد الشراء</button>
-                <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('buy-modal')" data-i18n="cancel">إلغاء</button>
+
+            <div style="display:flex;gap:8px;">
+
+                <button
+                    class="btn btn-amber"
+                    onclick="buyPoints()"
+                    data-i18n="confirmPurchase"
+                >
+                    تأكيد الشراء
+                </button>
+
+                <button
+                    class="btn btn-purple"
+                    style="background:rgba(255,255,255,0.1);"
+                    onclick="closeModal('buy-modal')"
+                    data-i18n="cancel"
+                >
+                    إلغاء
+                </button>
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- Modal: Add Link -->
+    <!-- Add Task Modal -->
     <div class="modal" id="add-modal">
+
         <div class="modal-box">
-            <h3 style="margin-bottom:10px; font-size:12pt;" data-i18n="newTaskTitle">إنشاء مهمة جديدة 🔗</h3>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="referralLinkLabel">رابط الإحالة:</label>
-            <input type="url" class="inp" id="add-url" data-i18n-placeholder="urlPlaceholder" placeholder="https://t.me/your_bot">
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="taskDescriptionLabel">وصف المهمة:</label>
-            <textarea class="inp" id="add-description" data-i18n-placeholder="descriptionPlaceholder" placeholder="اكتب وصفاً مختصراً للمهمة" rows="3" style="resize:vertical;"></textarea>
-            <label style="font-size:8.5pt; color:var(--muted);" data-i18n="requiredVisits">عدد الزيارات المطلوبة:</label>
-            <input type="number" class="inp" id="add-cnt" data-i18n-placeholder="visitsPlaceholder" placeholder="من 1 إلى 20" min="1" max="20">
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-purple" style="background:var(--emerald); color:#0f172a;" onclick="addLink()" data-i18n="publishNow">نشر الآن</button>
-                <button class="btn btn-purple" style="background:rgba(255,255,255,0.1);" onclick="closeModal('add-modal')">إلغاء</button>
+
+            <h3
+                style="margin-bottom:10px;font-size:12pt;"
+                data-i18n="newTaskTitle"
+            >
+                إنشاء مهمة جديدة 🔗
+            </h3>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="taskLinkLabel"
+            >
+                رابط المهمة:
+            </label>
+
+            <input
+                type="url"
+                class="inp"
+                id="add-url"
+                placeholder="https://t.me/your_bot"
+            >
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="taskDescriptionLabel"
+            >
+                وصف المهمة:
+            </label>
+
+            <textarea
+                class="inp"
+                id="add-description"
+                placeholder="اكتب وصفاً مختصراً للمهمة"
+                rows="3"
+                style="resize:vertical;"
+            ></textarea>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="requiredVisits"
+            >
+                عدد الزيارات المطلوبة:
+            </label>
+
+            <input
+                type="number"
+                class="inp"
+                id="add-cnt"
+                placeholder="من 1 إلى 20"
+                min="1"
+                max="20"
+            >
+
+            <div
+                style="
+                    font-size:8pt;
+                    color:var(--muted);
+                    margin-top:-8px;
+                    margin-bottom:12px;
+                    text-align:center;
+                "
+                data-i18n="taskCostInfo"
+            >
+                كل زيارة تكلف 2 نقطة
             </div>
-        </div>
-    </div>
 
-    </div> <!-- /home-page -->
+            <div style="display:flex;gap:8px;">
 
-    <div id="referrals-page" style="display:none;">
-        <div class="card">
-            <div style="font-size:18pt;font-weight:900;color:var(--cyan);margin-bottom:6px;" data-i18n="referralsTitle">👥 الإحالات</div>
-            <p style="font-size:9pt;color:var(--muted);line-height:1.7;">
-                <span data-i18n="referralsIntro">شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.</span>
-            </p>
-        </div>
+                <button
+                    class="btn btn-purple"
+                    style="background:var(--emerald);color:#0f172a;"
+                    onclick="addLink()"
+                    data-i18n="publishNow"
+                >
+                    نشر الآن
+                </button>
 
-    <!-- Referral Card -->
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-weight:800; font-size:10pt;" data-i18n="referralSystem">نظام الإحالة 👥</span>
-            <span style="font-size:8pt; background:rgba(52,211,153,0.15); color:var(--emerald); padding:3px 7px; border-radius:7px;">+40 نقطة</span>
-        </div>
-        <p style="font-size:8.5pt; color:var(--muted); margin-bottom:8px;">
-            <span data-i18n="referralDescription">ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.</span>
-        </p>
-        <div class="link-box" id="referral-url">جارٍ تجهيز رابط الإحالة...</div>
-        <div style="display:flex; gap:8px;">
-            <button class="btn btn-emerald" onclick="copyReferral()" data-i18n="copyLink">📋 نسخ الرابط</button>
-            <button class="btn btn-purple" onclick="shareReferral()" data-i18n="share">📤 مشاركة</button>
-        </div>
-        <div style="margin-top:10px; font-size:8.5pt; color:var(--muted);">
-            <span data-i18n="referralCountLabel">عدد الإحالات:</span> <b id="ref-count" style="color:#fff;">0</b>
-            &nbsp;|&nbsp;
-            <span data-i18n="referralPointsLabel">نقاط الإحالة:</span> <b id="ref-points" style="color:var(--amber);">0</b>
-        </div>
-    </div>
+                <button
+                    class="btn btn-purple"
+                    style="background:rgba(255,255,255,0.1);"
+                    onclick="closeModal('add-modal')"
+                    data-i18n="cancel"
+                >
+                    إلغاء
+                </button>
 
+            </div>
+
+        </div>
 
     </div>
 
     <!-- Withdraw Page -->
     <div id="withdraw-page" style="display:none;">
+
         <div class="card">
-            <div style="font-size:18pt;font-weight:900;color:var(--cyan);margin-bottom:6px;" data-i18n="withdrawTitle">💰 سحب USDT</div>
-            <p style="font-size:9pt;color:var(--muted);line-height:1.7;" data-i18n="withdrawIntro">كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.</p>
-        </div>
-        <div class="card">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-                <div class="stat-box"><div class="stat-val" id="withdraw-points-balance">0</div><div class="stat-lbl" data-i18n="pointsBalance">رصيد النقاط</div></div>
-                <div class="stat-box"><div class="stat-val" id="withdraw-usdt-balance" style="color:var(--emerald);">0.00</div><div class="stat-lbl">USDT</div></div>
+
+            <div
+                style="
+                    font-size:18pt;
+                    font-weight:900;
+                    color:var(--cyan);
+                    margin-bottom:6px;
+                "
+                data-i18n="withdrawTitle"
+            >
+                💰 سحب USDT
             </div>
-            <label style="font-size:8.5pt;color:var(--muted);" data-i18n="withdrawPointsLabel">عدد النقاط المراد سحبها:</label>
-            <input type="number" class="inp" id="withdraw-points" min="80" step="20" placeholder="80">
-            <div id="withdraw-usdt-preview" style="text-align:center;font-size:12pt;font-weight:900;color:var(--emerald);margin:-4px 0 12px;">0.00 USDT</div>
-            <label style="font-size:8.5pt;color:var(--muted);" data-i18n="walletLabel">عنوان محفظة USDT:</label>
-            <input type="text" class="inp" id="withdraw-wallet" placeholder="TRC20 wallet address" dir="ltr">
-            <button class="btn btn-emerald" onclick="requestWithdrawal()" data-i18n="requestWithdraw">طلب السحب</button>
-            <div id="withdraw-history" style="margin-top:14px;"></div>
+
+            <p
+                style="
+                    font-size:9pt;
+                    color:var(--muted);
+                    line-height:1.7;
+                "
+                data-i18n="withdrawIntro"
+            >
+                كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.
+            </p>
+
         </div>
+
+        <div class="card">
+
+            <div style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:8px;
+                margin-bottom:12px;
+            ">
+
+                <div class="stat-box">
+                    <div
+                        class="stat-val"
+                        id="withdraw-points-balance"
+                    >
+                        0
+                    </div>
+
+                    <div
+                        class="stat-lbl"
+                        data-i18n="pointsBalance"
+                    >
+                        رصيد النقاط
+                    </div>
+                </div>
+
+                <div class="stat-box">
+
+                    <div
+                        class="stat-val"
+                        id="withdraw-usdt-balance"
+                        style="color:var(--emerald);"
+                    >
+                        0.00
+                    </div>
+
+                    <div class="stat-lbl">
+                        USDT
+                    </div>
+
+                </div>
+
+            </div>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="withdrawPointsLabel"
+            >
+                عدد النقاط المراد سحبها:
+            </label>
+
+            <input
+                type="number"
+                class="inp"
+                id="withdraw-points"
+                min="80"
+                step="20"
+                placeholder="80"
+            >
+
+            <div
+                id="withdraw-usdt-preview"
+                style="
+                    text-align:center;
+                    font-size:12pt;
+                    font-weight:900;
+                    color:var(--emerald);
+                    margin:-4px 0 12px;
+                "
+            >
+                0.00 USDT
+            </div>
+
+            <label
+                style="font-size:8.5pt;color:var(--muted);"
+                data-i18n="walletLabel"
+            >
+                عنوان محفظة USDT:
+            </label>
+
+            <input
+                type="text"
+                class="inp"
+                id="withdraw-wallet"
+                placeholder="TRC20 wallet address"
+                dir="ltr"
+            >
+
+            <button
+                class="btn btn-emerald"
+                onclick="requestWithdrawal()"
+                data-i18n="requestWithdraw"
+            >
+                طلب السحب
+            </button>
+
+            <div
+                id="withdraw-history"
+                style="margin-top:14px;"
+            ></div>
+
+        </div>
+
     </div>
 
     <!-- Bottom Navigation -->
     <div class="nav">
-        <div id="nav-home" class="nav-item active" onclick="showPage('home')">🏠<br><span data-i18n="home">الرئيسية</span></div>
-        <div id="nav-referrals" class="nav-item" onclick="showPage('referrals')">👥<br><span data-i18n="referrals">الإحالات</span></div>
-        <div id="nav-withdraw" class="nav-item" onclick="showPage('withdraw')">💰<br><span data-i18n="withdraw">السحب</span></div>
-        <div class="nav-item" onclick="alert(t('storeUnavailable'))">💎<br><span data-i18n="store">المتجر</span></div>
+
+        <div
+            id="nav-home"
+            class="nav-item active"
+            onclick="showPage('home')"
+        >
+            🏠<br>
+            <span data-i18n="home">الرئيسية</span>
+        </div>
+
+        <div
+            id="nav-withdraw"
+            class="nav-item"
+            onclick="showPage('withdraw')"
+        >
+            💰<br>
+            <span data-i18n="withdraw">السحب</span>
+        </div>
+
+        <div
+            class="nav-item"
+            onclick="alert(t('storeUnavailable'))"
+        >
+            💎<br>
+            <span data-i18n="store">المتجر</span>
+        </div>
+
     </div>
 
-    <script>
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
+<script>
+
+    /* ================================
+       TELEGRAM
+    ================================= */
+
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+    }
+
+
+    /* ================================
+       SUPABASE
+    ================================= */
+
+    const SUPABASE_URL =
+        "https://lquaccwytlxnosjbtdvk.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi";
+
+
+    class RestQuery {
+
+        constructor(client, table) {
+            this.client = client;
+            this.table = table;
+            this.params = new URLSearchParams();
+            this.headers = {};
+            this.method = 'GET';
+            this.body = null;
+            this.returnSingle = false;
         }
 
-        // Supabase configuration
-        // We use Supabase REST directly so the page does NOT depend on jsDelivr.
-        const SUPABASE_URL = "https://lquaccwytlxnosjbtdvk.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_1CuwndQnWV16Lhm7uQ7elw_ym16t_Bi";
+        select(columns='*') {
+            this.params.set('select', columns);
+            this.headers['Prefer'] = 'return=representation';
+            return this;
+        }
 
-        class RestQuery {
-            constructor(client, table) {
-                this.client = client;
-                this.table = table;
-                this.params = new URLSearchParams();
-                this.headers = {};
-                this.method = 'GET';
-                this.body = null;
-                this.returnSingle = false;
-            }
+        eq(column, value) {
+            this.params.set(column, `eq.${value}`);
+            return this;
+        }
 
-            select(columns='*') {
-                this.params.set('select', columns);
-                this.headers['Prefer'] = 'return=representation';
-                return this;
-            }
+        order(column, options = {}) {
+            const direction =
+                options.ascending === false ? 'desc' : 'asc';
 
-            eq(column, value) {
-                this.params.set(column, `eq.${value}`);
-                return this;
-            }
+            this.params.set(
+                'order',
+                `${column}.${direction}`
+            );
 
-            order(column, options = {}) {
-                const direction = options.ascending === false ? 'desc' : 'asc';
-                this.params.set('order', `${column}.${direction}`);
-                return this;
-            }
+            return this;
+        }
 
-            insert(row) {
-                this.method = 'POST';
-                this.body = row;
-                this.headers['Prefer'] = 'return=representation';
-                return this;
-            }
+        insert(row) {
+            this.method = 'POST';
+            this.body = row;
+            this.headers['Prefer'] =
+                'return=representation';
 
-            single() {
-                this.returnSingle = true;
-                return this;
-            }
+            return this;
+        }
 
-            async execute() {
-                let url = `${this.client.url}/rest/v1/${encodeURIComponent(this.table)}`;
-                const options = {
-                    method: this.method,
-                    headers: {
-                        apikey: this.client.key,
-                        Authorization: `Bearer ${this.client.key}`,
-                        'Content-Type': 'application/json',
-                        ...this.headers
-                    }
-                };
+        single() {
+            this.returnSingle = true;
+            return this;
+        }
 
-                if (this.method === 'GET') {
-                    const query = this.params.toString();
-                    if (query) url += `?${query}`;
-                } else {
-                    const query = this.params.toString();
-                    if (query) url += `?${query}`;
-                    options.body = JSON.stringify(this.body);
+        async execute() {
+
+            let url =
+                `${this.client.url}/rest/v1/${encodeURIComponent(this.table)}`;
+
+            const options = {
+                method: this.method,
+
+                headers: {
+                    apikey: this.client.key,
+                    Authorization: `Bearer ${this.client.key}`,
+                    'Content-Type': 'application/json',
+                    ...this.headers
                 }
+            };
+
+            const query = this.params.toString();
+
+            if (query) {
+                url += `?${query}`;
+            }
+
+            if (this.method !== 'GET') {
+                options.body = JSON.stringify(this.body);
+            }
+
+            try {
+
+                const response =
+                    await fetch(url, options);
+
+                const raw =
+                    await response.text();
+
+                let data = null;
 
                 try {
-                    const response = await fetch(url, options);
-                    const raw = await response.text();
-                    let data = null;
-                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
+                    data = raw ? JSON.parse(raw) : null;
+                } catch (_) {
+                    data = raw;
+                }
 
-                    if (!response.ok) {
-                        const error = {
-                            message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
+                if (!response.ok) {
+
+                    const error = {
+                        message:
+                            (data &&
+                                (
+                                    data.message ||
+                                    data.error_description ||
+                                    data.hint
+                                )
+                            ) ||
+                            `HTTP ${response.status}`,
+
+                        code: data?.code,
+                        details: data?.details,
+                        hint: data?.hint,
+                        status: response.status
+                    };
+
+                    return {
+                        data: null,
+                        error
+                    };
+                }
+
+                if (this.returnSingle) {
+
+                    if (Array.isArray(data)) {
+
+                        if (data.length === 0) {
+
+                            return {
+                                data: null,
+                                error: {
+                                    message: 'No rows returned',
+                                    code: 'PGRST116'
+                                }
+                            };
+
+                        }
+
+                        return {
+                            data: data[0],
+                            error: null
+                        };
+                    }
+                }
+
+                return {
+                    data,
+                    error: null
+                };
+
+            } catch (err) {
+
+                return {
+                    data: null,
+                    error: {
+                        message:
+                            err?.message ||
+                            'Network error',
+                        code: 'NETWORK_ERROR'
+                    }
+                };
+            }
+        }
+
+        then(resolve, reject) {
+            return this.execute().then(resolve, reject);
+        }
+
+        catch(reject) {
+            return this.execute().catch(reject);
+        }
+    }
+
+
+    const supabase = {
+
+        url: SUPABASE_URL,
+
+        key: SUPABASE_KEY,
+
+        from(table) {
+            return new RestQuery(
+                this,
+                table
+            );
+        },
+
+        async rpc(functionName, args = {}) {
+
+            const url =
+                `${this.url}/rest/v1/rpc/${encodeURIComponent(functionName)}`;
+
+            try {
+
+                const response =
+                    await fetch(url, {
+
+                        method: 'POST',
+
+                        headers: {
+                            apikey: this.key,
+                            Authorization:
+                                `Bearer ${this.key}`,
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body:
+                            JSON.stringify(args)
+                    });
+
+                const raw =
+                    await response.text();
+
+                let data = null;
+
+                try {
+                    data =
+                        raw
+                            ? JSON.parse(raw)
+                            : null;
+                } catch (_) {
+                    data = raw;
+                }
+
+                if (!response.ok) {
+
+                    return {
+                        data: null,
+
+                        error: {
+                            message:
+                                (data &&
+                                    (
+                                        data.message ||
+                                        data.error_description ||
+                                        data.hint
+                                    )
+                                ) ||
+                                `HTTP ${response.status}`,
+
                             code: data?.code,
                             details: data?.details,
                             hint: data?.hint,
                             status: response.status
-                        };
-                        return { data: null, error };
-                    }
-
-                    if (this.returnSingle) {
-                        if (Array.isArray(data)) {
-                            if (data.length === 0) {
-                                return { data: null, error: { message: 'No rows returned', code: 'PGRST116' } };
-                            }
-                            return { data: data[0], error: null };
-                        }
-                    }
-
-                    return { data, error: null };
-                } catch (err) {
-                    return {
-                        data: null,
-                        error: {
-                            message: err?.message || 'Network error',
-                            code: 'NETWORK_ERROR'
                         }
                     };
                 }
-            }
 
-            then(resolve, reject) {
-                return this.execute().then(resolve, reject);
-            }
+                if (
+                    Array.isArray(data) &&
+                    data.length === 1 &&
+                    Object.keys(data[0] || {}).length === 1
+                ) {
 
-            catch(reject) {
-                return this.execute().catch(reject);
+                    const key =
+                        Object.keys(data[0])[0];
+
+                    if (
+                        typeof data[0][key] !== 'object'
+                    ) {
+                        data = data[0][key];
+                    }
+                }
+
+                return {
+                    data,
+                    error: null
+                };
+
+            } catch (err) {
+
+                return {
+                    data: null,
+
+                    error: {
+                        message:
+                            err?.message ||
+                            'Network error',
+
+                        code:
+                            'NETWORK_ERROR'
+                    }
+                };
             }
         }
+    };
 
-        const supabase = {
-            url: SUPABASE_URL,
-            key: SUPABASE_KEY,
 
-            from(table) {
-                return new RestQuery(this, table);
-            },
+    let supabaseReady = true;
 
-            async rpc(functionName, args = {}) {
-                const url = `${this.url}/rest/v1/rpc/${encodeURIComponent(functionName)}`;
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            apikey: this.key,
-                            Authorization: `Bearer ${this.key}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(args)
-                    });
 
-                    const raw = await response.text();
-                    let data = null;
-                    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
+    /* ================================
+       APP STATE
+    ================================= */
 
-                    if (!response.ok) {
-                        return {
-                            data: null,
-                            error: {
-                                message: (data && (data.message || data.error_description || data.hint)) || `HTTP ${response.status}`,
-                                code: data?.code,
-                                details: data?.details,
-                                hint: data?.hint,
-                                status: response.status
-                            }
-                        };
+    let pts = 0;
+
+    let gram =
+        Number(localStorage.getItem('gram') || '0.50');
+
+    let myLink = null;
+
+    let visitedTasks = [];
+
+    let tasks = [];
+
+    let currentUser = null;
+
+
+    /* ================================
+       REWARD
+    ================================= */
+
+    let rewardAt =
+        parseInt(
+            localStorage.getItem('rewardAt') || '0'
+        );
+
+    const REWARD_MS =
+        12 * 60 * 60 * 1000;
+
+    const REWARD_POINTS = 15;
+
+    const TASK_REWARD = 2;
+
+
+    /* ================================
+       TASK
+    ================================= */
+
+    function getNextAvailableTask() {
+
+        return tasks.find(t =>
+
+            Number(t.owner_id) !==
+            Number(currentUser?.telegram_id)
+
+            &&
+
+            !visitedTasks.includes(
+                Number(t.id)
+            )
+
+            &&
+
+            Number(
+                t.left ||
+                t.required_visits ||
+                0
+            ) > 0
+
+            &&
+
+            t.is_active !== false
+        );
+    }
+
+
+    /* ================================
+       DAILY VISITORS
+    ================================= */
+
+    const todayKey =
+        new Date()
+            .toISOString()
+            .slice(0, 10);
+
+    let visitorDate =
+        localStorage.getItem(
+            'visitorDate'
+        );
+
+    let dailyVisitors =
+        parseInt(
+            localStorage.getItem(
+                'dailyVisitors'
+            )
+        ) || 0;
+
+    if (visitorDate !== todayKey) {
+
+        visitorDate = todayKey;
+
+        dailyVisitors = 0;
+
+        localStorage.setItem(
+            'visitorDate',
+            visitorDate
+        );
+
+        localStorage.setItem(
+            'dailyVisitors',
+            '0'
+        );
+    }
+
+    const visitorSessionKey =
+        'visitorSession_' + todayKey;
+
+    if (
+        !sessionStorage.getItem(
+            visitorSessionKey
+        )
+    ) {
+
+        dailyVisitors += 1;
+
+        localStorage.setItem(
+            'dailyVisitors',
+            String(dailyVisitors)
+        );
+
+        sessionStorage.setItem(
+            visitorSessionKey,
+            '1'
+        );
+    }
+
+
+    /* ================================
+       TRANSLATIONS
+    ================================= */
+
+    const I18N = {
+
+        ar: {
+
+            appName:
+                'تبادل الإحالات',
+
+            languageLabel:
+                '🌐 اللغة',
+
+            availableLinks:
+                'الروابط المتاحة',
+
+            currentBalance:
+                'رصيدك الحالي',
+
+            visitedLinks:
+                'روابط زرتها',
+
+            dailyVisitors:
+                'زائر البوت اليوم',
+
+            rewardTitle:
+                'مكافأة كل 12 ساعة',
+
+            rewardStatus:
+                'احصل على 15 نقطة مجاناً',
+
+            claimReward:
+                'استلام 15 نقطة',
+
+            rewardReady:
+                'مكافأتك المجانية جاهزة',
+
+            rewardComeBack:
+                'ارجع بعد 12 ساعة',
+
+            yourPublishedLink:
+                'رابطك المنشور',
+
+            createTask:
+                '+ إنشاء مهمة',
+
+            noPublishedLink:
+                'لا يوجد رابط مضاف حالياً.',
+
+            buyPointsTitle:
+                'شراء النقاط بعملة Gram 💎',
+
+            choosePackage:
+                'اختر الباقة:',
+
+            confirmPurchase:
+                'تأكيد الشراء',
+
+            cancel:
+                'إلغاء',
+
+            newTaskTitle:
+                'إنشاء مهمة جديدة 🔗',
+
+            taskLinkLabel:
+                'رابط المهمة:',
+
+            taskDescriptionLabel:
+                'وصف المهمة:',
+
+            descriptionPlaceholder:
+                'اكتب وصفاً مختصراً للمهمة',
+
+            requiredVisits:
+                'عدد الزيارات المطلوبة:',
+
+            taskCostInfo:
+                'كل زيارة تكلف 2 نقطة',
+
+            publishNow:
+                'نشر الآن',
+
+            home:
+                'الرئيسية',
+
+            withdraw:
+                'السحب',
+
+            store:
+                'المتجر',
+
+            withdrawTitle:
+                '💰 سحب USDT',
+
+            withdrawIntro:
+                'كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.',
+
+            pointsBalance:
+                'رصيد النقاط',
+
+            withdrawPointsLabel:
+                'عدد النقاط المراد سحبها:',
+
+            walletLabel:
+                'عنوان محفظة USDT:',
+
+            requestWithdraw:
+                'طلب السحب',
+
+            withdrawHistory:
+                'طلبات السحب',
+
+            noWithdrawals:
+                'لا توجد طلبات سحب.',
+
+            withdrawalPending:
+                'قيد المراجعة',
+
+            withdrawalPaid:
+                'تم الدفع',
+
+            withdrawalRejected:
+                'مرفوض',
+
+            withdrawSuccess:
+                'تم إرسال طلب السحب بنجاح ✅',
+
+            invalidWithdraw:
+                'الحد الأدنى 80 نقطة، والنقاط يجب أن تكون من مضاعفات 20.',
+
+            walletRequired:
+                'يرجى إدخال عنوان محفظة USDT.',
+
+            withdrawLoadError:
+                'تعذر تحميل طلبات السحب.',
+
+            storeUnavailable:
+                'المتجر غير متاح حالياً',
+
+            publisher:
+                'ناشر الرابط:',
+
+            remaining:
+                'متبقي:',
+
+            visitLink:
+                '↗ زيارة الرابط (+2 نقطة)',
+
+            allDone:
+                '🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.',
+
+            remainingVisits:
+                'المتبقي:',
+
+            insufficientGram:
+                'رصيدك من عملة Gram غير كافٍ!',
+
+            purchaseSuccess:
+                'تم شراء {p} نقطة بنجاح!',
+
+            invalidTask:
+                'يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!',
+
+            insufficientPoints:
+                'نقاطك لا تكفي! رصيدك الحالي: {p}',
+
+            taskSuccess:
+                'تم إنشاء المهمة ونشر رابطك بنجاح!',
+
+            rewardReceived:
+                'تمت إضافة 15 نقطة إلى رصيدك 🎉',
+
+            rewardAvailable:
+                'متاحة بعد {h}س {m}د {s}ث',
+
+            urlPlaceholder:
+                'https://t.me/your_bot',
+
+            visitsPlaceholder:
+                'من 1 إلى 20',
+
+            loading:
+                'جارٍ تحميل البيانات...',
+
+            loadError:
+                'تعذر تحميل البيانات من الخادم. حاول مرة أخرى.'
+        },
+
+
+        en: {
+
+            appName:
+                'Referral Exchange',
+
+            languageLabel:
+                '🌐 Language',
+
+            availableLinks:
+                'Available Links',
+
+            currentBalance:
+                'Current Balance',
+
+            visitedLinks:
+                'Links Visited',
+
+            dailyVisitors:
+                'Bot Visitors Today',
+
+            rewardTitle:
+                'Reward Every 12 Hours',
+
+            rewardStatus:
+                'Get 15 free points',
+
+            claimReward:
+                'Claim 15 Points',
+
+            rewardReady:
+                'Your free reward is ready',
+
+            rewardComeBack:
+                'Come back after 12 hours',
+
+            yourPublishedLink:
+                'Your Published Link',
+
+            createTask:
+                '+ Create Task',
+
+            noPublishedLink:
+                'No link added yet.',
+
+            buyPointsTitle:
+                'Buy Points with Gram 💎',
+
+            choosePackage:
+                'Choose a package:',
+
+            confirmPurchase:
+                'Confirm Purchase',
+
+            cancel:
+                'Cancel',
+
+            newTaskTitle:
+                'Create New Task 🔗',
+
+            taskLinkLabel:
+                'Task Link:',
+
+            taskDescriptionLabel:
+                'Task Description:',
+
+            descriptionPlaceholder:
+                'Write a short task description',
+
+            requiredVisits:
+                'Required Visits:',
+
+            taskCostInfo:
+                'Each visit costs 2 points',
+
+            publishNow:
+                'Publish Now',
+
+            home:
+                'Home',
+
+            withdraw:
+                'Withdraw',
+
+            store:
+                'Store',
+
+            withdrawTitle:
+                '💰 USDT Withdrawal',
+
+            withdrawIntro:
+                '20 points = 0.01 USDT. Minimum withdrawal is 0.04 USDT = 80 points.',
+
+            pointsBalance:
+                'Points Balance',
+
+            withdrawPointsLabel:
+                'Points to withdraw:',
+
+            walletLabel:
+                'USDT Wallet Address:',
+
+            requestWithdraw:
+                'Request Withdrawal',
+
+            withdrawHistory:
+                'Withdrawal History',
+
+            noWithdrawals:
+                'No withdrawal requests.',
+
+            withdrawalPending:
+                'Pending',
+
+            withdrawalPaid:
+                'Paid',
+
+            withdrawalRejected:
+                'Rejected',
+
+            withdrawSuccess:
+                'Withdrawal request submitted ✅',
+
+            invalidWithdraw:
+                'Minimum is 80 points, and points must be a multiple of 20.',
+
+            walletRequired:
+                'Please enter your USDT wallet address.',
+
+            withdrawLoadError:
+                'Could not load withdrawal requests.',
+
+            storeUnavailable:
+                'Store is currently unavailable',
+
+            publisher:
+                'Link Publisher:',
+
+            remaining:
+                'Remaining:',
+
+            visitLink:
+                '↗ Visit Link (+2 points)',
+
+            allDone:
+                '🎉 You completed all available links!<br>Come back later for new links.',
+
+            remainingVisits:
+                'Remaining:',
+
+            insufficientGram:
+                'Your Gram balance is insufficient!',
+
+            purchaseSuccess:
+                'Successfully purchased {p} points!',
+
+            invalidTask:
+                'Please enter a link and choose between 1 and 20 visits!',
+
+            insufficientPoints:
+                'Not enough points! Your current balance: {p}',
+
+            taskSuccess:
+                'Task created and your link was published successfully!',
+
+            rewardReceived:
+                '15 points added to your balance 🎉',
+
+            rewardAvailable:
+                'Available in {h}h {m}m {s}s',
+
+            urlPlaceholder:
+                'https://t.me/your_bot',
+
+            visitsPlaceholder:
+                '1 to 20',
+
+            loading:
+                'Loading data...',
+
+            loadError:
+                'Could not load data from the server. Please try again.'
+        }
+    };
+
+
+    function t(key, vars = {}) {
+
+        let value =
+            (
+                I18N[currentLang] &&
+                I18N[currentLang][key]
+            )
+            ||
+            I18N.ar[key]
+            ||
+            key;
+
+        Object.keys(vars).forEach(k => {
+
+            value =
+                value.replaceAll(
+                    '{' + k + '}',
+                    vars[k]
+                );
+
+        });
+
+        return value;
+    }
+
+
+    /* ================================
+       LANGUAGE
+    ================================= */
+
+    let currentLang =
+        localStorage.getItem(
+            'appLang'
+        ) || 'ar';
+
+
+    function toggleLanguage() {
+
+        currentLang =
+            currentLang === 'ar'
+                ? 'en'
+                : 'ar';
+
+        localStorage.setItem(
+            'appLang',
+            currentLang
+        );
+
+        applyLanguage();
+    }
+
+
+    function applyTranslations() {
+
+        document
+            .querySelectorAll('[data-i18n]')
+            .forEach(el => {
+
+                el.innerHTML =
+                    t(
+                        el.getAttribute(
+                            'data-i18n'
+                        )
+                    );
+            });
+
+        document
+            .getElementById(
+                'app-title'
+            )
+            .textContent =
+                t('appName');
+
+        const urlInput =
+            document.getElementById(
+                'add-url'
+            );
+
+        if (urlInput) {
+            urlInput.placeholder =
+                t('urlPlaceholder');
+        }
+
+        const descriptionInput =
+            document.getElementById(
+                'add-description'
+            );
+
+        if (descriptionInput) {
+            descriptionInput.placeholder =
+                t('descriptionPlaceholder');
+        }
+
+        const visitsInput =
+            document.getElementById(
+                'add-cnt'
+            );
+
+        if (visitsInput) {
+            visitsInput.placeholder =
+                t('visitsPlaceholder');
+        }
+    }
+
+
+    function applyLanguage() {
+
+        const en =
+            currentLang === 'en';
+
+        document.body.classList.toggle(
+            'en',
+            en
+        );
+
+        document.documentElement.lang =
+            en ? 'en' : 'ar';
+
+        document.documentElement.dir =
+            en ? 'ltr' : 'rtl';
+
+        document.getElementById(
+            'lang-toggle'
+        ).innerText =
+            en
+                ? 'العربية'
+                : 'English';
+
+        applyTranslations();
+
+        render();
+
+        updateRewardUI();
+    }
+
+
+    /* ================================
+       REWARD UI
+    ================================= */
+
+    function updateRewardUI() {
+
+        const now = Date.now();
+
+        const ready =
+            !rewardAt ||
+            now >= rewardAt;
+
+        const btn =
+            document.getElementById(
+                'reward-btn'
+            );
+
+        const status =
+            document.getElementById(
+                'reward-status'
+            );
+
+        if (!btn || !status) return;
+
+        if (ready) {
+
+            btn.disabled = false;
+
+            btn.style.opacity = '1';
+
+            btn.innerText =
+                t('claimReward');
+
+            status.innerText =
+                t('rewardReady');
+
+        } else {
+
+            const remaining =
+                rewardAt - now;
+
+            const h =
+                Math.floor(
+                    remaining / 3600000
+                );
+
+            const m =
+                Math.floor(
+                    (remaining % 3600000) /
+                    60000
+                );
+
+            const sec =
+                Math.floor(
+                    (remaining % 60000) /
+                    1000
+                );
+
+            btn.disabled = true;
+
+            btn.style.opacity = '.55';
+
+            btn.innerText =
+                t(
+                    'rewardAvailable',
+                    {
+                        h,
+                        m,
+                        s: sec
                     }
+                );
 
-                    // PostgreSQL scalar RPC results are returned directly.
-                    if (Array.isArray(data) && data.length === 1 && Object.keys(data[0] || {}).length === 1) {
-                        const key = Object.keys(data[0])[0];
-                        if (typeof data[0][key] !== 'object') data = data[0][key];
+            status.innerText =
+                t('rewardComeBack');
+        }
+    }
+
+
+    /* ================================
+       CLAIM REWARD
+    ================================= */
+
+    async function claimReward() {
+
+        if (
+            !ensureSupabase(
+                'استلام المكافأة'
+            )
+        ) return;
+
+        if (
+            rewardAt &&
+            Date.now() < rewardAt
+        ) {
+            return;
+        }
+
+        if (!currentUser) {
+
+            alert(
+                t('loadError')
+            );
+
+            return;
+        }
+
+        const btn =
+            document.getElementById(
+                'reward-btn'
+            );
+
+        btn.disabled = true;
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabase.rpc(
+                    'add_points',
+                    {
+                        p_user_id:
+                            currentUser.telegram_id,
+
+                        p_points:
+                            REWARD_POINTS
                     }
+                );
 
-                    return { data, error: null };
-                } catch (err) {
-                    return {
-                        data: null,
-                        error: {
-                            message: err?.message || 'Network error',
-                            code: 'NETWORK_ERROR'
-                        }
-                    };
-                }
+            if (error) {
+                throw error;
             }
-        };
 
-        let supabaseReady = true;
+            pts =
+                Number(data);
 
-        // App state
-        let pts = 0;
-        let gram = 0.50;
-        let myLink = null;
-        let visitedTasks = [];
-        let referralCount = 0;
-        let referralPoints = 0;
-        let tasks = [];
-        let currentUser = null;
+            rewardAt =
+                Date.now() +
+                REWARD_MS;
 
-        // Temporary client-side reward timer. Final anti-abuse protection belongs in Backend/Edge Function.
-        let rewardAt = parseInt(localStorage.getItem('rewardAt') || '0');
-        const REWARD_MS = 12 * 60 * 60 * 1000;
+            localStorage.setItem(
+                'rewardAt',
+                String(rewardAt)
+            );
 
-        function getNextAvailableTask() {
-            return tasks.find(t =>
-                Number(t.owner_id) !== Number(currentUser?.telegram_id) &&
-                !visitedTasks.includes(Number(t.id)) &&
-                Number(t.left || t.required_visits || 0) > 0 &&
-                t.is_active !== false
+            render();
+
+            updateRewardUI();
+
+            alert(
+                t('rewardReceived')
+            );
+
+        } catch (err) {
+
+            console.error(
+                'claimReward:',
+                err
+            );
+
+            btn.disabled = false;
+
+            alert(
+                t('loadError')
+            );
+        }
+    }
+
+
+    setInterval(
+        updateRewardUI,
+        1000
+    );
+
+
+    /* ================================
+       PAGES
+    ================================= */
+
+    function showPage(page) {
+
+        const home =
+            document.getElementById(
+                'home-page'
+            );
+
+        const withdraw =
+            document.getElementById(
+                'withdraw-page'
+            );
+
+        const homeNav =
+            document.getElementById(
+                'nav-home'
+            );
+
+        const withdrawNav =
+            document.getElementById(
+                'nav-withdraw'
+            );
+
+        home.style.display =
+            page === 'home'
+                ? 'block'
+                : 'none';
+
+        if (withdraw) {
+
+            withdraw.style.display =
+                page === 'withdraw'
+                    ? 'block'
+                    : 'none';
+        }
+
+        homeNav.classList.toggle(
+            'active',
+            page === 'home'
+        );
+
+        if (withdrawNav) {
+
+            withdrawNav.classList.toggle(
+                'active',
+                page === 'withdraw'
             );
         }
 
-        // Visitor count is intentionally kept local for now.
-        // A global daily count requires a backend/Edge Function to avoid spoofing.
-        const todayKey = new Date().toISOString().slice(0, 10);
-        let visitorDate = localStorage.getItem('visitorDate');
-        let dailyVisitors = parseInt(localStorage.getItem('dailyVisitors')) || 0;
-        if (visitorDate !== todayKey) {
-            visitorDate = todayKey;
-            dailyVisitors = 0;
-            localStorage.setItem('visitorDate', visitorDate);
-            localStorage.setItem('dailyVisitors', '0');
-        }
-        const visitorSessionKey = 'visitorSession_' + todayKey;
-        if (!sessionStorage.getItem(visitorSessionKey)) {
-            dailyVisitors += 1;
-            localStorage.setItem('dailyVisitors', String(dailyVisitors));
-            sessionStorage.setItem(visitorSessionKey, '1');
-        }
+        if (page === 'withdraw') {
 
-        const I18N = {
-            ar: {
-                appName:'تبادل الإحالات', languageLabel:'🌐 اللغة', availableLinks:'الروابط المتاحة', currentBalance:'رصيدك الحالي', visitedLinks:'روابط زرتها', dailyVisitors:'زائر البوت اليوم',
-                rewardTitle:'مكافأة كل 12 ساعة', rewardStatus:'احصل على 8 نقاط مجاناً', claimReward:'استلام 8 نقاط', rewardReady:'مكافأتك المجانية جاهزة', rewardComeBack:'ارجع بعد 12 ساعة',
-                yourPublishedLink:'رابطك المنشور', createTask:'+ إنشاء مهمة', noPublishedLink:'لا يوجد رابط مضاف حالياً.', buyPointsTitle:'شراء النقاط بعملة Gram 💎', choosePackage:'اختر الباقة:', confirmPurchase:'تأكيد الشراء', cancel:'إلغاء',
-                newTaskTitle:'إنشاء مهمة جديدة 🔗', taskDescriptionLabel:'وصف المهمة:', descriptionPlaceholder:'اكتب وصفاً مختصراً للمهمة', referralLinkLabel:'رابط الإحالة:', requiredVisits:'عدد الزيارات المطلوبة:', publishNow:'نشر الآن', referralsTitle:'👥 الإحالات',
-                referralsIntro:'شارك رابطك مع أصدقائك. عند احتساب إحالة ناجحة تحصل على <b style="color:var(--emerald);">40 نقطة</b>.', referralSystem:'نظام الإحالة 👥', referralDescription:'ادعُ أصدقاءك عبر رابطك، وتحصل على <b style="color:var(--emerald);">40 نقطة</b> عن كل إحالة ناجحة.',
-                copyLink:'📋 نسخ الرابط', share:'📤 مشاركة', referralCountLabel:'عدد الإحالات:', referralPointsLabel:'نقاط الإحالة:', home:'الرئيسية', referrals:'الإحالات', withdraw:'السحب', store:'المتجر',
-                 withdrawTitle:'💰 سحب USDT', withdrawIntro:'كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.', pointsBalance:'رصيد النقاط', withdrawPointsLabel:'عدد النقاط المراد سحبها:', walletLabel:'عنوان محفظة USDT:', requestWithdraw:'طلب السحب', withdrawHistory:'طلبات السحب', noWithdrawals:'لا توجد طلبات سحب.', withdrawalPending:'قيد المراجعة', withdrawalPaid:'تم الدفع', withdrawalRejected:'مرفوض', withdrawSuccess:'تم إرسال طلب السحب بنجاح ✅', invalidWithdraw:'الحد الأدنى 80 نقطة، والنقاط يجب أن تكون من مضاعفات 20.', walletRequired:'يرجى إدخال عنوان محفظة USDT.', withdrawLoadError:'تعذر تحميل طلبات السحب.', storeUnavailable:'المتجر غير متاح حالياً',
-                publisher:'ناشر الرابط:', remaining:'متبقي:', visitLink:'↗ زيارة الرابط (+1 نقطة)', allDone:'🎉 أكملت جميع الروابط المتاحة حالياً!<br>عد لاحقاً للحصول على روابط جديدة.', remainingVisits:'المتبقي:',
-                copySuccess:'تم نسخ رابط الإحالة ✅', shareText:'انضم عن طريقي واحصل على فرصة لجمع النقاط 👥', insufficientGram:'رصيدك من عملة Gram غير كافٍ!', purchaseSuccess:'تم شراء {p} نقطة بنجاح!',
-                invalidTask:'يرجى كتابة الرابط وتحديد عدد الزيارات من 1 إلى 20 فقط!', insufficientPoints:'نقاطك لا تكفي! رصيدك الحالي: {p}', taskSuccess:'تم إنشاء المهمة ونشر رابطك بنجاح!', rewardReceived:'تمت إضافة 8 نقاط إلى رصيدك 🎉',
-                rewardAvailable:'متاحة بعد {h}س {m}د {s}ث', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'من 1 إلى 20', preparingReferral:'جارٍ تجهيز رابط الإحالة...', loading:'جارٍ تحميل البيانات...', loadError:'تعذر تحميل البيانات من الخادم. حاول مرة أخرى.'
-            },
-            en: {
-                appName:'Referral Exchange', languageLabel:'🌐 Language', availableLinks:'Available Links', currentBalance:'Current Balance', visitedLinks:'Links Visited', dailyVisitors:'Bot Visitors Today',
-                rewardTitle:'Reward Every 12 Hours', rewardStatus:'Get 8 free points', claimReward:'Claim 8 Points', rewardReady:'Your free reward is ready', rewardComeBack:'Come back after 12 hours',
-                yourPublishedLink:'Your Published Link', createTask:'+ Create Task', noPublishedLink:'No link added yet.', buyPointsTitle:'Buy Points with Gram 💎', choosePackage:'Choose a package:', confirmPurchase:'Confirm Purchase', cancel:'Cancel',
-                newTaskTitle:'Create New Task 🔗', taskDescriptionLabel:'Task Description:', descriptionPlaceholder:'Write a short task description', referralLinkLabel:'Referral Link:', requiredVisits:'Required Visits:', publishNow:'Publish Now', referralsTitle:'👥 Referrals',
-                referralsIntro:'Share your link with friends. When a referral is counted successfully, you receive <b style="color:var(--emerald);">40 points</b>.', referralSystem:'Referral System 👥', referralDescription:'Invite friends using your link and get <b style="color:var(--emerald);">40 points</b> for each successful referral.',
-                copyLink:'📋 Copy Link', share:'📤 Share', referralCountLabel:'Referrals:', referralPointsLabel:'Referral Points:', home:'Home', referrals:'Referrals', withdraw:'Withdraw', store:'Store',
-                 withdrawTitle:'💰 USDT Withdrawal', withdrawIntro:'20 points = 0.01 USDT. Minimum withdrawal is 0.04 USDT = 80 points.', pointsBalance:'Points Balance', withdrawPointsLabel:'Points to withdraw:', walletLabel:'USDT Wallet Address:', requestWithdraw:'Request Withdrawal', withdrawHistory:'Withdrawal History', noWithdrawals:'No withdrawal requests.', withdrawalPending:'Pending', withdrawalPaid:'Paid', withdrawalRejected:'Rejected', withdrawSuccess:'Withdrawal request submitted ✅', invalidWithdraw:'Minimum is 80 points, and points must be a multiple of 20.', walletRequired:'Please enter your USDT wallet address.', withdrawLoadError:'Could not load withdrawal requests.', storeUnavailable:'Store is currently unavailable',
-                publisher:'Link Publisher:', remaining:'Remaining:', visitLink:'↗ Visit Link (+1 point)', allDone:'🎉 You completed all available links!<br>Come back later for new links.', remainingVisits:'Remaining:',
-                copySuccess:'Referral link copied ✅', shareText:'Join through my link and get a chance to earn points 👥', insufficientGram:'Your Gram balance is insufficient!', purchaseSuccess:'Successfully purchased {p} points!',
-                invalidTask:'Please enter a link and choose between 1 and 20 visits!', insufficientPoints:'Not enough points! Your current balance: {p}', taskSuccess:'Task created and your link was published successfully!', rewardReceived:'8 points added to your balance 🎉',
-                rewardAvailable:'Available in {h}h {m}m {s}s', rewardAvailableEn:'Available in {h}h {m}m {s}s',
-                urlPlaceholder:'https://t.me/your_bot', visitsPlaceholder:'1 to 20', preparingReferral:'Preparing your referral link...', loading:'Loading data...', loadError:'Could not load data from the server. Please try again.'
-            }
-        };
-        function t(key, vars={}) { let v=(I18N[currentLang]&&I18N[currentLang][key])||I18N.ar[key]||key; Object.keys(vars).forEach(k=>v=v.replaceAll('{'+k+'}',vars[k])); return v; }
-        function applyTranslations() {
-            document.querySelectorAll('[data-i18n]').forEach(el=>el.innerHTML=t(el.getAttribute('data-i18n')));
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-placeholder')));
-            document.getElementById('app-title').textContent=t('appName');
-        }
-
-        let currentLang = localStorage.getItem('appLang') || 'ar';
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            localStorage.setItem('appLang', currentLang);
-            applyLanguage();
-        }
-
-        function applyLanguage() {
-            const en = currentLang === 'en';
-            document.body.classList.toggle('en', en);
-            document.documentElement.lang = en ? 'en' : 'ar';
-            document.documentElement.dir = en ? 'ltr' : 'rtl';
-            document.getElementById('lang-toggle').innerText = en ? 'العربية' : 'English';
-            applyTranslations();
-            render();
-            updateRewardUI();
-        }
-
-        function updateRewardUI() {
-            const now = Date.now();
-            const ready = !rewardAt || now >= rewardAt;
-            const btn = document.getElementById('reward-btn');
-            const status = document.getElementById('reward-status');
-            if (ready) {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.innerText = t('claimReward');
-                status.innerText = t('rewardReady');
-            } else {
-                const remaining = rewardAt - now;
-                const h = Math.floor(remaining / 3600000);
-                const m = Math.floor((remaining % 3600000) / 60000);
-                const sec = Math.floor((remaining % 60000) / 1000);
-                btn.disabled = true;
-                btn.style.opacity = '.55';
-                btn.innerText = t('rewardAvailable',{h,m,s:sec});
-                status.innerText = t('rewardComeBack');
-            }
-        }
-
-        async function claimReward() {
-    if (!ensureSupabase('استلام المكافأة')) return;
-            if (rewardAt && Date.now() < rewardAt) return;
-            if (!currentUser) {
-                alert(t('loadError'));
-                return;
-            }
-
-            const btn = document.getElementById('reward-btn');
-            btn.disabled = true;
-
-            try {
-                const { data, error } = await supabase.rpc('add_points', {
-                    p_user_id: currentUser.telegram_id,
-                    p_points: 8
-                });
-
-                if (error) throw error;
-
-                pts = Number(data);
-                rewardAt = Date.now() + REWARD_MS;
-                localStorage.setItem('rewardAt', String(rewardAt));
-                render();
-                updateRewardUI();
-                alert(t('rewardReceived'));
-            } catch (err) {
-                console.error('claimReward:', err);
-                btn.disabled = false;
-                alert(t('loadError'));
-            }
-        }
-
-        setInterval(updateRewardUI, 1000);
-
-        function showPage(page) {
-            const home = document.getElementById('home-page');
-            const referrals = document.getElementById('referrals-page');
-            const withdraw = document.getElementById('withdraw-page');
-            const homeNav = document.getElementById('nav-home');
-            const refNav = document.getElementById('nav-referrals');
-            const withdrawNav = document.getElementById('nav-withdraw');
-
-            home.style.display = page === 'home' ? 'block' : 'none';
-            referrals.style.display = page === 'referrals' ? 'block' : 'none';
-            if (withdraw) withdraw.style.display = page === 'withdraw' ? 'block' : 'none';
-
-            homeNav.classList.toggle('active', page === 'home');
-            refNav.classList.toggle('active', page === 'referrals');
-            if (withdrawNav) withdrawNav.classList.toggle('active', page === 'withdraw');
-
-            if (page === 'withdraw') {
-                updateWithdrawUI();
-                loadWithdrawals();
-            }
-            window.scrollTo({top:0, behavior:'smooth'});
-        }
-
-        function showReferral() {
-            showPage('referrals');
-        }
-
-        function render() {
-            document.getElementById('pts-bal').innerText = pts;
-            document.getElementById('gram-bal').innerText = gram.toFixed(2);
             updateWithdrawUI();
-            document.getElementById('completed-cnt').innerText = visitedTasks.length;
-            document.getElementById('total-tasks-cnt').innerText = tasks.filter(t => Number(t.owner_id) !== Number(currentUser?.telegram_id) && t.left > 0).length;
 
-            let curTask = getNextAvailableTask();
-            let cardBox = document.getElementById('task-card');
+            loadWithdrawals();
+        }
 
-            if (curTask) {
-                cardBox.style.display = 'block';
-                cardBox.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:10pt;" id="task-user">${t('publisher')} ${escapeHtml(curTask.user)}</span>
-                        <span style="font-size:8pt; background:rgba(34,211,238,0.2); color:var(--cyan); padding:2px 6px; border-radius:6px;" id="task-left">${t('remaining')} ${curTask.left}</span>
-                    </div>
-                    ${curTask.description ? `<div style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-top:8px;">${escapeHtml(curTask.description)}</div>` : ''}
-                    <div class="link-box" id="task-url">${escapeHtml(curTask.url)}</div>
-                    <button class="btn btn-purple" onclick="visitLink()">↗ زيارة الرابط (+1 نقطة)</button>
-                `;
-            } else {
-                cardBox.innerHTML = `<div style="text-align:center; padding:15px; color:var(--muted); font-size:10pt;">${t('allDone')}</div>`;
-            }
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
 
-            let infoBox = document.getElementById('my-task-info');
+
+    /* ================================
+       RENDER
+    ================================= */
+
+    function render() {
+
+        const ptsEl =
+            document.getElementById(
+                'pts-bal'
+            );
+
+        if (ptsEl) {
+            ptsEl.innerText =
+                pts;
+        }
+
+        const gramEl =
+            document.getElementById(
+                'gram-bal'
+            );
+
+        if (gramEl) {
+            gramEl.innerText =
+                Number(gram).toFixed(2);
+        }
+
+        updateWithdrawUI();
+
+        const completedEl =
+            document.getElementById(
+                'completed-cnt'
+            );
+
+        if (completedEl) {
+
+            completedEl.innerText =
+                visitedTasks.length;
+        }
+
+        const totalTasksEl =
+            document.getElementById(
+                'total-tasks-cnt'
+            );
+
+        if (totalTasksEl) {
+
+            totalTasksEl.innerText =
+                tasks.filter(t =>
+
+                    Number(t.owner_id) !==
+                    Number(
+                        currentUser?.telegram_id
+                    )
+
+                    &&
+
+                    Number(t.left || 0) > 0
+
+                ).length;
+        }
+
+
+        const dailyBox =
+            document.getElementById(
+                'daily-visitors'
+            );
+
+        if (dailyBox) {
+
+            dailyBox.innerText =
+                dailyVisitors;
+        }
+
+
+        const cardBox =
+            document.getElementById(
+                'task-card'
+            );
+
+        if (!cardBox) return;
+
+
+        const curTask =
+            getNextAvailableTask();
+
+
+        if (curTask) {
+
+            cardBox.style.display =
+                'block';
+
+            cardBox.innerHTML = `
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                ">
+
+                    <span style="
+                        font-weight:800;
+                        font-size:10pt;
+                    ">
+                        ${t('publisher')}
+                        ${escapeHtml(curTask.user)}
+                    </span>
+
+                    <span style="
+                        font-size:8pt;
+                        background:rgba(34,211,238,0.2);
+                        color:var(--cyan);
+                        padding:2px 6px;
+                        border-radius:6px;
+                    ">
+                        ${t('remaining')}
+                        ${curTask.left}
+                    </span>
+
+                </div>
+
+                ${
+                    curTask.description
+                        ? `
+                            <div style="
+                                font-size:8.5pt;
+                                color:var(--muted);
+                                line-height:1.6;
+                                margin-top:8px;
+                            ">
+                                ${escapeHtml(
+                                    curTask.description
+                                )}
+                            </div>
+                        `
+                        : ''
+                }
+
+                <div class="link-box">
+                    ${escapeHtml(curTask.url)}
+                </div>
+
+                <button
+                    class="btn btn-purple"
+                    onclick="visitLink()"
+                >
+                    ${t('visitLink')}
+                </button>
+            `;
+
+        } else {
+
+            cardBox.innerHTML = `
+
+                <div style="
+                    text-align:center;
+                    padding:15px;
+                    color:var(--muted);
+                    font-size:10pt;
+                ">
+                    ${t('allDone')}
+                </div>
+            `;
+        }
+
+
+        const infoBox =
+            document.getElementById(
+                'my-task-info'
+            );
+
+        if (infoBox) {
+
             if (myLink) {
-                infoBox.innerHTML = `<b style="color:var(--cyan);">${escapeHtml(myLink.url)}</b><br>${t('remainingVisits')} ${myLink.cnt}`;
+
+                infoBox.innerHTML = `
+
+                    <b style="color:var(--cyan);">
+                        ${escapeHtml(
+                            myLink.url
+                        )}
+                    </b>
+
+                    <br>
+
+                    ${t('remainingVisits')}
+                    ${myLink.left ?? myLink.cnt ?? 0}
+                `;
+
             } else {
-                infoBox.innerText = t('noPublishedLink');
-            }
 
-            document.getElementById('ref-count').innerText = referralCount;
-            document.getElementById('ref-points').innerText = referralPoints;
-            const dailyBox = document.getElementById('daily-visitors');
-            if (dailyBox) dailyBox.innerText = dailyVisitors;
-
-            buildReferralLink();
-        }
-
-        function escapeHtml(value) {
-            return String(value).replace(/[&<>"']/g, ch => ({
-                '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
-            }[ch]));
-        }
-
-        function getTelegramUserId() {
-            try {
-                return window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
-            } catch (_) {
-                return null;
+                infoBox.innerText =
+                    t('noPublishedLink');
             }
         }
-
-        function ensureSupabase(actionName = 'هذه العملية') {
-    if (!navigator.onLine) {
-        alert('لا يوجد اتصال بالإنترنت حالياً.\n\n' + actionName + ' تحتاج اتصالاً بالإنترنت.');
-        return false;
     }
-    if (!supabaseReady || !supabase) {
-        alert('تعذر الاتصال بخدمة البيانات الآن.\n\n' + actionName + ' تحتاج اتصال Supabase. جرّب تحديث الصفحة والتأكد من الإنترنت.');
-        return false;
+
+
+    /* ================================
+       HTML ESCAPE
+    ================================= */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(
+                /[&<>"']/g,
+                ch => ({
+
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+
+                }[ch])
+            );
     }
-    return true;
-}
 
-function isTelegramMode() {
-    return !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
-}
 
-function getTelegramUser() {
-            try {
-                return window.Telegram?.WebApp?.initDataUnsafe?.user || null;
-            } catch (_) {
-                return null;
-            }
+    /* ================================
+       TELEGRAM USER
+    ================================= */
+
+    function getTelegramUser() {
+
+        try {
+
+            return (
+                window.Telegram
+                    ?.WebApp
+                    ?.initDataUnsafe
+                    ?.user
+                ||
+                null
+            );
+
+        } catch (_) {
+
+            return null;
+        }
+    }
+
+
+    function getTelegramUserId() {
+
+        const user =
+            getTelegramUser();
+
+        return user?.id || null;
+    }
+
+
+    /* ================================
+       SUPABASE CHECK
+    ================================= */
+
+    function ensureSupabase(
+        actionName = 'هذه العملية'
+    ) {
+
+        if (!navigator.onLine) {
+
+            alert(
+                'لا يوجد اتصال بالإنترنت حالياً.\n\n' +
+                actionName +
+                ' تحتاج اتصالاً بالإنترنت.'
+            );
+
+            return false;
         }
 
-        function buildReferralLink() {
-            const box = document.getElementById('referral-url');
-            if (!box) return;
+        if (
+            !supabaseReady ||
+            !supabase
+        ) {
 
-            const userId = getTelegramUserId();
-            const configuredBot = window.APP_BOT_USERNAME || "Getttttsbot";
-            const link = `https://t.me/${configuredBot}?start=ref_${userId || 'USER_ID'}`;
+            alert(
+                'تعذر الاتصال بخدمة البيانات الآن.\n\n' +
+                actionName +
+                ' تحتاج اتصال Supabase.'
+            );
 
-            box.innerText = link;
-            box.dataset.referral = link;
+            return false;
         }
 
-        function copyReferral() {
-            const box = document.getElementById('referral-url');
-            const link = box?.dataset?.referral || box?.innerText || '';
-            if (!link) return;
+        return true;
+    }
 
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(link).then(() => alert(t('copySuccess')));
-            } else {
-                const temp = document.createElement('textarea');
-                temp.value = link;
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand('copy');
-                temp.remove();
-                alert(t('copySuccess'));
-            }
+
+    /* ================================
+       MODALS
+    ================================= */
+
+    function openModal(id) {
+
+        const modal =
+            document.getElementById(id);
+
+        if (modal) {
+            modal.style.display =
+                'flex';
+        }
+    }
+
+
+    function closeModal(id) {
+
+        const modal =
+            document.getElementById(id);
+
+        if (modal) {
+            modal.style.display =
+                'none';
+        }
+    }
+
+
+    /* ================================
+       AWARD POINTS
+    ================================= */
+
+    async function awardPoints(
+        points,
+        userId = currentUser?.telegram_id
+    ) {
+
+        const {
+            data,
+            error
+        } =
+            await supabase.rpc(
+                'add_points',
+                {
+                    p_user_id: userId,
+                    p_points: points
+                }
+            );
+
+        if (error) {
+            throw error;
         }
 
-        function shareReferral() {
-            const box = document.getElementById('referral-url');
-            const link = box?.dataset?.referral || box?.innerText || '';
-            if (!link) return;
+        const newBalance =
+            Number(data);
 
-            const text = t('shareText');
-            if (window.Telegram?.WebApp?.openTelegramLink) {
-                window.Telegram.WebApp.openTelegramLink(
-                    `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`
+        if (
+            !Number.isFinite(
+                newBalance
+            )
+        ) {
+
+            throw new Error(
+                'Invalid balance returned by add_points'
+            );
+        }
+
+        return newBalance;
+    }
+
+
+    /* ================================
+       VISIT TASK
+    ================================= */
+
+    async function visitLink() {
+
+        if (
+            !ensureSupabase(
+                'تنفيذ المهمة'
+            )
+        ) return;
+
+        const curTask =
+            getNextAvailableTask();
+
+        if (
+            !curTask ||
+            !currentUser
+        ) {
+            return;
+        }
+
+        const taskId =
+            Number(curTask.id);
+
+        if (
+            visitedTasks.includes(
+                taskId
+            )
+        ) {
+            return;
+        }
+
+        window.open(
+            curTask.url,
+            '_blank'
+        );
+
+        let pointsAwarded = false;
+
+        try {
+
+            /*
+             * كل زيارة = 2 نقطة
+             */
+
+            pts =
+                await awardPoints(
+                    TASK_REWARD
                 );
-            } else if (navigator.share) {
-                navigator.share({ text, url: link }).catch(() => {});
-            } else {
-                copyReferral();
-            }
-        }
 
-        function showReferral() {
-            document.getElementById('referral-url')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+            pointsAwarded = true;
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        async function awardPoints(points, userId = currentUser?.telegram_id) {
-            const { data, error } = await supabase.rpc('add_points', {
-                p_user_id: userId,
-                p_points: points
-            });
-            if (error) throw error;
-            const newBalance = Number(data);
-            if (!Number.isFinite(newBalance)) {
-                throw new Error('Invalid balance returned by add_points');
-            }
-            return newBalance;
-        }
-
-        async function visitLink() {
-    if (!ensureSupabase('تنفيذ المهمة')) return;
-            const curTask = getNextAvailableTask();
-            if (!curTask || !currentUser) return;
-
-            const taskId = Number(curTask.id);
-            if (visitedTasks.includes(taskId)) return;
-
-            window.open(curTask.url, '_blank');
-
-            let pointsAwarded = false;
-            try {
-                // Award the point first. If recording the visit fails, roll the point back.
-                // This prevents the old bug where a successful completed_tasks insert
-                // could happen while add_points failed, leaving the task completed but unpaid.
-                pts = await awardPoints(1);
-                pointsAwarded = true;
-
-                const { error: completedError } = await supabase
-                    .from('completed_tasks')
+            const {
+                error: completedError
+            } =
+                await supabase
+                    .from(
+                        'completed_tasks'
+                    )
                     .insert({
-                        user_id: currentUser.telegram_id,
-                        task_id: taskId
+                        user_id:
+                            currentUser.telegram_id,
+
+                        task_id:
+                            taskId
                     });
 
-                if (completedError) {
-                    // Duplicate means the task was already completed; don't keep the extra point.
-                    if (String(completedError.code) === '23505') {
-                        await supabase.rpc('subtract_points', {
-                            p_user_id: currentUser.telegram_id,
-                            p_points: 1
-                        });
-                        pointsAwarded = false;
-                        if (!visitedTasks.includes(taskId)) visitedTasks.push(taskId);
-                        render();
-                        return;
+
+            if (completedError) {
+
+                if (
+                    String(
+                        completedError.code
+                    ) === '23505'
+                ) {
+
+                    await supabase.rpc(
+                        'subtract_points',
+                        {
+                            p_user_id:
+                                currentUser.telegram_id,
+
+                            p_points:
+                                TASK_REWARD
+                        }
+                    );
+
+                    pointsAwarded = false;
+
+                    if (
+                        !visitedTasks.includes(
+                            taskId
+                        )
+                    ) {
+
+                        visitedTasks.push(
+                            taskId
+                        );
                     }
-                    throw completedError;
-                }
 
-                visitedTasks.push(taskId);
+                    render();
 
-                // Update the local display immediately; server remains the source of truth.
-                curTask.left = Math.max(0, Number(curTask.left || curTask.required_visits || 0) - 1);
-                if (curTask.left === 0) curTask.is_active = false;
-                render();
-            } catch (err) {
-                // If the visit could not be recorded after awarding the point, refund it.
-                if (pointsAwarded) {
-                    try {
-                        pts = await supabase.rpc('add_points', {
-                            p_user_id: currentUser.telegram_id,
-                            p_points: -1
-                        }).then(r => {
-                            if (r.error) throw r.error;
-                            return Number(r.data);
-                        });
-                    } catch (refundErr) {
-                        console.error('visitLink refund failed:', refundErr);
-                    }
-                }
-                console.error('visitLink:', err);
-                alert((err?.message || '').includes('23505') ? 'تم احتساب هذه المهمة مسبقاً.' : t('loadError'));
-                await loadData();
-            }
-        }
-
-        function buyPoints() {
-            let p = parseInt(document.getElementById('buy-pkg').value);
-            let cost = (p / 100) * 0.05;
-
-            if(gram < cost) {
-                alert(t('insufficientGram'));
-                return;
-            }
-
-            gram -= cost;
-            pts += p;
-
-            localStorage.setItem('gram', gram);
-            localStorage.setItem('pts', pts);
-
-            closeModal('buy-modal');
-            render();
-            alert(t('purchaseSuccess',{p}));
-        }
-
-
-        function pointsToUsdt(points) {
-            return (Number(points || 0) / 20) * 0.01;
-        }
-
-        function updateWithdrawUI() {
-            const pointsEl = document.getElementById('withdraw-points-balance');
-            const usdtEl = document.getElementById('withdraw-usdt-balance');
-            const input = document.getElementById('withdraw-points');
-            const preview = document.getElementById('withdraw-usdt-preview');
-            if (pointsEl) pointsEl.innerText = Number(pts || 0);
-            if (usdtEl) usdtEl.innerText = pointsToUsdt(pts).toFixed(2);
-            if (input && preview) preview.innerText = pointsToUsdt(Number(input.value || 0)).toFixed(2) + ' USDT';
-        }
-
-        document.addEventListener('input', function(e) {
-            if (e.target && e.target.id === 'withdraw-points') updateWithdrawUI();
-        });
-
-        async function requestWithdrawal() {
-            if (!ensureSupabase('طلب السحب')) return;
-            if (!currentUser) { alert(t('loadError')); return; }
-
-            const points = Number(document.getElementById('withdraw-points')?.value || 0);
-            const wallet = String(document.getElementById('withdraw-wallet')?.value || '').trim();
-
-            if (points < 80 || points % 20 !== 0) { alert(t('invalidWithdraw')); return; }
-            if (!wallet) { alert(t('walletRequired')); return; }
-            if (points > Number(pts)) { alert(t('insufficientPoints', {p: pts})); return; }
-
-            try {
-                const { data, error } = await supabase.rpc('request_withdrawal', {
-                    p_user_id: currentUser.telegram_id,
-                    p_points: points,
-                    p_wallet_address: wallet
-                });
-                if (error) throw error;
-
-                pts = Number(data?.remaining_points ?? (pts - points));
-                document.getElementById('withdraw-points').value = '';
-                document.getElementById('withdraw-wallet').value = '';
-                render();
-                await loadWithdrawals();
-                alert(t('withdrawSuccess') + '\n' + points + ' points = ' + pointsToUsdt(points).toFixed(2) + ' USDT');
-            } catch (err) {
-                console.error('requestWithdrawal:', err);
-                alert(err?.message || t('loadError'));
-            }
-        }
-
-        async function loadWithdrawals() {
-            const box = document.getElementById('withdraw-history');
-            if (!box || !currentUser) return;
-            try {
-                const { data, error } = await supabase.rpc('get_my_withdrawals', { p_user_id: currentUser.telegram_id });
-                if (error) throw error;
-                if (!data || !data.length) {
-                    box.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:9pt;">' + t('noWithdrawals') + '</div>';
                     return;
                 }
-                box.innerHTML = data.map(row => {
-                    const s = String(row.status || 'pending');
-                    const status = s === 'paid' ? t('withdrawalPaid') : (s === 'rejected' ? t('withdrawalRejected') : t('withdrawalPending'));
-                    return `<div class="card" style="margin-bottom:8px;padding:10px;background:rgba(0,0,0,.18);">
-                        <div style="display:flex;justify-content:space-between;gap:8px;"><b>${Number(row.points)} نقطة = ${Number(row.amount_usdt).toFixed(2)} USDT</b><span style="color:var(--cyan);">${escapeHtml(status)}</span></div>
-                        <div style="font-size:8pt;color:var(--muted);margin-top:5px;direction:ltr;text-align:left;word-break:break-all;">${escapeHtml(row.wallet_address || '')}</div>
-                        <div style="font-size:7.5pt;color:var(--muted);margin-top:5px;">${escapeHtml(row.created_at || '')}</div>
-                    </div>`;
-                }).join('');
-            } catch (err) {
-                console.error('loadWithdrawals:', err);
-                box.innerHTML = '<div style="text-align:center;color:#fca5a5;font-size:9pt;">' + t('withdrawLoadError') + '</div>';
+
+                throw completedError;
             }
+
+
+            visitedTasks.push(
+                taskId
+            );
+
+
+            curTask.left =
+                Math.max(
+                    0,
+                    Number(
+                        curTask.left ||
+                        curTask.required_visits ||
+                        0
+                    ) - 1
+                );
+
+
+            if (
+                curTask.left === 0
+            ) {
+
+                curTask.is_active =
+                    false;
+            }
+
+
+            render();
+
+        } catch (err) {
+
+            if (pointsAwarded) {
+
+                try {
+
+                    pts =
+                        await supabase.rpc(
+                            'add_points',
+                            {
+                                p_user_id:
+                                    currentUser.telegram_id,
+
+                                p_points:
+                                    -TASK_REWARD
+                            }
+                        )
+                        .then(r => {
+
+                            if (r.error) {
+                                throw r.error;
+                            }
+
+                            return Number(
+                                r.data
+                            );
+                        });
+
+                } catch (refundErr) {
+
+                    console.error(
+                        'visitLink refund failed:',
+                        refundErr
+                    );
+                }
+            }
+
+            console.error(
+                'visitLink:',
+                err
+            );
+
+            alert(
+                String(
+                    err?.message || ''
+                ).includes('23505')
+                    ? 'تم احتساب هذه المهمة مسبقاً.'
+                    : t('loadError')
+            );
+
+            await loadData();
+        }
+    }
+
+
+    /* ================================
+       BUY POINTS
+    ================================= */
+
+    function buyPoints() {
+
+        const p =
+            parseInt(
+                document.getElementById(
+                    'buy-pkg'
+                ).value
+            );
+
+        const cost =
+            (p / 100) * 0.05;
+
+
+        if (gram < cost) {
+
+            alert(
+                t('insufficientGram')
+            );
+
+            return;
         }
 
-        async function addLink() {
-    if (!ensureSupabase('إضافة المهمة')) return;
-            const u = document.getElementById('add-url').value.trim();
-            const description = document.getElementById('add-description').value.trim();
-            const c = parseInt(document.getElementById('add-cnt').value);
 
-            if (!u || !/^https?:\/\//i.test(u) || c < 1 || c > 20) {
-                alert(t('invalidTask'));
+        gram -= cost;
+
+        pts += p;
+
+
+        localStorage.setItem(
+            'gram',
+            String(gram)
+        );
+
+        localStorage.setItem(
+            'pts',
+            String(pts)
+        );
+
+
+        closeModal(
+            'buy-modal'
+        );
+
+        render();
+
+
+        alert(
+            t(
+                'purchaseSuccess',
+                {p}
+            )
+        );
+    }
+
+
+    /* ================================
+       WITHDRAW
+    ================================= */
+
+    function pointsToUsdt(
+        points
+    ) {
+
+        return (
+            Number(points || 0) /
+            20
+        ) * 0.01;
+    }
+
+
+    function updateWithdrawUI() {
+
+        const pointsEl =
+            document.getElementById(
+                'withdraw-points-balance'
+            );
+
+        const usdtEl =
+            document.getElementById(
+                'withdraw-usdt-balance'
+            );
+
+        const input =
+            document.getElementById(
+                'withdraw-points'
+            );
+
+        const preview =
+            document.getElementById(
+                'withdraw-usdt-preview'
+            );
+
+
+        if (pointsEl) {
+
+            pointsEl.innerText =
+                Number(pts || 0);
+        }
+
+
+        if (usdtEl) {
+
+            usdtEl.innerText =
+                pointsToUsdt(
+                    pts
+                ).toFixed(2);
+        }
+
+
+        if (
+            input &&
+            preview
+        ) {
+
+            preview.innerText =
+                pointsToUsdt(
+                    Number(
+                        input.value || 0
+                    )
+                ).toFixed(2)
+                +
+                ' USDT';
+        }
+    }
+
+
+    document.addEventListener(
+        'input',
+        function(e) {
+
+            if (
+                e.target &&
+                e.target.id ===
+                    'withdraw-points'
+            ) {
+
+                updateWithdrawUI();
+            }
+        }
+    );
+
+
+    async function requestWithdrawal() {
+
+        if (
+            !ensureSupabase(
+                'طلب السحب'
+            )
+        ) return;
+
+
+        if (!currentUser) {
+
+            alert(
+                t('loadError')
+            );
+
+            return;
+        }
+
+
+        const points =
+            Number(
+                document.getElementById(
+                    'withdraw-points'
+                )?.value || 0
+            );
+
+
+        const wallet =
+            String(
+                document.getElementById(
+                    'withdraw-wallet'
+                )?.value || ''
+            ).trim();
+
+
+        if (
+            points < 80 ||
+            points % 20 !== 0
+        ) {
+
+            alert(
+                t('invalidWithdraw')
+            );
+
+            return;
+        }
+
+
+        if (!wallet) {
+
+            alert(
+                t('walletRequired')
+            );
+
+            return;
+        }
+
+
+        if (
+            points >
+            Number(pts)
+        ) {
+
+            alert(
+                t(
+                    'insufficientPoints',
+                    {p: pts}
+                )
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabase.rpc(
+                    'request_withdrawal',
+                    {
+                        p_user_id:
+                            currentUser.telegram_id,
+
+                        p_points:
+                            points,
+
+                        p_wallet_address:
+                            wallet
+                    }
+                );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            pts =
+                Number(
+                    data?.remaining_points ??
+                    (
+                        pts - points
+                    )
+                );
+
+
+            document.getElementById(
+                'withdraw-points'
+            ).value = '';
+
+
+            document.getElementById(
+                'withdraw-wallet'
+            ).value = '';
+
+
+            render();
+
+            await loadWithdrawals();
+
+
+            alert(
+                t('withdrawSuccess')
+                +
+                '\n'
+                +
+                points
+                +
+                ' points = '
+                +
+                pointsToUsdt(
+                    points
+                ).toFixed(2)
+                +
+                ' USDT'
+            );
+
+        } catch (err) {
+
+            console.error(
+                'requestWithdrawal:',
+                err
+            );
+
+            alert(
+                err?.message ||
+                t('loadError')
+            );
+        }
+    }
+
+
+    async function loadWithdrawals() {
+
+        const box =
+            document.getElementById(
+                'withdraw-history'
+            );
+
+
+        if (
+            !box ||
+            !currentUser
+        ) {
+            return;
+        }
+
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabase.rpc(
+                    'get_my_withdrawals',
+                    {
+                        p_user_id:
+                            currentUser.telegram_id
+                    }
+                );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            if (
+                !data ||
+                !data.length
+            ) {
+
+                box.innerHTML =
+                    `
+                    <div style="
+                        text-align:center;
+                        color:var(--muted);
+                        font-size:9pt;
+                    ">
+                        ${t('noWithdrawals')}
+                    </div>
+                    `;
+
                 return;
             }
 
-            if (!currentUser) {
-                alert(t('loadError'));
-                return;
+
+            box.innerHTML =
+                data
+                    .map(row => {
+
+                        const status =
+                            String(
+                                row.status ||
+                                'pending'
+                            );
+
+
+                        const statusText =
+                            status === 'paid'
+                                ? t(
+                                    'withdrawalPaid'
+                                )
+                                :
+                            status === 'rejected'
+                                ? t(
+                                    'withdrawalRejected'
+                                )
+                                :
+                                t(
+                                    'withdrawalPending'
+                                );
+
+
+                        return `
+
+                            <div
+                                class="card"
+                                style="
+                                    margin-bottom:8px;
+                                    padding:10px;
+                                    background:rgba(0,0,0,.18);
+                                "
+                            >
+
+                                <div style="
+                                    display:flex;
+                                    justify-content:space-between;
+                                    gap:8px;
+                                ">
+
+                                    <b>
+                                        ${Number(
+                                            row.points
+                                        )}
+                                        نقطة =
+                                        ${Number(
+                                            row.amount_usdt
+                                        ).toFixed(2)}
+                                        USDT
+                                    </b>
+
+                                    <span style="
+                                        color:var(--cyan);
+                                    ">
+                                        ${escapeHtml(
+                                            statusText
+                                        )}
+                                    </span>
+
+                                </div>
+
+                                <div style="
+                                    font-size:8pt;
+                                    color:var(--muted);
+                                    margin-top:5px;
+                                    direction:ltr;
+                                    text-align:left;
+                                    word-break:break-all;
+                                ">
+                                    ${escapeHtml(
+                                        row.wallet_address ||
+                                        ''
+                                    )}
+                                </div>
+
+                                <div style="
+                                    font-size:7.5pt;
+                                    color:var(--muted);
+                                    margin-top:5px;
+                                ">
+                                    ${escapeHtml(
+                                        row.created_at ||
+                                        ''
+                                    )}
+                                </div>
+
+                            </div>
+                        `;
+                    })
+                    .join('');
+
+        } catch (err) {
+
+            console.error(
+                'loadWithdrawals:',
+                err
+            );
+
+            box.innerHTML =
+                `
+                <div style="
+                    text-align:center;
+                    color:#fca5a5;
+                    font-size:9pt;
+                ">
+                    ${t('withdrawLoadError')}
+                </div>
+                `;
+        }
+    }
+
+
+    /* ================================
+       CREATE TASK
+    ================================= */
+
+    async function addLink() {
+
+        if (
+            !ensureSupabase(
+                'إضافة المهمة'
+            )
+        ) return;
+
+
+        const u =
+            document.getElementById(
+                'add-url'
+            ).value.trim();
+
+
+        const description =
+            document.getElementById(
+                'add-description'
+            ).value.trim();
+
+
+        const c =
+            parseInt(
+                document.getElementById(
+                    'add-cnt'
+                ).value
+            );
+
+
+        if (
+            !u ||
+            !/^https?:\/\//i.test(u) ||
+            c < 1 ||
+            c > 20
+        ) {
+
+            alert(
+                t('invalidTask')
+            );
+
+            return;
+        }
+
+
+        if (!currentUser) {
+
+            alert(
+                t('loadError')
+            );
+
+            return;
+        }
+
+
+        /*
+         * كل زيارة = 2 نقطة
+         *
+         * لذلك إنشاء مهمة بـ:
+         * 1 زيارة = 2 نقاط
+         * 5 زيارات = 10 نقاط
+         * 10 زيارات = 20 نقطة
+         * 20 زيارة = 40 نقطة
+         */
+
+        const totalCost =
+            c * TASK_REWARD;
+
+
+        if (
+            Number(pts) <
+            totalCost
+        ) {
+
+            alert(
+                t(
+                    'insufficientPoints',
+                    {p: pts}
+                )
+                +
+                '\n\n'
+                +
+                'تكلفة المهمة: ' +
+                totalCost +
+                ' نقطة'
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const {
+                data: newPoints,
+                error: pointsError
+            } =
+                await supabase.rpc(
+                    'subtract_points',
+                    {
+                        p_user_id:
+                            currentUser.telegram_id,
+
+                        p_points:
+                            totalCost
+                    }
+                );
+
+
+            if (pointsError) {
+                throw pointsError;
             }
 
-            try {
-                const { data: newPoints, error: pointsError } = await supabase.rpc('subtract_points', {
-                    p_user_id: currentUser.telegram_id,
-                    p_points: c
-                });
-                if (pointsError) throw pointsError;
 
-                const { data: insertedTask, error: taskError } = await supabase
+            const {
+                data: insertedTask,
+                error: taskError
+            } =
+                await supabase
                     .from('tasks')
                     .insert({
+
                         title: u,
-                        description: description || null,
-                        reward_points: 1,
+
+                        description:
+                            description ||
+                            null,
+
+                        reward_points:
+                            TASK_REWARD,
+
                         url: u,
-                        is_active: true,
-                        owner_id: currentUser.telegram_id,
-                        required_visits: c
+
+                        is_active:
+                            true,
+
+                        owner_id:
+                            currentUser.telegram_id,
+
+                        required_visits:
+                            c
                     })
                     .select()
                     .single();
 
-                if (taskError) {
-                    // Refund points if task creation failed.
-                    await supabase.rpc('add_points', {
-                        p_user_id: currentUser.telegram_id,
-                        p_points: c
-                    });
-                    throw taskError;
-                }
 
-                pts = Number(newPoints);
-                myLink = insertedTask;
+            if (taskError) {
 
-                closeModal('add-modal');
-                document.getElementById('add-url').value = '';
-                document.getElementById('add-description').value = '';
-                document.getElementById('add-cnt').value = '';
+                await supabase.rpc(
+                    'add_points',
+                    {
+                        p_user_id:
+                            currentUser.telegram_id,
 
-                await loadData();
-                alert(t('taskSuccess'));
-            } catch (err) {
-                console.error('addLink:', err);
-                if (String(err?.message || '').toLowerCase().includes('insufficient points')) {
-                    alert(t('insufficientPoints', {p: pts}));
-                } else {
-                    alert(t('loadError'));
-                }
+                        p_points:
+                            totalCost
+                    }
+                );
+
+                throw taskError;
+            }
+
+
+            pts =
+                Number(
+                    newPoints
+                );
+
+
+            myLink =
+                insertedTask;
+
+
+            closeModal(
+                'add-modal'
+            );
+
+
+            document.getElementById(
+                'add-url'
+            ).value = '';
+
+
+            document.getElementById(
+                'add-description'
+            ).value = '';
+
+
+            document.getElementById(
+                'add-cnt'
+            ).value = '';
+
+
+            await loadData();
+
+
+            alert(
+                t('taskSuccess')
+            );
+
+        } catch (err) {
+
+            console.error(
+                'addLink:',
+                err
+            );
+
+            if (
+                String(
+                    err?.message || ''
+                )
+                .toLowerCase()
+                .includes(
+                    'insufficient points'
+                )
+            ) {
+
+                alert(
+                    t(
+                        'insufficientPoints',
+                        {p: pts}
+                    )
+                );
+
+            } else {
+
+                alert(
+                    t('loadError')
+                );
             }
         }
-
-        // Give each newly-created Telegram account a one-time 20-point welcome bonus.
-        // The server-side create_user RPC should ideally perform this atomically as well.
-        async function grantWelcomeBonusIfNew(user) {
-            if (!user?.telegram_id) return;
-            const key = 'welcomeBonusGranted_' + String(user.telegram_id);
-            if (localStorage.getItem(key) === '1') return;
-
-            const createdAt = user.created_at ? new Date(user.created_at).getTime() : NaN;
-            const isNewUser = Number.isFinite(createdAt) && (Date.now() - createdAt) < 2 * 60 * 1000;
-            if (!isNewUser) return;
-
-            try {
-                const newBalance = await awardPoints(20, user.telegram_id);
-                pts = Number(newBalance);
-                localStorage.setItem(key, '1');
-                render();
-                alert('🎁 أهلاً بك! تمت إضافة 20 نقطة مجانية إلى حسابك.');
-            } catch (err) {
-                console.error('welcome bonus:', err);
-                // Do not mark as granted if the server rejected it; retry on next load.
-            }
-        }
-
-        // Gram purchases remain a UI placeholder until a real payment/backend flow is implemented.
-        async function loadData() {
-    if (!ensureSupabase('تحميل بيانات الحساب')) {
-        currentUser = null;
-        pts = Number(localStorage.getItem('pts') || 0);
-        render();
-        return;
     }
-            const telegramUser = getTelegramUser();
 
-            if (!telegramUser?.id) {
-                // Browser preview: no Telegram user exists, so do not create fake DB users.
-                currentUser = null;
-                pts = 0;
-                tasks = [];
-                visitedTasks = [];
-                referralCount = 0;
-                referralPoints = 0;
-                render();
-                return;
+
+    /* ================================
+       WELCOME BONUS
+    ================================= */
+
+    async function grantWelcomeBonusIfNew(
+        user
+    ) {
+
+        if (
+            !user?.telegram_id
+        ) {
+            return;
+        }
+
+
+        const key =
+            'welcomeBonusGranted_' +
+            String(
+                user.telegram_id
+            );
+
+
+        if (
+            localStorage.getItem(
+                key
+            ) === '1'
+        ) {
+            return;
+        }
+
+
+        const createdAt =
+            user.created_at
+                ? new Date(
+                    user.created_at
+                ).getTime()
+                : NaN;
+
+
+        const isNewUser =
+            Number.isFinite(
+                createdAt
+            )
+            &&
+            (
+                Date.now() -
+                createdAt
+            )
+            <
+            2 * 60 * 1000;
+
+
+        if (!isNewUser) {
+            return;
+        }
+
+
+        try {
+
+            const newBalance =
+                await awardPoints(
+                    20,
+                    user.telegram_id
+                );
+
+
+            pts =
+                Number(
+                    newBalance
+                );
+
+
+            localStorage.setItem(
+                key,
+                '1'
+            );
+
+
+            render();
+
+
+            alert(
+                '🎁 أهلاً بك! تمت إضافة 20 نقطة مجانية إلى حسابك.'
+            );
+
+        } catch (err) {
+
+            console.error(
+                'welcome bonus:',
+                err
+            );
+        }
+    }
+
+
+    /* ================================
+       LOAD DATA
+    ================================= */
+
+    async function loadData() {
+
+        if (
+            !ensureSupabase(
+                'تحميل بيانات الحساب'
+            )
+        ) {
+
+            currentUser = null;
+
+            pts =
+                Number(
+                    localStorage.getItem(
+                        'pts'
+                    ) || 0
+                );
+
+            render();
+
+            return;
+        }
+
+
+        const telegramUser =
+            getTelegramUser();
+
+
+        if (!telegramUser?.id) {
+
+            currentUser = null;
+
+            pts = 0;
+
+            tasks = [];
+
+            visitedTasks = [];
+
+            render();
+
+            return;
+        }
+
+
+        try {
+
+            const {
+                data: user,
+                error: userError
+            } =
+                await supabase.rpc(
+                    'create_user',
+                    {
+                        p_telegram_id:
+                            telegramUser.id,
+
+                        p_username:
+                            telegramUser.username ||
+                            null,
+
+                        p_first_name:
+                            telegramUser.first_name ||
+                            null
+                    }
+                );
+
+
+            if (userError) {
+                throw userError;
             }
 
-            try {
-                const { data: user, error: userError } = await supabase.rpc('create_user', {
-                    p_telegram_id: telegramUser.id,
-                    p_username: telegramUser.username || null,
-                    p_first_name: telegramUser.first_name || null
-                });
 
-                if (userError) throw userError;
+            currentUser =
+                user;
 
-                currentUser = user;
-                await grantWelcomeBonusIfNew(user);
 
-                const { data: taskRows, error: taskError } = await supabase
+            await grantWelcomeBonusIfNew(
+                user
+            );
+
+
+            /*
+             * تحميل المهام
+             */
+
+            const {
+                data: taskRows,
+                error: taskError
+            } =
+                await supabase
                     .from('tasks')
-                    .select('id,title,description,reward_points,url,is_active,created_at,owner_id,required_visits')
-                    .eq('is_active', true)
-                    .order('created_at', { ascending: true });
+                    .select(
+                        'id,title,description,reward_points,url,is_active,created_at,owner_id,required_visits'
+                    )
+                    .eq(
+                        'is_active',
+                        true
+                    )
+                    .order(
+                        'created_at',
+                        {
+                            ascending: true
+                        }
+                    );
 
-                if (taskError) throw taskError;
 
-                const { data: completedRows, error: completedError } = await supabase
-                    .from('completed_tasks')
-                    .select('task_id')
-                    .eq('user_id', telegramUser.id);
+            if (taskError) {
+                throw taskError;
+            }
 
-                if (completedError) throw completedError;
 
-                const { data: allCompletedRows, error: allCompletedError } = await supabase
-                    .from('completed_tasks')
-                    .select('task_id');
+            /*
+             * المهام التي أكملها المستخدم
+             */
 
-                if (allCompletedError) throw allCompletedError;
+            const {
+                data: completedRows,
+                error: completedError
+            } =
+                await supabase
+                    .from(
+                        'completed_tasks'
+                    )
+                    .select(
+                        'task_id'
+                    )
+                    .eq(
+                        'user_id',
+                        telegramUser.id
+                    );
 
-                const completedCounts = {};
-                (allCompletedRows || []).forEach(row => {
-                    const id = Number(row.task_id);
-                    completedCounts[id] = (completedCounts[id] || 0) + 1;
+
+            if (completedError) {
+                throw completedError;
+            }
+
+
+            /*
+             * عدد الإنجازات لكل مهمة
+             */
+
+            const {
+                data: allCompletedRows,
+                error: allCompletedError
+            } =
+                await supabase
+                    .from(
+                        'completed_tasks'
+                    )
+                    .select(
+                        'task_id'
+                    );
+
+
+            if (allCompletedError) {
+                throw allCompletedError;
+            }
+
+
+            const completedCounts = {};
+
+
+            (
+                allCompletedRows || []
+            )
+            .forEach(row => {
+
+                const id =
+                    Number(
+                        row.task_id
+                    );
+
+                completedCounts[id] =
+                    (
+                        completedCounts[id] ||
+                        0
+                    ) + 1;
+            });
+
+
+            pts =
+                Number(
+                    user.points || 0
+                );
+
+
+            visitedTasks =
+                (
+                    completedRows || []
+                )
+                .map(
+                    r =>
+                        Number(
+                            r.task_id
+                        )
+                );
+
+
+            /*
+             * بناء المهام للواجهة
+             */
+
+            tasks =
+                (
+                    taskRows || []
+                )
+                .map(row => {
+
+                    const required =
+                        Number(
+                            row.required_visits ||
+                            1
+                        );
+
+
+                    const completed =
+                        Number(
+                            completedCounts[
+                                Number(row.id)
+                            ] || 0
+                        );
+
+
+                    return {
+
+                        id:
+                            Number(
+                                row.id
+                            ),
+
+                        user:
+                            Number(
+                                row.owner_id
+                            ) ===
+                            Number(
+                                telegramUser.id
+                            )
+                                ?
+                                (
+                                    currentLang === 'en'
+                                        ? 'You'
+                                        : 'أنت'
+                                )
+                                :
+                                (
+                                    row.title ||
+                                    'User'
+                                ),
+
+                        title:
+                            row.title,
+
+                        description:
+                            row.description ||
+                            '',
+
+                        url:
+                            row.url,
+
+                        left:
+                            Math.max(
+                                0,
+                                required -
+                                completed
+                            ),
+
+                        required_visits:
+                            required,
+
+                        reward_points:
+                            Number(
+                                row.reward_points ||
+                                TASK_REWARD
+                            ),
+
+                        is_active:
+                            row.is_active,
+
+                        owner_id:
+                            row.owner_id
+                    };
                 });
 
-                const { data: referralRows, error: referralError } = await supabase
-                    .from('referrals')
-                    .select('reward_points')
-                    .eq('referrer_id', telegramUser.id);
 
-                if (referralError) throw referralError;
+            /*
+             * مهمة المستخدم نفسه
+             */
 
-                pts = Number(user.points || 0);
-                visitedTasks = (completedRows || []).map(r => Number(r.task_id));
-                referralCount = (referralRows || []).length;
-                referralPoints = (referralRows || []).reduce((sum, r) => sum + Number(r.reward_points || 0), 0);
+            myLink =
+                tasks.find(
+                    t =>
+                        Number(
+                            t.owner_id
+                        ) ===
+                        Number(
+                            telegramUser.id
+                        )
+                )
+                ||
+                null;
 
-                // Map DB tasks to the UI. "left" is derived from required_visits minus completed visits
-                // for the current task; exact global remaining counters should eventually be handled server-side.
-                tasks = (taskRows || []).map(row => ({
-                    id: Number(row.id),
-                    user: Number(row.owner_id) === Number(telegramUser.id)
-                        ? (currentLang === 'en' ? 'You' : 'أنت')
-                        : (row.title || 'User'),
-                    title: row.title,
-                    description: row.description || '',
-                    url: row.url,
-                    left: Math.max(0, Number(row.required_visits || 1) - Number(completedCounts[Number(row.id)] || 0)),
-                    required_visits: Number(row.required_visits || 1),
-                    reward_points: Number(row.reward_points || 1),
-                    is_active: row.is_active,
-                    owner_id: row.owner_id
-                }));
 
-                myLink = tasks.find(t => Number(t.owner_id) === Number(telegramUser.id)) || null;
+            render();
 
-                render();
-            } catch (err) {
-                console.error('loadData:', err);
-                currentUser = null;
-                render();
-                alert(t('loadError'));
-            }
+        } catch (err) {
+
+            console.error(
+                'loadData:',
+                err
+            );
+
+            currentUser =
+                null;
+
+            render();
+
+            alert(
+                t('loadError')
+            );
         }
-
-        applyLanguage();
-        // Never block the UI waiting for a third-party script.
-        setTimeout(() => loadData(), 0);
-    </script>
-
-<div id="connectionStatus" style="
-position:fixed;left:10px;bottom:10px;z-index:9999;
-padding:7px 10px;border-radius:10px;font-size:11px;
-background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px);
-">
-جاري فحص الاتصال...
-</div>
-<script>
-(function(){
-    function updateConnectionStatus(){
-        const el=document.getElementById('connectionStatus');
-        if(!el) return;
-        const telegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe);
-        const online = navigator.onLine;
-        let text = telegram ? 'Telegram ✓' : 'Chrome/Browser';
-        text += online ? ' • Internet ✓' : ' • Internet ✕';
-        text += (typeof supabaseReady !== 'undefined' && supabaseReady) ? ' • Supabase ✓' : ' • Supabase ✕';
-        el.textContent=text;
     }
-    window.addEventListener('online',updateConnectionStatus);
-    window.addEventListener('offline',updateConnectionStatus);
-    setTimeout(updateConnectionStatus,500);
-})();
+
+
+    /* ================================
+       START
+    ================================= */
+
+    applyLanguage();
+
+    setTimeout(
+        () => loadData(),
+        0
+    );
+
 </script>
+
+
+<!-- Connection Status -->
+<div
+    id="connectionStatus"
+    style="
+        position:fixed;
+        left:10px;
+        bottom:10px;
+        z-index:9999;
+        padding:7px 10px;
+        border-radius:10px;
+        font-size:11px;
+        background:rgba(0,0,0,.55);
+        color:#fff;
+        backdrop-filter:blur(6px);
+    "
+>
+    جاري فحص الاتصال...
+</div>
+
+
 <script>
+
 (function () {
-    const ADMIN_ID = 5339335944;
+
+    function updateConnectionStatus() {
+
+        const el =
+            document.getElementById(
+                'connectionStatus'
+            );
+
+        if (!el) return;
+
+
+        const telegram =
+            !!(
+                window.Telegram &&
+                window.Telegram.WebApp &&
+                window.Telegram.WebApp.initDataUnsafe
+            );
+
+
+        const online =
+            navigator.onLine;
+
+
+        let text =
+            telegram
+                ? 'Telegram ✓'
+                : 'Chrome/Browser';
+
+
+        text +=
+            online
+                ? ' • Internet ✓'
+                : ' • Internet ✕';
+
+
+        text +=
+            (
+                typeof supabaseReady !==
+                'undefined' &&
+                supabaseReady
+            )
+                ? ' • Supabase ✓'
+                : ' • Supabase ✕';
+
+
+        el.textContent =
+            text;
+    }
+
+
+    window.addEventListener(
+        'online',
+        updateConnectionStatus
+    );
+
+    window.addEventListener(
+        'offline',
+        updateConnectionStatus
+    );
+
+
+    setTimeout(
+        updateConnectionStatus,
+        500
+    );
+
+})();
+
+</script>
+
+
+<!-- ADMIN -->
+<script>
+
+(function () {
+
+    const ADMIN_ID =
+        5339335944;
+
 
     function addAdminButton() {
-        if (!window.Telegram || !window.Telegram.WebApp) return;
 
-        const tg = window.Telegram.WebApp;
-        const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+        if (
+            !window.Telegram ||
+            !window.Telegram.WebApp
+        ) {
+            return;
+        }
 
-        if (!user || Number(user.id) !== ADMIN_ID) return;
 
-        if (document.getElementById('adminButton')) return;
+        const tg =
+            window.Telegram.WebApp;
 
-        const button = document.createElement('button');
-        button.id = 'adminButton';
-        button.textContent = '⚙️ الإدارة';
+
+        const user =
+            tg.initDataUnsafe &&
+            tg.initDataUnsafe.user;
+
+
+        if (
+            !user ||
+            Number(user.id) !==
+                ADMIN_ID
+        ) {
+            return;
+        }
+
+
+        if (
+            document.getElementById(
+                'adminButton'
+            )
+        ) {
+            return;
+        }
+
+
+        const button =
+            document.createElement(
+                'button'
+            );
+
+
+        button.id =
+            'adminButton';
+
+
+        button.textContent =
+            '⚙️ الإدارة';
+
 
         button.style.cssText = `
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            z-index: 99999;
-            border: none;
-            border-radius: 12px;
-            padding: 10px 14px;
-            background: #222;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
+            position:fixed;
+            top:12px;
+            left:12px;
+            z-index:99999;
+            border:none;
+            border-radius:12px;
+            padding:10px 14px;
+            background:#222;
+            color:white;
+            font-size:14px;
+            font-weight:bold;
+            cursor:pointer;
         `;
 
-        button.onclick = async function () {
-    const panel = document.getElementById('adminPanel');
-    const countElement = document.getElementById('adminUsersCount');
-        loadAdminWithdrawals();
 
-    if (panel) {
-        panel.style.display = 'block';
-    }
+        button.onclick =
+            async function () {
 
-    if (!countElement) return;
+                const panel =
+                    document.getElementById(
+                        'adminPanel'
+                    );
 
-    countElement.textContent = 'جاري التحميل...';
 
-    try {
-        // Ask Supabase for the exact row count without downloading user records.
-        const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/users?select=telegram_id`,
-            {
-                method: 'HEAD',
-                headers: {
-                    apikey: SUPABASE_KEY,
-                    Authorization: `Bearer ${SUPABASE_KEY}`,
-                    Prefer: 'count=exact'
+                const countElement =
+                    document.getElementById(
+                        'adminUsersCount'
+                    );
+
+
+                await loadAdminWithdrawals();
+
+
+                if (panel) {
+                    panel.style.display =
+                        'block';
                 }
-            }
+
+
+                if (!countElement) {
+                    return;
+                }
+
+
+                countElement.textContent =
+                    'جاري التحميل...';
+
+
+                try {
+
+                    const response =
+                        await fetch(
+
+                            `${SUPABASE_URL}/rest/v1/users?select=telegram_id`,
+
+                            {
+                                method:
+                                    'HEAD',
+
+                                headers: {
+
+                                    apikey:
+                                        SUPABASE_KEY,
+
+                                    Authorization:
+                                        `Bearer ${SUPABASE_KEY}`,
+
+                                    Prefer:
+                                        'count=exact'
+                                }
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            `HTTP ${response.status}`
+                        );
+                    }
+
+
+                    const range =
+                        response.headers.get(
+                            'content-range'
+                        );
+
+
+                    if (!range) {
+
+                        throw new Error(
+                            'Supabase did not return a row count'
+                        );
+                    }
+
+
+                    const total =
+                        range.split('/')[1];
+
+
+                    if (
+                        total === undefined ||
+                        total === '*'
+                    ) {
+
+                        throw new Error(
+                            'Invalid user count'
+                        );
+                    }
+
+
+                    countElement.textContent =
+                        Number(total);
+
+                } catch (err) {
+
+                    console.error(
+                        'Admin users count:',
+                        err
+                    );
+
+                    countElement.textContent =
+                        'خطأ';
+                }
+            };
+
+
+        document.body.appendChild(
+            button
         );
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        const range = response.headers.get('content-range');
-
-        if (!range) {
-            throw new Error('Supabase did not return a row count');
-        }
-
-        const total = range.split('/')[1];
-
-        if (total === undefined || total === '*') {
-            throw new Error('Invalid user count');
-        }
-
-        countElement.textContent = Number(total);
-    } catch (err) {
-        console.error('Admin users count:', err);
-        countElement.textContent = 'خطأ';
-    }
-};
-
-document.body.appendChild(button);
     }
 
 
     async function loadAdminWithdrawals() {
-        const box = document.getElementById('adminWithdrawals');
-        if (!box) return;
-        box.innerHTML = 'جاري تحميل طلبات السحب...';
-        try {
-            const { data, error } = await supabase.rpc('admin_get_withdrawals', { p_admin_id: ADMIN_ID });
-            if (error) throw error;
-            if (!data || !data.length) { box.innerHTML = 'لا توجد طلبات سحب حالياً.'; return; }
 
-            box.innerHTML = data.map(row => `
-                <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:12px;margin-top:10px;">
-                    <div style="font-weight:bold;">👤 ${escapeHtml(row.username || row.first_name || 'بدون اسم')}</div>
-                    <div style="font-size:13px;margin-top:4px;">Telegram ID: ${escapeHtml(row.telegram_id)}</div>
-                    <div style="font-size:13px;margin-top:4px;">النقاط: <b>${Number(row.points)}</b> → <b>${Number(row.amount_usdt).toFixed(2)} USDT</b></div>
-                    <div style="font-size:12px;margin-top:5px;direction:ltr;text-align:left;word-break:break-all;">${escapeHtml(row.wallet_address || '')}</div>
-                    <div style="font-size:11px;color:#666;margin-top:5px;">${escapeHtml(row.created_at || '')}</div>
-                    <div style="margin-top:8px;font-weight:bold;">الحالة: ${escapeHtml(row.status || 'pending')}</div>
-                    ${row.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:10px;">
-                        <button onclick="processAdminWithdrawal(${Number(row.id)}, 'paid')" style="flex:1;padding:10px;border:0;border-radius:9px;background:#16a34a;color:#fff;font-weight:bold;">تم الدفع</button>
-                        <button onclick="processAdminWithdrawal(${Number(row.id)}, 'rejected')" style="flex:1;padding:10px;border:0;border-radius:9px;background:#dc2626;color:#fff;font-weight:bold;">رفض</button>
-                    </div>` : ''}
-                </div>`).join('');
+        const box =
+            document.getElementById(
+                'adminWithdrawals'
+            );
+
+
+        if (!box) return;
+
+
+        box.innerHTML =
+            'جاري تحميل طلبات السحب...';
+
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabase.rpc(
+                    'admin_get_withdrawals',
+                    {
+                        p_admin_id:
+                            ADMIN_ID
+                    }
+                );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            if (
+                !data ||
+                !data.length
+            ) {
+
+                box.innerHTML =
+                    'لا توجد طلبات سحب حالياً.';
+
+                return;
+            }
+
+
+            box.innerHTML =
+                data
+                    .map(row => `
+
+                        <div style="
+                            background:#fff;
+                            border:1px solid #ddd;
+                            border-radius:12px;
+                            padding:12px;
+                            margin-top:10px;
+                        ">
+
+                            <div style="
+                                font-weight:bold;
+                            ">
+                                👤
+                                ${escapeHtml(
+                                    row.username ||
+                                    row.first_name ||
+                                    'بدون اسم'
+                                )}
+                            </div>
+
+                            <div style="
+                                font-size:13px;
+                                margin-top:4px;
+                            ">
+                                Telegram ID:
+                                ${escapeHtml(
+                                    row.telegram_id
+                                )}
+                            </div>
+
+                            <div style="
+                                font-size:13px;
+                                margin-top:4px;
+                            ">
+                                النقاط:
+                                <b>
+                                    ${Number(
+                                        row.points
+                                    )}
+                                </b>
+
+                                →
+
+                                <b>
+                                    ${Number(
+                                        row.amount_usdt
+                                    ).toFixed(2)}
+                                    USDT
+                                </b>
+                            </div>
+
+                            <div style="
+                                font-size:12px;
+                                margin-top:5px;
+                                direction:ltr;
+                                text-align:left;
+                                word-break:break-all;
+                            ">
+                                ${escapeHtml(
+                                    row.wallet_address ||
+                                    ''
+                                )}
+                            </div>
+
+                            <div style="
+                                font-size:11px;
+                                color:#666;
+                                margin-top:5px;
+                            ">
+                                ${escapeHtml(
+                                    row.created_at ||
+                                    ''
+                                )}
+                            </div>
+
+                            <div style="
+                                margin-top:8px;
+                                font-weight:bold;
+                            ">
+                                الحالة:
+                                ${escapeHtml(
+                                    row.status ||
+                                    'pending'
+                                )}
+                            </div>
+
+
+                            ${
+                                row.status === 'pending'
+                                    ?
+
+                                    `
+                                    <div style="
+                                        display:flex;
+                                        gap:8px;
+                                        margin-top:10px;
+                                    ">
+
+                                        <button
+                                            onclick="
+                                                processAdminWithdrawal(
+                                                    ${Number(row.id)},
+                                                    'paid'
+                                                )
+                                            "
+                                            style="
+                                                flex:1;
+                                                padding:10px;
+                                                border:0;
+                                                border-radius:9px;
+                                                background:#16a34a;
+                                                color:#fff;
+                                                font-weight:bold;
+                                            "
+                                        >
+                                            تم الدفع
+                                        </button>
+
+
+                                        <button
+                                            onclick="
+                                                processAdminWithdrawal(
+                                                    ${Number(row.id)},
+                                                    'rejected'
+                                                )
+                                            "
+                                            style="
+                                                flex:1;
+                                                padding:10px;
+                                                border:0;
+                                                border-radius:9px;
+                                                background:#dc2626;
+                                                color:#fff;
+                                                font-weight:bold;
+                                            "
+                                        >
+                                            رفض
+                                        </button>
+
+                                    </div>
+                                    `
+
+                                    :
+
+                                    ''
+                            }
+
+                        </div>
+                    `)
+                    .join('');
+
         } catch (err) {
-            console.error('loadAdminWithdrawals:', err);
-            box.innerHTML = 'تعذر تحميل طلبات السحب: ' + escapeHtml(err?.message || '');
+
+            console.error(
+                'loadAdminWithdrawals:',
+                err
+            );
+
+            box.innerHTML =
+                'تعذر تحميل طلبات السحب: ' +
+                escapeHtml(
+                    err?.message || ''
+                );
         }
     }
 
-    window.processAdminWithdrawal = async function(id, status) {
-        if (!confirm(status === 'paid' ? 'تأكيد أن الطلب تم دفعه؟' : 'رفض الطلب وإرجاع النقاط للمستخدم؟')) return;
-        try {
-            const { error } = await supabase.rpc('process_withdrawal', {
-                p_admin_id: ADMIN_ID,
-                p_withdrawal_id: id,
-                p_status: status
-            });
-            if (error) throw error;
-            alert(status === 'paid' ? 'تم تسجيل الدفع ✅' : 'تم رفض الطلب وإرجاع النقاط للمستخدم ✅');
-            await loadAdminWithdrawals();
-        } catch (err) {
-            console.error('processAdminWithdrawal:', err);
-            alert('تعذر معالجة الطلب: ' + (err?.message || 'خطأ غير معروف'));
-        }
-    };
 
-    setTimeout(addAdminButton, 1000);
+    window.processAdminWithdrawal =
+        async function (
+            id,
+            status
+        ) {
+
+            const message =
+                status === 'paid'
+                    ?
+                    'تأكيد أن الطلب تم دفعه؟'
+                    :
+                    'رفض الطلب وإرجاع النقاط للمستخدم؟';
+
+
+            if (
+                !confirm(message)
+            ) {
+                return;
+            }
+
+
+            try {
+
+                const {
+                    error
+                } =
+                    await supabase.rpc(
+                        'process_withdrawal',
+                        {
+                            p_admin_id:
+                                ADMIN_ID,
+
+                            p_withdrawal_id:
+                                id,
+
+                            p_status:
+                                status
+                        }
+                    );
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                alert(
+                    status === 'paid'
+                        ?
+                        'تم تسجيل الدفع ✅'
+                        :
+                        'تم رفض الطلب وإرجاع النقاط للمستخدم ✅'
+                );
+
+
+                await loadAdminWithdrawals();
+
+            } catch (err) {
+
+                console.error(
+                    'processAdminWithdrawal:',
+                    err
+                );
+
+                alert(
+                    'تعذر معالجة الطلب: ' +
+                    (
+                        err?.message ||
+                        'خطأ غير معروف'
+                    )
+                );
+            }
+        };
+
+
+    setTimeout(
+        addAdminButton,
+        1000
+    );
+
 })();
+
 </script>
-<div id="adminPanel" style="
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:999998;
-    background:#f5f5f5;
-    color:#222;
-    padding:20px;
-    overflow:auto;
-    direction:rtl;
-">
+
+
+<!-- ADMIN PANEL -->
+<div
+    id="adminPanel"
+    style="
+        display:none;
+        position:fixed;
+        inset:0;
+        z-index:999998;
+        background:#f5f5f5;
+        color:#222;
+        padding:20px;
+        overflow:auto;
+        direction:rtl;
+    "
+>
+
     <div style="
         max-width:500px;
         margin:40px auto;
@@ -1278,45 +4259,101 @@ document.body.appendChild(button);
         padding:20px;
         box-shadow:0 4px 20px rgba(0,0,0,.15);
     ">
-        <h2 style="margin-top:0;">⚙️ لوحة الإدارة</h2>
 
+        <h2 style="
+            margin-top:0;
+        ">
+            ⚙️ لوحة الإدارة
+        </h2>
+
+
+        <!-- Users -->
         <div style="
             background:#f0f0f0;
             border-radius:14px;
             padding:18px;
             margin-top:20px;
         ">
-            <div style="font-size:15px;">👥 عدد المستخدمين</div>
-            <div id="adminUsersCount" style="
-                font-size:32px;
-                font-weight:bold;
-                margin-top:8px;
-            ">--</div>
+
+            <div style="
+                font-size:15px;
+            ">
+                👥 عدد المستخدمين
+            </div>
+
+            <div
+                id="adminUsersCount"
+                style="
+                    font-size:32px;
+                    font-weight:bold;
+                    margin-top:8px;
+                "
+            >
+                --
+            </div>
+
         </div>
 
-        <div style="background:#f0f0f0;border-radius:14px;padding:18px;margin-top:20px;">
-            <div style="font-size:15px;font-weight:bold;">💰 طلبات سحب USDT</div>
-            <div id="adminWithdrawals" style="margin-top:12px;">اضغط على الإدارة لتحميل الطلبات.</div>
-        </div>
 
-        <button id="closeAdminPanel" style="
-            width:100%;
+        <!-- Withdrawals -->
+        <div style="
+            background:#f0f0f0;
+            border-radius:14px;
+            padding:18px;
             margin-top:20px;
-            padding:13px;
-            border:0;
-            border-radius:12px;
-            background:#222;
-            color:white;
-            font-size:16px;
         ">
+
+            <div style="
+                font-size:15px;
+                font-weight:bold;
+            ">
+                💰 طلبات سحب USDT
+            </div>
+
+            <div
+                id="adminWithdrawals"
+                style="margin-top:12px;"
+            >
+                اضغط على الإدارة لتحميل الطلبات.
+            </div>
+
+        </div>
+
+
+        <button
+            id="closeAdminPanel"
+            style="
+                width:100%;
+                margin-top:20px;
+                padding:13px;
+                border:0;
+                border-radius:12px;
+                background:#222;
+                color:white;
+                font-size:16px;
+            "
+        >
             إغلاق
         </button>
+
     </div>
+
 </div>
+
+
 <script>
-document.getElementById('closeAdminPanel').onclick = function () {
-    document.getElementById('adminPanel').style.display = 'none';
+
+document.getElementById(
+    'closeAdminPanel'
+).onclick = function () {
+
+    document.getElementById(
+        'adminPanel'
+    ).style.display =
+        'none';
 };
+
 </script>
+
 </body>
 </html>
