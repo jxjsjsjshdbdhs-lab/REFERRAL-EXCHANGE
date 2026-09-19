@@ -1,761 +1,755 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="app-title">منصة تبادل الإحالات</title>
+    <title id="app-title">منصة تبادل الإحالات</title><script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-1: #0f172a;
+        --bg-2: #1e1b4b;
+        --card: rgba(30, 41, 59, 0.9);
+        --border: rgba(255, 255, 255, 0.15);
+        --purple: #818cf8;
+        --cyan: #22d3ee;
+        --emerald: #34d399;
+        --amber: #fbbf24;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+    }
 
-    <style>
-        :root {
-            --bg-1: #0f172a;
-            --bg-2: #1e1b4b;
-            --card: rgba(30, 41, 59, 0.9);
-            --border: rgba(255, 255, 255, 0.15);
-            --purple: #818cf8;
-            --cyan: #22d3ee;
-            --emerald: #34d399;
-            --amber: #fbbf24;
-            --text: #f8fafc;
-            --muted: #94a3b8;
-        }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Tajawal', sans-serif;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', sans-serif;
-        }
+    body {
+        background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        background-attachment: fixed;
+        color: var(--text);
+        padding: 16px;
+        padding-bottom: 90px;
+        max-width: 480px;
+        margin: 0 auto;
+        min-height: 100vh;
+    }
 
-        body {
-            background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
-            background-attachment: fixed;
-            color: var(--text);
-            padding: 16px;
-            padding-bottom: 90px;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-        }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
+    .title {
+        font-size: 18pt;
+        font-weight: 900;
+        color: var(--cyan);
+    }
 
-        .title {
-            font-size: 18pt;
-            font-weight: 900;
-            color: var(--cyan);
-        }
+    .pill {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid var(--border);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 10pt;
+        font-weight: 700;
+    }
 
-        .pill {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 10pt;
-            font-weight: 700;
-        }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+    }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
-        }
+    .stat-box {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 4px;
+        text-align: center;
+    }
 
-        .stat-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 4px;
-            text-align: center;
-        }
+    .stat-val {
+        font-size: 13pt;
+        font-weight: 900;
+        color: #fff;
+    }
 
-        .stat-val {
-            font-size: 13pt;
-            font-weight: 900;
-            color: #fff;
-        }
+    .stat-lbl {
+        font-size: 7.5pt;
+        color: var(--muted);
+        margin-top: 2px;
+    }
 
-        .stat-lbl {
-            font-size: 7.5pt;
-            color: var(--muted);
-            margin-top: 2px;
-        }
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 16px;
+    }
 
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 16px;
-        }
+    .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 800;
+        font-size: 10pt;
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
 
-        .btn {
-            border: none;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-weight: 800;
-            font-size: 10pt;
-            cursor: pointer;
-            display: block;
-            width: 100%;
-            text-align: center;
-        }
+    .btn:disabled {
+        cursor: not-allowed;
+    }
 
-        .btn:disabled {
-            cursor: not-allowed;
-        }
+    .btn-amber {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #0f172a;
+    }
 
-        .btn-amber {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0f172a;
-        }
+    .btn-purple {
+        background: linear-gradient(135deg, var(--purple), #6366f1);
+        color: #fff;
+    }
 
-        .btn-purple {
-            background: linear-gradient(135deg, var(--purple), #6366f1);
-            color: #fff;
-        }
+    .btn-emerald {
+        background: rgba(52,211,153,0.2);
+        color: var(--emerald);
+        border: 1px solid var(--emerald);
+    }
 
-        .btn-emerald {
-            background: rgba(52,211,153,0.2);
-            color: var(--emerald);
-            border: 1px solid var(--emerald);
-        }
+    .link-box {
+        background: rgba(0,0,0,0.4);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 9pt;
+        color: var(--cyan);
+        margin: 10px 0;
+        direction: ltr;
+        text-align: left;
+        word-break: break-all;
+    }
 
-        .link-box {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 9pt;
-            color: var(--cyan);
-            margin: 10px 0;
-            direction: ltr;
-            text-align: left;
-            word-break: break-all;
-        }
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 16px;
+    }
 
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            padding: 16px;
-        }
+    .modal-box {
+        background: #1e293b;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+        width: 100%;
+        max-width: 360px;
+    }
 
-        .modal-box {
-            background: #1e293b;
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 18px;
-            width: 100%;
-            max-width: 360px;
-        }
+    .inp {
+        width: 100%;
+        padding: 10px;
+        background: #0f172a;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: #fff;
+        margin: 6px 0 14px 0;
+        outline: none;
+        font-size: 10pt;
+    }
 
-        .inp {
-            width: 100%;
-            padding: 10px;
-            background: #0f172a;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: #fff;
-            margin: 6px 0 14px 0;
-            outline: none;
-            font-size: 10pt;
-        }
+    textarea.inp {
+        min-height: 80px;
+    }
 
-        textarea.inp {
-            min-height: 80px;
-        }
+    .nav {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 20px);
+        max-width: 440px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        display: flex;
+        justify-content: space-around;
+        padding: 8px 0;
+        z-index: 999;
+    }
 
-        .nav {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 20px);
-            max-width: 440px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            z-index: 999;
-        }
+    .nav-item {
+        color: var(--muted);
+        font-size: 8pt;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        min-width: 70px;
+    }
 
-        .nav-item {
-            color: var(--muted);
-            font-size: 8pt;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            min-width: 70px;
-        }
+    .nav-item.active {
+        color: var(--cyan);
+    }
 
-        .nav-item.active {
-            color: var(--cyan);
-        }
+    body.en {
+        direction: ltr;
+    }
 
-        body.en {
-            direction: ltr;
-        }
+    body.en .link-box {
+        direction: ltr;
+        text-align: left;
+    }
 
-        body.en .link-box {
-            direction: ltr;
-            text-align: left;
-        }
+    body.en .stat-box,
+    body.en .card {
+        text-align: left;
+    }
 
-        body.en .stat-box,
-        body.en .card {
-            text-align: left;
-        }
+    body.en .header {
+        direction: ltr;
+    }
 
-        body.en .header {
-            direction: ltr;
-        }
+    #connectionStatus {
+        pointer-events: none;
+    }
+</style>
 
-        #connectionStatus {
-            pointer-events: none;
-        }
-    </style>
-</head>
+</head><body><!-- Header -->
+<div class="header">
+    <div class="title" data-i18n="appName">تبادل الإحالات</div>
 
-<body>
+    <div class="pill">
+        💎 Gram:
+        <span id="gram-bal" style="color:var(--amber);">0.50</span>
+    </div>
+</div>
 
-    <!-- Header -->
-    <div class="header">
-        <div class="title" data-i18n="appName">تبادل الإحالات</div>
+<!-- Language -->
+<div class="card" style="
+    padding:10px;
+    margin-bottom:12px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:space-between;
+">
+    <span style="font-size:9pt;color:var(--muted);" data-i18n="languageLabel">
+        🌐 اللغة
+    </span>
 
-        <div class="pill">
-            💎 Gram:
-            <span id="gram-bal" style="color:var(--amber);">0.50</span>
-        </div>
+    <button
+        id="lang-toggle"
+        class="btn btn-emerald"
+        style="width:auto;padding:6px 12px;"
+        onclick="toggleLanguage()"
+    >
+        English
+    </button>
+</div>
+
+<!-- Reward -->
+<div class="card" style="text-align:center;">
+    <div style="font-size:24px;">🎁</div>
+
+    <div
+        style="font-size:13pt;font-weight:900;"
+        id="reward-title"
+        data-i18n="rewardTitle"
+    >
+        مكافأة كل 12 ساعة
     </div>
 
-    <!-- Language -->
-    <div class="card" style="
-        padding:10px;
-        margin-bottom:12px;
-        display:flex;
-        gap:8px;
-        align-items:center;
-        justify-content:space-between;
-    ">
-        <span style="font-size:9pt;color:var(--muted);" data-i18n="languageLabel">
-            🌐 اللغة
-        </span>
-
-        <button
-            id="lang-toggle"
-            class="btn btn-emerald"
-            style="width:auto;padding:6px 12px;"
-            onclick="toggleLanguage()"
-        >
-            English
-        </button>
+    <div
+        style="font-size:9pt;color:var(--muted);margin:5px 0;"
+        id="reward-status"
+    >
+        احصل على 15 نقطة مجاناً
     </div>
 
-    <!-- Reward -->
-    <div class="card" style="text-align:center;">
-        <div style="font-size:24px;">🎁</div>
+    <button
+        class="btn btn-amber"
+        id="reward-btn"
+        onclick="claimReward()"
+    >
+        استلام 15 نقطة
+    </button>
+</div>
 
-        <div
-            style="font-size:13pt;font-weight:900;"
-            id="reward-title"
-            data-i18n="rewardTitle"
-        >
-            مكافأة كل 12 ساعة
+<!-- Home -->
+<div id="home-page">
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+
+        <div class="stat-box">
+            <div class="stat-val" id="total-tasks-cnt">0</div>
+            <div class="stat-lbl" data-i18n="availableLinks">
+                الروابط المتاحة
+            </div>
         </div>
 
-        <div
-            style="font-size:9pt;color:var(--muted);margin:5px 0;"
-            id="reward-status"
-        >
-            احصل على 15 نقطة مجاناً
-        </div>
-
-        <button
-            class="btn btn-amber"
-            id="reward-btn"
-            onclick="claimReward()"
-        >
-            استلام 15 نقطة
-        </button>
-    </div>
-
-    <!-- Home -->
-    <div id="home-page">
-
-        <!-- Statistics -->
-        <div class="stats-grid">
-
-            <div class="stat-box">
-                <div class="stat-val" id="total-tasks-cnt">0</div>
-                <div class="stat-lbl" data-i18n="availableLinks">
-                    الروابط المتاحة
-                </div>
-            </div>
-
-            <div class="stat-box">
-                <div
-                    class="stat-val"
-                    id="pts-bal"
-                    style="color:var(--amber);"
-                >
-                    0
-                </div>
-
-                <div class="stat-lbl" data-i18n="currentBalance">
-                    رصيدك الحالي
-                </div>
-            </div>
-
-            <div class="stat-box">
-                <div class="stat-val" id="completed-cnt">0</div>
-
-                <div class="stat-lbl" data-i18n="visitedLinks">
-                    روابط زرتها
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Daily Visitors -->
-        <div class="card" style="text-align:center;">
-            <div style="font-size:24px;">👥</div>
-
+        <div class="stat-box">
             <div
-                style="font-size:16pt;font-weight:900;margin:4px 0;"
-                id="daily-visitors"
+                class="stat-val"
+                id="pts-bal"
+                style="color:var(--amber);"
             >
                 0
             </div>
 
-            <div
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="dailyVisitors"
-            >
-                زائر البوت اليوم
+            <div class="stat-lbl" data-i18n="currentBalance">
+                رصيدك الحالي
             </div>
         </div>
 
-        <!-- Active Task -->
-        <div class="card" id="task-card">
+        <div class="stat-box">
+            <div class="stat-val" id="completed-cnt">0</div>
 
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-            ">
-                <span
-                    style="font-weight:800;font-size:10pt;"
-                    id="task-user"
-                >
-                    ناشر الرابط
-                </span>
-
-                <span
-                    style="
-                        font-size:8pt;
-                        background:rgba(34,211,238,0.2);
-                        color:var(--cyan);
-                        padding:2px 6px;
-                        border-radius:6px;
-                    "
-                    id="task-left"
-                >
-                    متبقي: 0
-                </span>
+            <div class="stat-lbl" data-i18n="visitedLinks">
+                روابط زرتها
             </div>
-
-            <div
-                id="task-description"
-                style="
-                    font-size:8.5pt;
-                    color:var(--muted);
-                    line-height:1.6;
-                    margin-top:8px;
-                "
-            ></div>
-
-            <div class="link-box" id="task-url">
-                لا توجد مهمة حالياً
-            </div>
-
-            <button
-                class="btn btn-purple"
-                onclick="visitLink()"
-            >
-                ↗ زيارة الرابط (+2 نقطة)
-            </button>
-
-        </div>
-
-        <!-- My Link -->
-        <div class="card">
-
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                margin-bottom:8px;
-            ">
-
-                <span
-                    style="font-weight:800;font-size:10pt;"
-                    data-i18n="yourPublishedLink"
-                >
-                    رابطك المنشور
-                </span>
-
-                <button
-                    class="btn btn-emerald"
-                    style="width:auto;padding:4px 10px;"
-                    onclick="openModal('add-modal')"
-                    data-i18n="createTask"
-                >
-                    + إنشاء مهمة
-                </button>
-
-            </div>
-
-            <div
-                id="my-task-info"
-                style="font-size:8.5pt;color:var(--muted);"
-            >
-                لا يوجد رابط مضاف حالياً.
-            </div>
-
         </div>
 
     </div>
 
-    <!-- Buy Points Modal -->
-    <div class="modal" id="buy-modal">
+    <!-- Daily Visitors -->
+    <div class="card" style="text-align:center;">
+        <div style="font-size:24px;">👥</div>
 
-        <div class="modal-box">
-
-            <h3
-                style="margin-bottom:10px;font-size:12pt;"
-                data-i18n="buyPointsTitle"
-            >
-                شراء النقاط بعملة Gram 💎
-            </h3>
-
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="choosePackage"
-            >
-                اختر الباقة:
-            </label>
-
-            <select class="inp" id="buy-pkg">
-                <option value="100">100 نقطة = 0.05 Gram</option>
-                <option value="300">300 نقطة = 0.15 Gram</option>
-                <option value="500">500 نقطة = 0.25 Gram</option>
-                <option value="1000">1000 نقطة = 0.50 Gram</option>
-            </select>
-
-            <div style="display:flex;gap:8px;">
-
-                <button
-                    class="btn btn-amber"
-                    onclick="buyPoints()"
-                    data-i18n="confirmPurchase"
-                >
-                    تأكيد الشراء
-                </button>
-
-                <button
-                    class="btn btn-purple"
-                    style="background:rgba(255,255,255,0.1);"
-                    onclick="closeModal('buy-modal')"
-                    data-i18n="cancel"
-                >
-                    إلغاء
-                </button>
-
-            </div>
-
+        <div
+            style="font-size:16pt;font-weight:900;margin:4px 0;"
+            id="daily-visitors"
+        >
+            0
         </div>
 
+        <div
+            style="font-size:8.5pt;color:var(--muted);"
+            data-i18n="dailyVisitors"
+        >
+            زائر البوت اليوم
+        </div>
     </div>
 
-    <!-- Add Task Modal -->
-    <div class="modal" id="add-modal">
+    <!-- Active Task -->
+    <div class="card" id="task-card">
 
-        <div class="modal-box">
-
-            <h3
-                style="margin-bottom:10px;font-size:12pt;"
-                data-i18n="newTaskTitle"
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        ">
+            <span
+                style="font-weight:800;font-size:10pt;"
+                id="task-user"
             >
-                إنشاء مهمة جديدة 🔗
-            </h3>
+                ناشر الرابط
+            </span>
 
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="taskLinkLabel"
-            >
-                رابط المهمة:
-            </label>
-
-            <input
-                type="url"
-                class="inp"
-                id="add-url"
-                placeholder="https://t.me/your_bot"
-            >
-
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="taskDescriptionLabel"
-            >
-                وصف المهمة:
-            </label>
-
-            <textarea
-                class="inp"
-                id="add-description"
-                placeholder="اكتب وصفاً مختصراً للمهمة"
-                rows="3"
-                style="resize:vertical;"
-            ></textarea>
-
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="requiredVisits"
-            >
-                عدد الزيارات المطلوبة:
-            </label>
-
-            <input
-                type="number"
-                class="inp"
-                id="add-cnt"
-                placeholder="من 1 إلى 20"
-                min="1"
-                max="20"
-            >
-
-            <div
+            <span
                 style="
                     font-size:8pt;
-                    color:var(--muted);
-                    margin-top:-8px;
-                    margin-bottom:12px;
-                    text-align:center;
+                    background:rgba(34,211,238,0.2);
+                    color:var(--cyan);
+                    padding:2px 6px;
+                    border-radius:6px;
                 "
-                data-i18n="taskCostInfo"
+                id="task-left"
             >
-                كل زيارة تكلف 2 نقطة
-            </div>
-
-            <div style="display:flex;gap:8px;">
-
-                <button
-                    class="btn btn-purple"
-                    style="background:var(--emerald);color:#0f172a;"
-                    onclick="addLink()"
-                    data-i18n="publishNow"
-                >
-                    نشر الآن
-                </button>
-
-                <button
-                    class="btn btn-purple"
-                    style="background:rgba(255,255,255,0.1);"
-                    onclick="closeModal('add-modal')"
-                    data-i18n="cancel"
-                >
-                    إلغاء
-                </button>
-
-            </div>
-
+                متبقي: 0
+            </span>
         </div>
+
+        <div
+            id="task-description"
+            style="
+                font-size:8.5pt;
+                color:var(--muted);
+                line-height:1.6;
+                margin-top:8px;
+            "
+        ></div>
+
+        <div class="link-box" id="task-url">
+            لا توجد مهمة حالياً
+        </div>
+
+        <button
+            class="btn btn-purple"
+            onclick="visitLink()"
+        >
+            ↗ زيارة الرابط (+2 نقطة)
+        </button>
 
     </div>
 
-    <!-- Withdraw Page -->
-    <div id="withdraw-page" style="display:none;">
+    <!-- My Link -->
+    <div class="card">
 
-        <div class="card">
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:8px;
+        ">
 
-            <div
-                style="
-                    font-size:18pt;
-                    font-weight:900;
-                    color:var(--cyan);
-                    margin-bottom:6px;
-                "
-                data-i18n="withdrawTitle"
+            <span
+                style="font-weight:800;font-size:10pt;"
+                data-i18n="yourPublishedLink"
             >
-                💰 سحب USDT
-            </div>
-
-            <p
-                style="
-                    font-size:9pt;
-                    color:var(--muted);
-                    line-height:1.7;
-                "
-                data-i18n="withdrawIntro"
-            >
-                كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.
-            </p>
-
-        </div>
-
-        <div class="card">
-
-            <div style="
-                display:grid;
-                grid-template-columns:1fr 1fr;
-                gap:8px;
-                margin-bottom:12px;
-            ">
-
-                <div class="stat-box">
-                    <div
-                        class="stat-val"
-                        id="withdraw-points-balance"
-                    >
-                        0
-                    </div>
-
-                    <div
-                        class="stat-lbl"
-                        data-i18n="pointsBalance"
-                    >
-                        رصيد النقاط
-                    </div>
-                </div>
-
-                <div class="stat-box">
-
-                    <div
-                        class="stat-val"
-                        id="withdraw-usdt-balance"
-                        style="color:var(--emerald);"
-                    >
-                        0.00
-                    </div>
-
-                    <div class="stat-lbl">
-                        USDT
-                    </div>
-
-                </div>
-
-            </div>
-
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="withdrawPointsLabel"
-            >
-                عدد النقاط المراد سحبها:
-            </label>
-
-            <input
-                type="number"
-                class="inp"
-                id="withdraw-points"
-                min="80"
-                step="20"
-                placeholder="80"
-            >
-
-            <div
-                id="withdraw-usdt-preview"
-                style="
-                    text-align:center;
-                    font-size:12pt;
-                    font-weight:900;
-                    color:var(--emerald);
-                    margin:-4px 0 12px;
-                "
-            >
-                0.00 USDT
-            </div>
-
-            <label
-                style="font-size:8.5pt;color:var(--muted);"
-                data-i18n="walletLabel"
-            >
-                عنوان محفظة USDT:
-            </label>
-
-            <input
-                type="text"
-                class="inp"
-                id="withdraw-wallet"
-                placeholder="TRC20 wallet address"
-                dir="ltr"
-            >
+                رابطك المنشور
+            </span>
 
             <button
                 class="btn btn-emerald"
-                onclick="requestWithdrawal()"
-                data-i18n="requestWithdraw"
+                style="width:auto;padding:4px 10px;"
+                onclick="openModal('add-modal')"
+                data-i18n="createTask"
             >
-                طلب السحب
+                + إنشاء مهمة
             </button>
 
-            <div
-                id="withdraw-history"
-                style="margin-top:14px;"
-            ></div>
+        </div>
+
+        <div
+            id="my-task-info"
+            style="font-size:8.5pt;color:var(--muted);"
+        >
+            لا يوجد رابط مضاف حالياً.
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Buy Points Modal -->
+<div class="modal" id="buy-modal">
+
+    <div class="modal-box">
+
+        <h3
+            style="margin-bottom:10px;font-size:12pt;"
+            data-i18n="buyPointsTitle"
+        >
+            شراء النقاط بعملة Gram 💎
+        </h3>
+
+        <label
+            style="font-size:8.5pt;color:var(--muted);"
+            data-i18n="choosePackage"
+        >
+            اختر الباقة:
+        </label>
+
+        <select class="inp" id="buy-pkg">
+            <option value="100">100 نقطة = 0.05 Gram</option>
+            <option value="300">300 نقطة = 0.15 Gram</option>
+            <option value="500">500 نقطة = 0.25 Gram</option>
+            <option value="1000">1000 نقطة = 0.50 Gram</option>
+        </select>
+
+        <div style="display:flex;gap:8px;">
+
+            <button
+                class="btn btn-amber"
+                onclick="buyPoints()"
+                data-i18n="confirmPurchase"
+            >
+                تأكيد الشراء
+            </button>
+
+            <button
+                class="btn btn-purple"
+                style="background:rgba(255,255,255,0.1);"
+                onclick="closeModal('buy-modal')"
+                data-i18n="cancel"
+            >
+                إلغاء
+            </button>
 
         </div>
 
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="nav">
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal" id="add-modal">
+
+    <div class="modal-box">
+
+        <h3
+            style="margin-bottom:10px;font-size:12pt;"
+            data-i18n="newTaskTitle"
+        >
+            إنشاء مهمة جديدة 🔗
+        </h3>
+
+        <label
+            style="font-size:8.5pt;color:var(--muted);"
+            data-i18n="taskLinkLabel"
+        >
+            رابط المهمة:
+        </label>
+
+        <input
+            type="url"
+            class="inp"
+            id="add-url"
+            placeholder="https://t.me/your_bot"
+        >
+
+        <label
+            style="font-size:8.5pt;color:var(--muted);"
+            data-i18n="taskDescriptionLabel"
+        >
+            وصف المهمة:
+        </label>
+
+        <textarea
+            class="inp"
+            id="add-description"
+            placeholder="اكتب وصفاً مختصراً للمهمة"
+            rows="3"
+            style="resize:vertical;"
+        ></textarea>
+
+        <label
+            style="font-size:8.5pt;color:var(--muted);"
+            data-i18n="requiredVisits"
+        >
+            عدد الزيارات المطلوبة:
+        </label>
+
+        <input
+            type="number"
+            class="inp"
+            id="add-cnt"
+            placeholder="من 1 إلى 20"
+            min="1"
+            max="20"
+        >
 
         <div
-            id="nav-home"
-            class="nav-item active"
-            onclick="showPage('home')"
+            style="
+                font-size:8pt;
+                color:var(--muted);
+                margin-top:-8px;
+                margin-bottom:12px;
+                text-align:center;
+            "
+            data-i18n="taskCostInfo"
         >
-            🏠<br>
-            <span data-i18n="home">الرئيسية</span>
+            كل زيارة تكلف 2 نقطة
         </div>
 
-        <div
-            id="nav-withdraw"
-            class="nav-item"
-            onclick="showPage('withdraw')"
-        >
-            💰<br>
-            <span data-i18n="withdraw">السحب</span>
-        </div>
+        <div style="display:flex;gap:8px;">
 
-        <div
-            class="nav-item"
-            onclick="alert(t('storeUnavailable'))"
-        >
-            💎<br>
-            <span data-i18n="store">المتجر</span>
+            <button
+                class="btn btn-purple"
+                style="background:var(--emerald);color:#0f172a;"
+                onclick="addLink()"
+                data-i18n="publishNow"
+            >
+                نشر الآن
+            </button>
+
+            <button
+                class="btn btn-purple"
+                style="background:rgba(255,255,255,0.1);"
+                onclick="closeModal('add-modal')"
+                data-i18n="cancel"
+            >
+                إلغاء
+            </button>
+
         </div>
 
     </div>
+
+</div>
+
+<!-- Withdraw Page -->
+<div id="withdraw-page" style="display:none;">
+
+    <div class="card">
+
+        <div
+            style="
+                font-size:18pt;
+                font-weight:900;
+                color:var(--cyan);
+                margin-bottom:6px;
+            "
+            data-i18n="withdrawTitle"
+        >
+            💰 سحب USDT
+        </div>
+
+        <p
+            style="
+                font-size:9pt;
+                color:var(--muted);
+                line-height:1.7;
+            "
+            data-i18n="withdrawIntro"
+        >
+            كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <div style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:8px;
+            margin-bottom:12px;
+        ">
+
+            <div class="stat-box">
+                <div
+                    class="stat-val"
+                    id="withdraw-points-balance"
+                >
+                    0
+                </div>
+
+                <div
+                    class="stat-lbl"
+                    data-i18n="pointsBalance"
+                >
+                    رصيد النقاط
+                </div>
+            </div>
+
+            <div class="stat-box">
+
+                <div
+                    class="stat-val"
+                    id="withdraw-usdt-balance"
+                    style="color:var(--emerald);"
+                >
+                    0.00
+                </div>
+
+                <div class="stat-lbl">
+                    USDT
+                </div>
+
+            </div>
+
+        </div>
+
+        <label
+            style="font-size:8.5pt;color:var(--muted);"
+            data-i18n="withdrawPointsLabel"
+        >
+            عدد النقاط المراد سحبها:
+        </label>
+
+        <input
+            type="number"
+            class="inp"
+            id="withdraw-points"
+            min="80"
+            step="20"
+            placeholder="80"
+        >
+
+        <div
+            id="withdraw-usdt-preview"
+            style="
+                text-align:center;
+                font-size:12pt;
+                font-weight:900;
+                color:var(--emerald);
+                margin:-4px 0 12px;
+            "
+        >
+            0.00 USDT
+        </div>
+
+        <label
+            style="font-size:8.5pt;color:var(--muted);"
+            data-i18n="walletLabel"
+        >
+            عنوان محفظة USDT:
+        </label>
+
+        <input
+            type="text"
+            class="inp"
+            id="withdraw-wallet"
+            placeholder="TRC20 wallet address"
+            dir="ltr"
+        >
+
+        <button
+            class="btn btn-emerald"
+            onclick="requestWithdrawal()"
+            data-i18n="requestWithdraw"
+        >
+            طلب السحب
+        </button>
+
+        <div
+            id="withdraw-history"
+            style="margin-top:14px;"
+        ></div>
+
+    </div>
+
+</div>
+
+<!-- Bottom Navigation -->
+<div class="nav">
+
+    <div
+        id="nav-home"
+        class="nav-item active"
+        onclick="showPage('home')"
+    >
+        🏠<br>
+        <span data-i18n="home">الرئيسية</span>
+    </div>
+
+    <div
+        id="nav-withdraw"
+        class="nav-item"
+        onclick="showPage('withdraw')"
+    >
+        💰<br>
+        <span data-i18n="withdraw">السحب</span>
+    </div>
+
+    <div
+        class="nav-item"
+        onclick="alert(t('storeUnavailable'))"
+    >
+        💎<br>
+        <span data-i18n="store">المتجر</span>
+    </div>
+
+</div>
 
 <script>
 
@@ -1099,6 +1093,63 @@
     const REWARD_POINTS = 15;
 
     const TASK_REWARD = 2;
+
+
+    /* ================================
+       WITHDRAW AUTO REFRESH
+    ================================= */
+
+    let withdrawalRefreshTimer = null;
+
+    let withdrawalLoading = false;
+
+
+    function startWithdrawalAutoRefresh() {
+
+        if (withdrawalRefreshTimer) {
+
+            clearInterval(
+                withdrawalRefreshTimer
+            );
+        }
+
+
+        withdrawalRefreshTimer =
+            setInterval(
+                async function () {
+
+                    const withdrawPage =
+                        document.getElementById(
+                            'withdraw-page'
+                        );
+
+
+                    if (
+                        !withdrawPage ||
+                        withdrawPage.style.display === 'none' ||
+                        !currentUser ||
+                        !navigator.onLine
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                     * منع إرسال طلب جديد إذا كان
+                     * الطلب السابق لم ينتهِ بعد.
+                     */
+
+                    if (withdrawalLoading) {
+                        return;
+                    }
+
+
+                    await loadWithdrawals();
+
+                },
+                5000
+            );
+    }
 
 
     /* ================================
@@ -1487,21 +1538,6 @@
 
             requestWithdraw:
                 'Request Withdrawal',
-
-            withdrawHistory:
-                'Withdrawal History',
-
-            noWithdrawals:
-                'No withdrawal requests.',
-
-            withdrawalPending:
-                'Pending',
-
-            withdrawalPaid:
-                'Paid',
-
-            withdrawalRejected:
-                'Rejected',
 
             withdrawSuccess:
                 'Withdrawal request submitted ✅',
@@ -2349,10 +2385,6 @@
 
         try {
 
-            /*
-             * كل زيارة = 2 نقطة
-             */
-
             pts =
                 await awardPoints(
                     TASK_REWARD
@@ -2817,6 +2849,18 @@
         }
 
 
+        /*
+         * منع تداخل أكثر من طلب تحميل
+         * في نفس الوقت.
+         */
+
+        if (withdrawalLoading) {
+            return;
+        }
+
+        withdrawalLoading = true;
+
+
         try {
 
             const {
@@ -2839,6 +2883,7 @@
 
             if (
                 !data ||
+                !Array.isArray(data) ||
                 !data.length
             ) {
 
@@ -2861,27 +2906,58 @@
                 data
                     .map(row => {
 
+                        /*
+                         * توحيد حالة الطلب القادمة
+                         * من Supabase.
+                         */
+
                         const status =
                             String(
                                 row.status ||
                                 'pending'
-                            );
+                            )
+                            .trim()
+                            .toLowerCase();
 
 
-                        const statusText =
+                        let statusText;
+                        let statusColor;
+
+
+                        if (
                             status === 'paid'
-                                ? t(
+                        ) {
+
+                            statusText =
+                                t(
                                     'withdrawalPaid'
-                                )
-                                :
+                                );
+
+                            statusColor =
+                                '#34d399';
+
+                        } else if (
                             status === 'rejected'
-                                ? t(
+                        ) {
+
+                            statusText =
+                                t(
                                     'withdrawalRejected'
-                                )
-                                :
+                                );
+
+                            statusColor =
+                                '#f87171';
+
+                        } else {
+
+                            statusText =
                                 t(
                                     'withdrawalPending'
                                 );
+
+                            statusColor =
+                                '#fbbf24';
+                        }
 
 
                         return `
@@ -2899,6 +2975,7 @@
                                     display:flex;
                                     justify-content:space-between;
                                     gap:8px;
+                                    align-items:center;
                                 ">
 
                                     <b>
@@ -2913,7 +2990,9 @@
                                     </b>
 
                                     <span style="
-                                        color:var(--cyan);
+                                        color:${statusColor};
+                                        font-weight:800;
+                                        white-space:nowrap;
                                     ">
                                         ${escapeHtml(
                                             statusText
@@ -2959,16 +3038,31 @@
                 err
             );
 
-            box.innerHTML =
-                `
-                <div style="
-                    text-align:center;
-                    color:#fca5a5;
-                    font-size:9pt;
-                ">
-                    ${t('withdrawLoadError')}
-                </div>
-                `;
+            /*
+             * لا نمسح آخر حالة صحيحة ظهرت للمستخدم
+             * إذا فشل تحديث واحد بسبب الإنترنت.
+             */
+
+            if (
+                !box.innerHTML ||
+                box.innerHTML.trim() === ''
+            ) {
+
+                box.innerHTML =
+                    `
+                    <div style="
+                        text-align:center;
+                        color:#fca5a5;
+                        font-size:9pt;
+                    ">
+                        ${t('withdrawLoadError')}
+                    </div>
+                    `;
+            }
+
+        } finally {
+
+            withdrawalLoading = false;
         }
     }
 
@@ -3030,16 +3124,6 @@
             return;
         }
 
-
-        /*
-         * كل زيارة = 2 نقطة
-         *
-         * لذلك إنشاء مهمة بـ:
-         * 1 زيارة = 2 نقاط
-         * 5 زيارات = 10 نقاط
-         * 10 زيارات = 20 نقطة
-         * 20 زيارة = 40 نقطة
-         */
 
         const totalCost =
             c * TASK_REWARD;
@@ -3389,10 +3473,6 @@
             );
 
 
-            /*
-             * تحميل المهام
-             */
-
             const {
                 data: taskRows,
                 error: taskError
@@ -3419,10 +3499,6 @@
             }
 
 
-            /*
-             * المهام التي أكملها المستخدم
-             */
-
             const {
                 data: completedRows,
                 error: completedError
@@ -3444,10 +3520,6 @@
                 throw completedError;
             }
 
-
-            /*
-             * عدد الإنجازات لكل مهمة
-             */
 
             const {
                 data: allCompletedRows,
@@ -3505,10 +3577,6 @@
                         )
                 );
 
-
-            /*
-             * بناء المهام للواجهة
-             */
 
             tasks =
                 (
@@ -3592,10 +3660,6 @@
                 });
 
 
-            /*
-             * مهمة المستخدم نفسه
-             */
-
             myLink =
                 tasks.find(
                     t =>
@@ -3638,15 +3702,22 @@
     applyLanguage();
 
     setTimeout(
-        () => loadData(),
+        async function () {
+
+            await loadData();
+
+            /*
+             * بدء التحديث التلقائي للسحب
+             * بعد تحميل المستخدم.
+             */
+
+            startWithdrawalAutoRefresh();
+
+        },
         0
     );
 
-</script>
-
-
-<!-- Connection Status -->
-<div
+</script><!-- Connection Status --><div
     id="connectionStatus"
     style="
         position:fixed;
@@ -3662,10 +3733,7 @@
     "
 >
     جاري فحص الاتصال...
-</div>
-
-
-<script>
+</div><script>
 
 (function () {
 
@@ -3736,11 +3804,7 @@
 
 })();
 
-</script>
-
-
-<!-- ADMIN -->
-<script>
+</script><!-- ADMIN --><script>
 
 (function () {
 
@@ -4232,11 +4296,7 @@
 
 })();
 
-</script>
-
-
-<!-- ADMIN PANEL -->
-<div
+</script><!-- ADMIN PANEL --><div
     id="adminPanel"
     style="
         display:none;
@@ -4249,99 +4309,94 @@
         overflow:auto;
         direction:rtl;
     "
->
+><div style="
+    max-width:500px;
+    margin:40px auto;
+    background:white;
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 4px 20px rgba(0,0,0,.15);
+">
 
+    <h2 style="
+        margin-top:0;
+    ">
+        ⚙️ لوحة الإدارة
+    </h2>
+
+
+    <!-- Users -->
     <div style="
-        max-width:500px;
-        margin:40px auto;
-        background:white;
-        border-radius:18px;
-        padding:20px;
-        box-shadow:0 4px 20px rgba(0,0,0,.15);
+        background:#f0f0f0;
+        border-radius:14px;
+        padding:18px;
+        margin-top:20px;
     ">
 
-        <h2 style="
-            margin-top:0;
-        ">
-            ⚙️ لوحة الإدارة
-        </h2>
-
-
-        <!-- Users -->
         <div style="
-            background:#f0f0f0;
-            border-radius:14px;
-            padding:18px;
-            margin-top:20px;
+            font-size:15px;
         ">
-
-            <div style="
-                font-size:15px;
-            ">
-                👥 عدد المستخدمين
-            </div>
-
-            <div
-                id="adminUsersCount"
-                style="
-                    font-size:32px;
-                    font-weight:bold;
-                    margin-top:8px;
-                "
-            >
-                --
-            </div>
-
+            👥 عدد المستخدمين
         </div>
 
-
-        <!-- Withdrawals -->
-        <div style="
-            background:#f0f0f0;
-            border-radius:14px;
-            padding:18px;
-            margin-top:20px;
-        ">
-
-            <div style="
-                font-size:15px;
-                font-weight:bold;
-            ">
-                💰 طلبات سحب USDT
-            </div>
-
-            <div
-                id="adminWithdrawals"
-                style="margin-top:12px;"
-            >
-                اضغط على الإدارة لتحميل الطلبات.
-            </div>
-
-        </div>
-
-
-        <button
-            id="closeAdminPanel"
+        <div
+            id="adminUsersCount"
             style="
-                width:100%;
-                margin-top:20px;
-                padding:13px;
-                border:0;
-                border-radius:12px;
-                background:#222;
-                color:white;
-                font-size:16px;
+                font-size:32px;
+                font-weight:bold;
+                margin-top:8px;
             "
         >
-            إغلاق
-        </button>
+            --
+        </div>
 
     </div>
 
+
+    <!-- Withdrawals -->
+    <div style="
+        background:#f0f0f0;
+        border-radius:14px;
+        padding:18px;
+        margin-top:20px;
+    ">
+
+        <div style="
+            font-size:15px;
+            font-weight:bold;
+        ">
+            💰 طلبات سحب USDT
+        </div>
+
+        <div
+            id="adminWithdrawals"
+            style="margin-top:12px;"
+        >
+            اضغط على الإدارة لتحميل الطلبات.
+        </div>
+
+    </div>
+
+
+    <button
+        id="closeAdminPanel"
+        style="
+            width:100%;
+            margin-top:20px;
+            padding:13px;
+            border:0;
+            border-radius:12px;
+            background:#222;
+            color:white;
+            font-size:16px;
+        "
+    >
+        إغلاق
+    </button>
+
 </div>
 
-
-<script>
+</div><script>
 
 document.getElementById(
     'closeAdminPanel'
@@ -4353,7 +4408,5 @@ document.getElementById(
         'none';
 };
 
-</script>
-
-</body>
+</script></body>
 </html>
