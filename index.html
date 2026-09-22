@@ -2171,63 +2171,11 @@
                     ${myLink.left ?? myLink.cnt ?? 0}
                 `;
 
-                <button
-                    class="btn btn-purple"
-                    style="margin-top:10px;background:#dc2626;"
-                    onclick="deleteMyTask()"
-                >
-                    🗑️ حذف مهمتي
-                </button>
-
             } else {
 
                 infoBox.innerText =
                     t('noPublishedLink');
             }
-        }
-    }
-
-
-    /* ================================
-       DELETE MY TASK
-    ================================= */
-
-    async function deleteMyTask() {
-
-        if (!ensureSupabase('حذف المهمة')) return;
-
-        if (!currentUser || !myLink) {
-            alert('ما عندك مهمة منشورة للحذف.');
-            return;
-        }
-
-        const ownerId = Number(myLink.owner_id);
-        const userId = Number(currentUser.telegram_id);
-
-        if (!ownerId || ownerId !== userId) {
-            alert('ما مسموح لك تحذف هذه المهمة.');
-            return;
-        }
-
-        if (!confirm('هل أنت متأكد من حذف مهمتك؟\n\nالنقاط التي دُفعت لإنشاء المهمة لن تعود إليك، والنقاط التي حصل عليها المستخدمون سابقاً لن تُسحب منهم.')) {
-            return;
-        }
-
-        try {
-            const { error } = await supabase
-                .from('tasks')
-                .delete()
-                .eq('id', Number(myLink.id))
-                .eq('owner_id', userId);
-
-            if (error) throw error;
-
-            myLink = null;
-            await loadData();
-            alert('تم حذف المهمة بنجاح. ✅');
-        } catch (err) {
-            console.error('deleteMyTask:', err);
-            alert('تعذر حذف المهمة. تأكد من وجود صلاحية DELETE لمالك المهمة في Supabase.');
         }
     }
 
