@@ -481,6 +481,37 @@
 
     </div>
 
+    <!-- My Tasks -->
+    <div class="card" id="my-tasks-card">
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:8px;
+        ">
+            <span
+                style="font-weight:800;font-size:10pt;"
+                data-i18n="myTasksTitle"
+            >
+                مهامي
+            </span>
+
+            <span
+                id="my-tasks-count"
+                style="font-size:8pt;color:var(--cyan);"
+            >
+                0
+            </span>
+        </div>
+
+        <div
+            id="my-tasks-list"
+            style="font-size:8.5pt;color:var(--muted);"
+        >
+            لا توجد مهام منشورة.
+        </div>
+    </div>
+
 </div>
 
 <!-- Buy Points Modal -->
@@ -655,7 +686,7 @@
             "
             data-i18n="withdrawIntro"
         >
-            كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.
+            كل 250 نقطة = 0.05 USDT. الحد الأدنى للسحب 0.05 USDT = 250 نقطة.
         </p>
 
     </div>
@@ -714,9 +745,9 @@
             type="number"
             class="inp"
             id="withdraw-points"
-            min="80"
-            step="20"
-            placeholder="80"
+            min="250"
+            step="250"
+            placeholder="250"
         >
 
         <div
@@ -1155,6 +1186,15 @@
 
     const TASK_REWARD = 2;
 
+    const WITHDRAW_MIN_POINTS =
+        250;
+
+    const WITHDRAW_STEP_POINTS =
+        250;
+
+    const WITHDRAW_USDT_PER_STEP =
+        0.05;
+
 
     /* ================================
        WITHDRAW AUTO REFRESH
@@ -1368,6 +1408,24 @@
             yourPublishedLink:
                 'رابطك المنشور',
 
+            myTasksTitle:
+                'مهامي',
+
+            noMyTasks:
+                'لا توجد مهام منشورة.',
+
+            deleteTask:
+                'حذف المهمة',
+
+            confirmDeleteTask:
+                'هل تريد حذف هذه المهمة نهائياً؟ لن يتم إرجاع أي نقاط.',
+
+            deleteTaskSuccess:
+                'تم حذف المهمة بدون إرجاع النقاط ✅',
+
+            deleteTaskError:
+                'تعذر حذف المهمة حالياً.',
+
             createTask:
                 '+ إنشاء مهمة',
 
@@ -1420,7 +1478,7 @@
                 '💰 سحب USDT',
 
             withdrawIntro:
-                'كل 20 نقطة = 0.01 USDT. الحد الأدنى للسحب 0.04 USDT = 80 نقطة.',
+                'كل 250 نقطة = 0.05 USDT. الحد الأدنى للسحب 0.05 USDT = 250 نقطة.',
 
             pointsBalance:
                 'رصيد النقاط',
@@ -1453,7 +1511,7 @@
                 'تم إرسال طلب السحب بنجاح ✅',
 
             invalidWithdraw:
-                'الحد الأدنى 80 نقطة، والنقاط يجب أن تكون من مضاعفات 20.',
+                'الحد الأدنى 250 نقطة، والنقاط يجب أن تكون من مضاعفات 250.',
 
             walletRequired:
                 'يرجى إدخال عنوان محفظة USDT.',
@@ -1570,6 +1628,24 @@
             yourPublishedLink:
                 'Your Published Link',
 
+            myTasksTitle:
+                'My Tasks',
+
+            noMyTasks:
+                'No published tasks.',
+
+            deleteTask:
+                'Delete Task',
+
+            confirmDeleteTask:
+                'Delete this task permanently? Points will not be refunded.',
+
+            deleteTaskSuccess:
+                'Task deleted without refunding points ✅',
+
+            deleteTaskError:
+                'Could not delete the task.',
+
             createTask:
                 '+ Create Task',
 
@@ -1622,7 +1698,7 @@
                 '💰 USDT Withdrawal',
 
             withdrawIntro:
-                '20 points = 0.01 USDT. Minimum withdrawal is 0.04 USDT = 80 points.',
+                '250 points = 0.05 USDT. Minimum withdrawal is 0.05 USDT = 250 points.',
 
             pointsBalance:
                 'Points Balance',
@@ -1640,7 +1716,7 @@
                 'Withdrawal request submitted ✅',
 
             invalidWithdraw:
-                'Minimum is 80 points, and points must be a multiple of 20.',
+                'Minimum is 250 points, and points must be a multiple of 250.',
 
             walletRequired:
                 'Please enter your USDT wallet address.',
@@ -2084,6 +2160,196 @@
        RENDER
     ================================= */
 
+    function getMyTasks() {
+
+        if (!currentUser) {
+            return [];
+        }
+
+        return tasks
+            .filter(task =>
+                Number(task.owner_id) ===
+                Number(currentUser.telegram_id)
+            )
+            .sort((a, b) =>
+                Number(b.id) - Number(a.id)
+            );
+    }
+
+
+    function renderMyTasks() {
+
+        const list =
+            document.getElementById(
+                'my-tasks-list'
+            );
+
+        const count =
+            document.getElementById(
+                'my-tasks-count'
+            );
+
+        if (!list) {
+            return;
+        }
+
+        const mine =
+            getMyTasks();
+
+        if (count) {
+            count.innerText =
+                mine.length;
+        }
+
+        if (!mine.length) {
+            list.innerHTML =
+                t('noMyTasks');
+            return;
+        }
+
+        list.innerHTML =
+            mine.map(task => `
+                <div style="
+                    border:1px solid var(--border);
+                    border-radius:10px;
+                    padding:10px;
+                    margin-bottom:8px;
+                ">
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        gap:8px;
+                        align-items:flex-start;
+                    ">
+                        <b style="
+                            color:var(--text);
+                            word-break:break-word;
+                        ">
+                            ${escapeHtml(
+                                task.title ||
+                                task.url ||
+                                'Task'
+                            )}
+                        </b>
+
+                        <button
+                            class="btn"
+                            style="
+                                width:auto;
+                                padding:5px 8px;
+                                background:#ef4444;
+                                color:#fff;
+                                font-size:8pt;
+                                flex-shrink:0;
+                            "
+                            onclick="deleteMyTask(${Number(task.id)})"
+                        >
+                            ${t('deleteTask')}
+                        </button>
+                    </div>
+
+                    <div style="
+                        margin-top:6px;
+                        direction:ltr;
+                        text-align:left;
+                        word-break:break-all;
+                    ">
+                        ${escapeHtml(task.url || '')}
+                    </div>
+
+                    <div style="
+                        margin-top:6px;
+                        color:var(--muted);
+                    ">
+                        ${t('remainingVisits')}
+                        ${Number(task.left || 0)}
+                    </div>
+                </div>
+            `).join('');
+    }
+
+
+    async function deleteMyTask(taskId) {
+
+        if (
+            !currentUser ||
+            !ensureSupabase('حذف المهمة')
+        ) {
+            return;
+        }
+
+        const task =
+            tasks.find(item =>
+                Number(item.id) ===
+                Number(taskId)
+            );
+
+        if (
+            !task ||
+            Number(task.owner_id) !==
+                Number(currentUser.telegram_id)
+        ) {
+            return;
+        }
+
+        if (
+            !window.confirm(
+                t('confirmDeleteTask')
+            )
+        ) {
+            return;
+        }
+
+        try {
+            const {
+                data,
+                error
+            } = await supabase.rpc(
+                'delete_my_task',
+                {
+                    p_user_id:
+                        currentUser.telegram_id,
+                    p_task_id:
+                        Number(taskId)
+                }
+            );
+
+            if (error || data !== true) {
+                throw error ||
+                    new Error(
+                        'Task was not deleted'
+                    );
+            }
+
+            tasks =
+                tasks.filter(item =>
+                    Number(item.id) !==
+                    Number(taskId)
+                );
+
+            if (
+                myLink &&
+                Number(myLink.id) ===
+                    Number(taskId)
+            ) {
+                myLink =
+                    getMyTasks()[0] ||
+                    null;
+            }
+
+            render();
+            alert(t('deleteTaskSuccess'));
+
+        } catch (err) {
+            console.error(
+                'deleteMyTask:',
+                err
+            );
+            alert(t('deleteTaskError'));
+        }
+    }
+
+
     function render() {
 
         const ptsEl =
@@ -2109,6 +2375,8 @@
         updateWithdrawUI();
 
         updateReferralUI();
+
+        renderMyTasks();
 
         const completedEl =
             document.getElementById(
@@ -2906,8 +3174,8 @@
 
         return (
             Number(points || 0) /
-            20
-        ) * 0.01;
+            WITHDRAW_STEP_POINTS
+        ) * WITHDRAW_USDT_PER_STEP;
     }
 
 
@@ -3019,8 +3287,8 @@
 
 
         if (
-            points < 80 ||
-            points % 20 !== 0
+            points < WITHDRAW_MIN_POINTS ||
+            points % WITHDRAW_STEP_POINTS !== 0
         ) {
 
             alert(
@@ -3793,10 +4061,6 @@
                     .from('tasks')
                     .select(
                         'id,title,description,reward_points,url,is_active,created_at,owner_id,required_visits'
-                    )
-                    .eq(
-                        'is_active',
-                        true
                     )
                     .order(
                         'created_at',
