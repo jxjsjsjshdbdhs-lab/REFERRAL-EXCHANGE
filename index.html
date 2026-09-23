@@ -348,6 +348,50 @@
         </div>
     </div>
 
+    <!-- Referrals -->
+    <div class="card" id="referral-card">
+        <div style="font-size:24px;">🔗</div>
+
+        <div
+            style="font-size:13pt;font-weight:900;margin:4px 0;"
+            data-i18n="referralTitle"
+        >
+            نظام الإحالات
+        </div>
+
+        <div
+            style="font-size:8.5pt;color:var(--muted);line-height:1.6;margin-bottom:8px;"
+            data-i18n="referralIntro"
+        >
+            شارك رابطك. تُفعّل الإحالة عند ضغط المستخدم الجديد على «ابدأ».
+        </div>
+
+        <div
+            class="link-box"
+            id="referral-link"
+            dir="ltr"
+            style="font-size:8pt;word-break:break-all;"
+        >
+            جارٍ تجهيز رابط الإحالة...
+        </div>
+
+        <button
+            class="btn btn-emerald"
+            style="margin-top:8px;"
+            onclick="copyReferralLink()"
+            data-i18n="copyReferral"
+        >
+            نسخ رابط الإحالة
+        </button>
+
+        <div
+            id="referral-count"
+            style="font-size:8.5pt;color:var(--cyan);margin-top:9px;"
+        >
+            الإحالات الفعّالة: 0
+        </div>
+    </div>
+
     <!-- Active Task -->
     <div class="card" id="task-card">
 
@@ -1077,6 +1121,23 @@
 
     let currentUser = null;
 
+    /*
+     * ضع اسم البوت بدون @ هنا، مثل:
+     * const REFERRAL_BOT_USERNAME = 'my_exchange_bot';
+     *
+     * يجب أن يفتح البوت التطبيق باستخدام startapp حتى يصل
+     * معامل ref_<telegram_id> إلى Telegram Web App.
+     */
+    const REFERRAL_BOT_USERNAME =
+        'Getttstsbot';
+
+    const REFERRAL_REWARD =
+        10;
+
+    let referralCount = 0;
+
+    let referralLink = '';
+
 
     /* ================================
        REWARD
@@ -1271,6 +1332,24 @@
             dailyVisitors:
                 'زائر البوت اليوم',
 
+            referralTitle:
+                'نظام الإحالات',
+
+            referralIntro:
+                'شارك رابطك. تُفعّل الإحالة عند ضغط المستخدم الجديد على «ابدأ».',
+
+            copyReferral:
+                'نسخ رابط الإحالة',
+
+            referralCopied:
+                'تم نسخ رابط الإحالة ✅',
+
+            referralLinkMissing:
+                'اضبط اسم البوت أولاً لإنشاء رابط الإحالة.',
+
+            referralsCount:
+                'الإحالات الفعّالة: {n}',
+
             rewardTitle:
                 'مكافأة كل 12 ساعة',
 
@@ -1454,6 +1533,24 @@
 
             dailyVisitors:
                 'Bot Visitors Today',
+
+            referralTitle:
+                'Referral System',
+
+            referralIntro:
+                'Share your link. A referral activates when a new user presses “Start”.',
+
+            copyReferral:
+                'Copy Referral Link',
+
+            referralCopied:
+                'Referral link copied ✅',
+
+            referralLinkMissing:
+                'Set the bot username first to create a referral link.',
+
+            referralsCount:
+                'Active referrals: {n}',
 
             rewardTitle:
                 'Reward Every 12 Hours',
@@ -2011,6 +2108,8 @@
 
         updateWithdrawUI();
 
+        updateReferralUI();
+
         const completedEl =
             document.getElementById(
                 'completed-cnt'
@@ -2232,6 +2331,212 @@
             getTelegramUser();
 
         return user?.id || null;
+    }
+
+    /* ================================
+       REFERRALS
+    ================================= */
+
+    function getReferralStartParam() {
+
+        const webApp =
+            window.Telegram?.WebApp;
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        return String(
+            webApp?.initDataUnsafe?.start_param ||
+            urlParams.get('startapp') ||
+            urlParams.get('start_param') ||
+            urlParams.get('tgWebAppStartParam') ||
+            ''
+        ).trim();
+    }
+
+
+    function getReferralReferrerId() {
+
+        const match =
+            getReferralStartParam()
+                .match(/^ref_(\d+)$/);
+
+        return match
+            ? Number(match[1])
+            : null;
+    }
+
+
+    function buildReferralLink(userId) {
+
+        if (
+            !userId ||
+            !REFERRAL_BOT_USERNAME ||
+            REFERRAL_BOT_USERNAME ===
+                'YOUR_BOT_USERNAME'
+        ) {
+            return '';
+        }
+
+        return `https://t.me/${encodeURIComponent(
+            REFERRAL_BOT_USERNAME.replace(/^@/, '')
+        )}?startapp=ref_${encodeURIComponent(userId)}`;
+    }
+
+
+    async function copyReferralLink() {
+
+        if (!referralLink) {
+            alert(t('referralLinkMissing'));
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(
+                referralLink
+            );
+        } catch (_) {
+            const input =
+                document.createElement('textarea');
+
+            input.value = referralLink;
+            input.style.position = 'fixed';
+            input.style.opacity = '0';
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            input.remove();
+        }
+
+        alert(t('referralCopied'));
+    }
+
+
+    async function loadReferralStats(userId) {
+
+        referralCount = 0;
+
+        if (
+            !userId ||
+            !ensureSupabase('تحميل الإحالات')
+        ) {
+            return;
+        }
+
+        try {
+            const {
+                data,
+                error
+            } = await supabase.rpc(
+                'get_referral_count',
+                {
+                    p_referrer_id: userId
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            referralCount =
+                Number(data || 0);
+
+        } catch (err) {
+            /*
+             * لا نوقف تحميل التطبيق إذا لم تُطبّق
+             * جداول الإحالات في Supabase بعد.
+             */
+            console.warn(
+                'loadReferralStats:',
+                err
+            );
+        }
+    }
+
+
+    async function registerReferralIfEligible(user) {
+
+        const referrerId =
+            getReferralReferrerId();
+
+        const referredId =
+            Number(user?.telegram_id);
+
+        if (
+            !referrerId ||
+            !referredId ||
+            referrerId === referredId ||
+            !ensureSupabase('تفعيل الإحالة')
+        ) {
+            return;
+        }
+
+        try {
+            const {
+                data,
+                error
+            } = await supabase.rpc(
+                'register_referral',
+                {
+                    p_referrer_id: referrerId,
+                    p_referred_id: referredId,
+                    p_reward_points: REFERRAL_REWARD
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            if (
+                data === true ||
+                data?.new_referral === true
+            ) {
+                alert(
+                    `🎉 تمت إحالتك بنجاح! حصل الداعي على ${REFERRAL_REWARD} نقطة.`
+                );
+            }
+
+        } catch (err) {
+            console.warn(
+                'registerReferralIfEligible:',
+                err
+            );
+        }
+    }
+
+
+    function updateReferralUI() {
+
+        const linkBox =
+            document.getElementById(
+                'referral-link'
+            );
+
+        const countBox =
+            document.getElementById(
+                'referral-count'
+            );
+
+        referralLink =
+            buildReferralLink(
+                currentUser?.telegram_id
+            );
+
+        if (linkBox) {
+            linkBox.innerText =
+                referralLink ||
+                t('referralLinkMissing');
+        }
+
+        if (countBox) {
+            countBox.innerText =
+                t('referralsCount', {
+                    n: referralCount
+                });
+        }
     }
 
 
@@ -3468,10 +3773,17 @@
                 user;
 
 
+            await registerReferralIfEligible(
+                user
+            );
+
             await grantWelcomeBonusIfNew(
                 user
             );
 
+            await loadReferralStats(
+                telegramUser.id
+            );
 
             const {
                 data: taskRows,
