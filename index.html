@@ -775,12 +775,8 @@
             type="text"
             class="inp"
             id="withdraw-wallet"
-            placeholder="TRC20 USDT wallet address"
+            placeholder="TRC20 wallet address"
             dir="ltr"
-            autocomplete="off"
-            maxlength="34"
-            minlength="34"
-            pattern="T[1-9A-HJ-NP-Za-km-z]{33}"
         >
 
         <button
@@ -1519,10 +1515,7 @@
                 'الحد الأدنى 250 نقطة، والنقاط يجب أن تكون من مضاعفات 250.',
 
             walletRequired:
-                'يرجى إدخال عنوان محفظة USDT على شبكة TRC20.',
-
-            invalidUsdtWallet:
-                'عنوان المحفظة غير صالح. يجب إدخال عنوان USDT على شبكة TRC20 (يبدأ بحرف T وطوله 34 خانة).',
+                'يرجى إدخال عنوان محفظة USDT.',
 
             withdrawLoadError:
                 'تعذر تحميل طلبات السحب.',
@@ -1727,10 +1720,7 @@
                 'Minimum is 250 points, and points must be a multiple of 250.',
 
             walletRequired:
-                'Please enter a USDT wallet address on the TRC20 network.',
-
-            invalidUsdtWallet:
-                'Invalid wallet address. Enter a USDT TRC20 address (starts with T and is 34 characters long).',
+                'Please enter your USDT wallet address.',
 
             withdrawLoadError:
                 'Could not load withdrawal requests.',
@@ -3262,23 +3252,6 @@
     );
 
 
-    /* ================================
-       USDT TRC20 WALLET VALIDATION
-       TRC20 addresses use the Base58 format:
-       - start with T
-       - exactly 34 characters
-       - no 0, O, I or l
-    ================================= */
-
-    function isValidUsdtTrc20Address(address) {
-
-        const wallet =
-            String(address || '').trim();
-
-        return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(wallet);
-    }
-
-
     async function requestWithdrawal() {
 
         if (
@@ -3332,25 +3305,6 @@
             alert(
                 t('walletRequired')
             );
-
-            return;
-        }
-
-
-        if (!isValidUsdtTrc20Address(wallet)) {
-
-            alert(
-                t('invalidUsdtWallet')
-            );
-
-            const walletInput =
-                document.getElementById(
-                    'withdraw-wallet'
-                );
-
-            if (walletInput) {
-                walletInput.focus();
-            }
 
             return;
         }
